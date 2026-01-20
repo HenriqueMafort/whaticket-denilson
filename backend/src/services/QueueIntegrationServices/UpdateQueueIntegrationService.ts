@@ -60,6 +60,15 @@ const UpdateQueueIntegrationService = async ({
 
   const integration = await ShowIntegrationService(integrationId, companyId);
 
+  if (name && name !== integration.name) {
+    const nameExists = await QueueIntegrations.findOne({
+      where: { name }
+    });
+    if (nameExists) {
+      throw new AppError("Já existe uma integração com esse nome.");
+    }
+  }
+
   await integration.update({
     type,
     name,
