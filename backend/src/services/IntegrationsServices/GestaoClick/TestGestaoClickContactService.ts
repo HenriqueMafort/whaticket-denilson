@@ -96,13 +96,22 @@ const normalizeName = (value?: string): string => {
     .join(" ");
 };
 
-const sameDateOnly = (a?: Date | null, b?: Date | null): boolean => {
-  if (!a || !b) return false;
+const toDate = (value?: Date | string | null): Date | null => {
+  if (!value) return null;
+  if (value instanceof Date) return value;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const sameDateOnly = (a?: Date | string | null, b?: Date | string | null): boolean => {
+  const dateA = toDate(a);
+  const dateB = toDate(b);
+  if (!dateA || !dateB) return false;
   const toKey = (d: Date) =>
     `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
       d.getDate()
     ).padStart(2, "0")}`;
-  return toKey(a) === toKey(b);
+  return toKey(dateA) === toKey(dateB);
 };
 
 const parseConfig = (jsonContent?: string): GestaoClickConfig => {
