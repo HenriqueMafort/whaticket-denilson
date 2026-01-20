@@ -18,6 +18,8 @@ import {
   TextField,
   Grid,
   Paper,
+  Chip,
+  InputAdornment,
 } from "@material-ui/core";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -129,6 +131,19 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
     status: "idle",
     message: ""
   });
+
+  const getPingChip = () => {
+    if (gcPingStatus.status === "ok") {
+      return <Chip size="small" label="OK" style={{ background: "#1bbf5e", color: "#fff" }} />;
+    }
+    if (gcPingStatus.status === "error") {
+      return <Chip size="small" label="Erro" style={{ background: "#e84d4d", color: "#fff" }} />;
+    }
+    if (gcPingStatus.status === "loading") {
+      return <Chip size="small" label="..." />;
+    }
+    return <Chip size="small" label="-" />;
+  };
 
   useEffect(() => {
     (async () => {
@@ -561,7 +576,14 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
                             fullWidth
                             variant="outlined"
                             margin="dense"
-                            InputProps={{ readOnly: true }}
+                            InputProps={{
+                              readOnly: true,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  {getPingChip()}
+                                </InputAdornment>
+                              )
+                            }}
                           />
                         </Grid>
                         <Grid item xs={12} md={6} xl={6}>
