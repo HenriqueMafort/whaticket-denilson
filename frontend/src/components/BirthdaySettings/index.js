@@ -414,6 +414,9 @@ const BirthdaySettings = () => {
                 InputLabelProps={{ shrink: true }}
                 helperText="Horário em que as mensagens automáticas serão enviadas"
               />
+              <Typography className={classes.helpText}>
+                Envio com atraso aleatorio entre 1 e 6 minutos por mensagem.
+              </Typography>
             </Grid>
 
             <Grid item xs={12} md={6}>
