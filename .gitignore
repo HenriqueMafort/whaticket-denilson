@@ -1,0 +1,22 @@
+# Node
+node_modules/
+dist/
+build/
+
+# Public / uploads / mídia (WhatsApp, imagens, áudios)
+public/
+uploads/
+media/
+
+# Logs
+logs/
+*.log
+
+# Cache / sessões
+.cache/
+.wwebjs_*
+sessions/
+auth_info/
+
+# Git lixo local
+.git/objects/

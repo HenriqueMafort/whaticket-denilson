@@ -1,0 +1,18 @@
+=======================================================
+API OFICIAL DO WHATSAPP - INFORMAÇÕES DE ACESSO
+=======================================================
+
+URL:            https://apioficial.zapgo.online
+Porta:          6000
+Banco:          zapgo_apioficial
+PM2 Process:    zapgo-apioficial
+Swagger:        https://apioficial.zapgo.online/swagger
+
+TOKEN ADMIN:    99168a988d2b66020282027563dcd219f41a240a286d532d87b3afec1027fa63
+
+Webhook Meta:
+https://apioficial.zapgo.online/v1/webhook/{companyId}/{conexaoId}
+
+=======================================================
+GUARDE ESTAS INFORMAÇÕES EM LOCAL SEGURO!
+=======================================================
