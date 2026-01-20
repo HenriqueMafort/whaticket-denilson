@@ -362,8 +362,9 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
     }
     let toastId;
     try {
-      toastId = toast.loading(
-        i18n.t("queueIntegrationModal.messages.gcSyncInProgress")
+      toastId = toast.info(
+        i18n.t("queueIntegrationModal.messages.gcSyncInProgress"),
+        { autoClose: false }
       );
       const { data } = await api.post(
         `/queueIntegration/${integrationId}/sync-gestaoclick`
@@ -378,24 +379,22 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
           data?.lastError !== undefined ? data.lastError : prevState.gcLastError,
         gcLastSyncAt: data?.lastSyncAt || prevState.gcLastSyncAt
       }));
+      if (toastId) {
+        toast.dismiss(toastId);
+      }
       const finishMessage = data?.ok
         ? data?.message || i18n.t("queueIntegrationModal.messages.gcSyncFinishedOk")
         : data?.message || i18n.t("queueIntegrationModal.messages.gcSyncFinishedError");
-      toast.update(toastId, {
-        render: finishMessage,
-        type: data?.ok ? "success" : "warning",
-        isLoading: false,
-        autoClose: 5000
-      });
+      if (data?.ok) {
+        toast.success(finishMessage);
+      } else {
+        toast.warning(finishMessage);
+      }
     } catch (err) {
       if (toastId) {
-        toast.update(toastId, {
-        render: i18n.t("queueIntegrationModal.messages.gcSyncFinishedError"),
-        type: "error",
-        isLoading: false,
-        autoClose: 5000
-        });
+        toast.dismiss(toastId);
       }
+      toast.error(i18n.t("queueIntegrationModal.messages.gcSyncFinishedError"));
       toastError(err);
     }
   };
