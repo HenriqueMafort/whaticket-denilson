@@ -12,9 +12,14 @@ import BirthdayService from "../services/BirthdayService/BirthdayService";
 let io: SocketIO;
 
 export const initIO = (httpServer: Server): SocketIO => {
+  const allowedOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "")
+    .split(",")
+    .map(origin => origin.trim())
+    .filter(Boolean);
+
   io = new SocketIO(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL
+      origin: allowedOrigins.length ? allowedOrigins : true
     }
   });
 
