@@ -360,8 +360,11 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
       toast.error(i18n.t("queueIntegrationModal.messages.gcSaveFirst"));
       return;
     }
+    let toastId;
     try {
-      toast.info(i18n.t("queueIntegrationModal.messages.gcSyncStarted"));
+      toastId = toast.loading(
+        i18n.t("queueIntegrationModal.messages.gcSyncInProgress")
+      );
       const { data } = await api.post(
         `/queueIntegration/${integrationId}/sync-gestaoclick`
       );
@@ -375,12 +378,24 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
           data?.lastError !== undefined ? data.lastError : prevState.gcLastError,
         gcLastSyncAt: data?.lastSyncAt || prevState.gcLastSyncAt
       }));
-      if (data?.ok) {
-        toast.success(data?.message || i18n.t("queueIntegrationModal.messages.gcSyncSuccess"));
-      } else {
-        toast.warning(data?.message || i18n.t("queueIntegrationModal.messages.gcSyncError"));
-      }
+      const finishMessage = data?.ok
+        ? data?.message || i18n.t("queueIntegrationModal.messages.gcSyncFinishedOk")
+        : data?.message || i18n.t("queueIntegrationModal.messages.gcSyncFinishedError");
+      toast.update(toastId, {
+        render: finishMessage,
+        type: data?.ok ? "success" : "warning",
+        isLoading: false,
+        autoClose: 5000
+      });
     } catch (err) {
+      if (toastId) {
+        toast.update(toastId, {
+        render: i18n.t("queueIntegrationModal.messages.gcSyncFinishedError"),
+        type: "error",
+        isLoading: false,
+        autoClose: 5000
+        });
+      }
       toastError(err);
     }
   };
