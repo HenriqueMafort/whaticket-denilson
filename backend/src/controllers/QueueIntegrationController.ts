@@ -6,6 +6,7 @@ import ListQueueIntegrationService from "../services/QueueIntegrationServices/Li
 import ShowQueueIntegrationService from "../services/QueueIntegrationServices/ShowQueueIntegrationService";
 import TestSessionIntegrationService from "../services/QueueIntegrationServices/TestSessionDialogflowService";
 import UpdateQueueIntegrationService from "../services/QueueIntegrationServices/UpdateQueueIntegrationService";
+import TestGestaoClickContactService from "../services/IntegrationsServices/GestaoClick/TestGestaoClickContactService";
 
 type IndexQuery = {
   searchParam: string;
@@ -118,4 +119,21 @@ export const testSession = async (req: Request, res: Response): Promise<Response
   });
 
   return res.status(200).json(response);
+};
+
+export const testGestaoClickContact = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { integrationId } = req.params;
+  const { testNumber } = req.body;
+  const { companyId } = req.user;
+
+  const result = await TestGestaoClickContactService(
+    integrationId,
+    companyId,
+    testNumber
+  );
+
+  return res.status(200).json(result);
 };

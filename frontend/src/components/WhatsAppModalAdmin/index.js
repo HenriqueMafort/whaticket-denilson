@@ -149,6 +149,9 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
   const [copied, setCopied] = useState(false);
   const [integrations, setIntegrations] = useState([]);
   const [schedulesEnabled, setSchedulesEnabled] = useState(false);
+  const botIntegrations = integrations.filter(
+    (integration) => integration.type !== "gestaoclick"
+  );
 
 
   const [schedules, setSchedules] = useState([
@@ -773,7 +776,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                         placeholder={i18n.t("queueModal.form.integrationId")}
                         labelId="integrationId-selection-label"                        >
                         <MenuItem value={null} >{"Desabilitado"}</MenuItem>
-                        {integrations.map((integration) => (
+                        {botIntegrations.map((integration) => (
                           <MenuItem key={integration.id} value={integration.id}>
                             {integration.name}
                           </MenuItem>

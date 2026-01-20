@@ -98,6 +98,14 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
     sgpIeSenha: "",
     sgpUrl: "",
     sgpWidePayToken: "",
+    // Gestao Click integration fields
+    gcAccessToken: "",
+    gcSecretToken: "",
+    gcBaseUrl: "",
+    gcLastSyncAt: "",
+    gcUpdatedCount: 0,
+    gcLastError: "",
+    gcTestNumber: ""
   };
 
   const [integration, setIntegration] = useState(initialState);
@@ -107,18 +115,27 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
       if (!integrationId) return;
       try {
         const { data } = await api.get(`/queueIntegration/${integrationId}`);
-        let sgpFromJson = {};
+        let configFromJson = {};
         try {
-          sgpFromJson = data?.jsonContent ? JSON.parse(data.jsonContent) : {};
+          configFromJson = data?.jsonContent ? JSON.parse(data.jsonContent) : {};
         } catch (e) {
           logError("Falha ao parsear jsonContent da integração", e);
         }
         setIntegration((prevState) => ({
           ...prevState,
           ...data,
-          sgpIeSenha: sgpFromJson.sgpIeSenha || prevState.sgpIeSenha,
-          sgpUrl: sgpFromJson.sgpUrl || prevState.sgpUrl,
-          sgpWidePayToken: sgpFromJson.sgpWidePayToken || prevState.sgpWidePayToken,
+          sgpIeSenha: configFromJson.sgpIeSenha || prevState.sgpIeSenha,
+          sgpUrl: configFromJson.sgpUrl || prevState.sgpUrl,
+          sgpWidePayToken: configFromJson.sgpWidePayToken || prevState.sgpWidePayToken,
+          gcAccessToken: configFromJson.gcAccessToken || prevState.gcAccessToken,
+          gcSecretToken: configFromJson.gcSecretToken || prevState.gcSecretToken,
+          gcBaseUrl: configFromJson.gcBaseUrl || prevState.gcBaseUrl,
+          gcLastSyncAt: data?.gcLastSyncAt || prevState.gcLastSyncAt,
+          gcUpdatedCount:
+            typeof data?.gcUpdatedCount === "number"
+              ? data.gcUpdatedCount
+              : prevState.gcUpdatedCount,
+          gcLastError: data?.gcLastError || prevState.gcLastError
         }));
       } catch (err) {
         toastError(err);
@@ -126,15 +143,7 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
     })();
 
     return () => {
-      setIntegration({
-        type: "dialogflow",
-        name: "",
-        projectName: "",
-        jsonContent: "",
-        language: "",
-        urlN8N: "",
-        typebotDelayMessage: 1000,
-      });
+      setIntegration(initialState);
     };
   }, [integrationId, open]);
 
@@ -166,7 +175,8 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
         values.type === "webhook" ||
         values.type === "typebot" ||
         values.type === "flowbuilder" ||
-        values.type === "SGP"
+        values.type === "SGP" ||
+        values.type === "gestaoclick"
       ) {
         values.projectName = values.name;
       }
@@ -180,6 +190,18 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
           return;
         }
         logInfo("Salvando integração SGP", { name: values.name });
+      }
+      if (values.type === "gestaoclick") {
+        const errors = [];
+        if (!values.name) errors.push("Nome da integração é obrigatório.");
+        if (!values.gcAccessToken) errors.push("Access Token é obrigatório.");
+        if (!values.gcSecretToken) errors.push("Secret Token é obrigatório.");
+        if (errors.length) {
+          errors.forEach((e) => toast.error(e));
+          logError("Falha de validação Gestao Click", { errors, values });
+          return;
+        }
+        logInfo("Salvando integração Gestao Click", { name: values.name });
       }
       // Persist SGP settings into jsonContent
       let payload = { ...values };
@@ -203,6 +225,29 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
         delete payload.sgpUrl;
         delete payload.sgpWidePayToken;
       }
+      if (values.type === "gestaoclick") {
+        let baseJson = {};
+        try {
+          baseJson = values.jsonContent ? JSON.parse(values.jsonContent) : {};
+        } catch {}
+        const jsonContent = {
+          ...baseJson,
+          gcAccessToken: values.gcAccessToken,
+          gcSecretToken: values.gcSecretToken,
+          gcBaseUrl: values.gcBaseUrl,
+        };
+        payload = {
+          ...values,
+          jsonContent: JSON.stringify(jsonContent),
+        };
+        delete payload.gcAccessToken;
+        delete payload.gcSecretToken;
+        delete payload.gcBaseUrl;
+        delete payload.gcLastSyncAt;
+        delete payload.gcUpdatedCount;
+        delete payload.gcLastError;
+        delete payload.gcTestNumber;
+      }
 
       if (integrationId) {
         await api.put(`/queueIntegration/${integrationId}`, payload);
@@ -212,6 +257,27 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
         toast.success(i18n.t("queueIntegrationModal.messages.addSuccess"));
       }
       handleClose();
+    } catch (err) {
+      toastError(err);
+    }
+  };
+
+  const handleTestGestaoClick = async (values) => {
+    if (!integrationId) {
+      toast.error(i18n.t("queueIntegrationModal.messages.gcSaveFirst"));
+      return;
+    }
+    try {
+      const { data } = await api.post(
+        `/queueIntegration/${integrationId}/test-gestaoclick`,
+        { testNumber: values.gcTestNumber }
+      );
+      const statusMsg = data?.message || i18n.t("queueIntegrationModal.messages.gcTestSuccess");
+      if (data?.updated || data?.created) {
+        toast.success(statusMsg);
+      } else {
+        toast.warning(statusMsg);
+      }
     } catch (err) {
       toastError(err);
     }
@@ -269,6 +335,7 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
                           required
                         >
                           <MenuItem value="SGP">SGP</MenuItem>
+                          <MenuItem value="gestaoclick">Gestao Click</MenuItem>
                           <MenuItem value="dialogflow">DialogFlow</MenuItem>
                           <MenuItem value="n8n">N8N</MenuItem>
                           <MenuItem value="webhook">WebHooks</MenuItem>
@@ -343,6 +410,111 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
                             fullWidth
                             variant="outlined"
                             margin="dense"
+                          />
+                        </Grid>
+                      </>
+                    )}
+                    {values.type === "gestaoclick" && (
+                      <>
+                        <Grid item xs={12} md={6} xl={6}>
+                          <Field
+                            as={TextField}
+                            label={i18n.t("queueIntegrationModal.form.name")}
+                            autoFocus
+                            name="name"
+                            fullWidth
+                            error={touched.name && Boolean(errors.name)}
+                            helpertext={touched.name && errors.name}
+                            variant="outlined"
+                            margin="dense"
+                            className={classes.textField}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6} xl={6}>
+                          <Field
+                            as={TextField}
+                            label={i18n.t("queueIntegrationModal.form.gcAccessToken")}
+                            name="gcAccessToken"
+                            error={touched.gcAccessToken && Boolean(errors.gcAccessToken)}
+                            helpertext={touched.gcAccessToken && errors.gcAccessToken}
+                            fullWidth
+                            variant="outlined"
+                            margin="dense"
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6} xl={6}>
+                          <Field
+                            as={TextField}
+                            label={i18n.t("queueIntegrationModal.form.gcSecretToken")}
+                            name="gcSecretToken"
+                            error={touched.gcSecretToken && Boolean(errors.gcSecretToken)}
+                            helpertext={touched.gcSecretToken && errors.gcSecretToken}
+                            fullWidth
+                            variant="outlined"
+                            margin="dense"
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6} xl={6}>
+                          <Field
+                            as={TextField}
+                            label={i18n.t("queueIntegrationModal.form.gcBaseUrl")}
+                            name="gcBaseUrl"
+                            error={touched.gcBaseUrl && Boolean(errors.gcBaseUrl)}
+                            helpertext={touched.gcBaseUrl && errors.gcBaseUrl}
+                            fullWidth
+                            variant="outlined"
+                            margin="dense"
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6} xl={6}>
+                          <Field
+                            as={TextField}
+                            label={i18n.t("queueIntegrationModal.form.gcTestNumber")}
+                            name="gcTestNumber"
+                            fullWidth
+                            variant="outlined"
+                            margin="dense"
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6} xl={6}>
+                          <Button
+                            onClick={() => handleTestGestaoClick(values)}
+                            color="primary"
+                            variant="outlined"
+                            style={{ marginTop: 8 }}
+                            disabled={!values.gcTestNumber}
+                          >
+                            {i18n.t("queueIntegrationModal.buttons.gcTest")}
+                          </Button>
+                        </Grid>
+                        <Grid item xs={12} md={6} xl={6}>
+                          <TextField
+                            label={i18n.t("queueIntegrationModal.form.gcLastSyncAt")}
+                            value={values.gcLastSyncAt || ""}
+                            fullWidth
+                            variant="outlined"
+                            margin="dense"
+                            InputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6} xl={6}>
+                          <TextField
+                            label={i18n.t("queueIntegrationModal.form.gcUpdatedCount")}
+                            value={values.gcUpdatedCount || 0}
+                            fullWidth
+                            variant="outlined"
+                            margin="dense"
+                            InputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={12} xl={12}>
+                          <TextField
+                            label={i18n.t("queueIntegrationModal.form.gcLastError")}
+                            value={values.gcLastError || ""}
+                            fullWidth
+                            variant="outlined"
+                            margin="dense"
+                            InputProps={{ readOnly: true }}
                           />
                         </Grid>
                       </>

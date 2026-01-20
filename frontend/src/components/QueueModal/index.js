@@ -160,6 +160,9 @@ const QueueModal = ({ open, onClose, queueId, onEdit }) => {
   const [allQueues, setAllQueues] = useState([]);
   const [userOptions, setUserOptions] = useState([]);
   const isMounted = useRef(true);
+  const botIntegrations = integrations.filter(
+    (integration) => integration.type !== "gestaoclick"
+  );
 
   const initialStateSchedule = [
     { weekday: i18n.t("queueModal.serviceHours.monday"), weekdayEn: "monday", startTimeA: "08:00", endTimeA: "12:00", startTimeB: "13:00", endTimeB: "18:00" },
@@ -657,7 +660,7 @@ const QueueModal = ({ open, onClose, queueId, onEdit }) => {
                           value={values.integrationId || ""}
                         >
                           <MenuItem value={""} >{"Nenhum"}</MenuItem>
-                          {integrations.map((integration) => (
+                          {botIntegrations.map((integration) => (
                             <MenuItem key={integration.id} value={integration.id}>
                               {integration.name}
                             </MenuItem>
@@ -1172,7 +1175,7 @@ const QueueModal = ({ open, onClose, queueId, onEdit }) => {
                                                       // value={`chatbots[${index}].optQueueId`}
                                                       className={classes.textField1}
                                                     >
-                                                      {integrations.map(integration => (
+                                                      {botIntegrations.map(integration => (
                                                         <MenuItem key={integration.id} value={integration.id}>
                                                           {integration.name}
                                                         </MenuItem>

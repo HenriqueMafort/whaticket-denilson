@@ -47,6 +47,7 @@ import ContactTag from "./models/ContactTag";
 import Plan from "./models/Plan";
 import { getWbot } from "./libs/wbot";
 import { initializeBirthdayJobs } from "./jobs/BirthdayJob";
+import SyncGestaoClickBirthdaysService from "./services/IntegrationsServices/GestaoClick/SyncGestaoClickBirthdaysService";
 import { getJidOf } from "./services/WbotServices/getJidOf";
 import RecurrenceService from "./services/CampaignService/RecurrenceService";
 import WhatsappLidMap from "./models/WhatsapplidMap";
@@ -63,6 +64,7 @@ import delay from "./utils/delay";
 const connection = process.env.REDIS_URI || "";
 const limiterMax = process.env.REDIS_OPT_LIMITER_MAX || 1;
 const limiterDuration = process.env.REDIS_OPT_LIMITER_DURATION || 3000;
+const GESTAOCLICK_CRON = "0 0 3 * * *";
 
 interface ProcessCampaignData {
   id: number;
@@ -2831,10 +2833,31 @@ async function handleInvoiceCreate() {
   job.start();
 }
 
+const startGestaoClickSyncJob = () => {
+  const job = new CronJob(
+    GESTAOCLICK_CRON,
+    async () => {
+      logger.info("GestaoClick sync job started");
+      try {
+        await SyncGestaoClickBirthdaysService();
+        logger.info("GestaoClick sync job completed");
+      } catch (error) {
+        logger.error("GestaoClick sync job failed", error);
+      }
+    },
+    null,
+    true,
+    "America/Sao_Paulo"
+  );
+
+  return job;
+};
+
 handleInvoiceCreate();
 handleProcessLanes();
 handleCloseTicketsAutomatic();
 handleRandomUser();
+startGestaoClickSyncJob();
 
 async function handleLidRetry(job) {
   try {

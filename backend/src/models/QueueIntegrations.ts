@@ -77,6 +77,16 @@ class QueueIntegrations extends Model<QueueIntegrations> {
 
     @Column
     typebotRestartMessage: string;
+
+    @Column(DataType.DATE)
+    gcLastSyncAt: Date;
+
+    @Default(0)
+    @Column
+    gcUpdatedCount: number;
+
+    @Column(DataType.TEXT)
+    gcLastError: string;
 }
 
 export default QueueIntegrations;

@@ -197,6 +197,9 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, channel }) => {
   const { user } = useContext(AuthContext);
   const [isOficial, setIsOficial] = useState(false);
   const [useWhatsappOfficial, setUseWhatsappOfficial] = useState(false);
+  const botIntegrations = integrations.filter(
+    (integration) => integration.type !== "gestaoclick"
+  );
   const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
 
   const [schedules, setSchedules] = useState([
@@ -1300,7 +1303,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, channel }) => {
                           labelId="integrationId-selection-label"
                         >
                           <MenuItem value={null}>{"Desabilitado"}</MenuItem>
-                          {integrations.map((integration) => (
+                          {botIntegrations.map((integration) => (
                             <MenuItem
                               key={integration.id}
                               value={integration.id}

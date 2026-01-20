@@ -17,4 +17,10 @@ queueIntegrationRoutes.delete("/queueIntegration/:integrationId", isAuth, QueueI
 
 queueIntegrationRoutes.post("/queueIntegration/testsession", isAuth, QueueIntegrationController.testSession);
 
+queueIntegrationRoutes.post(
+  "/queueIntegration/:integrationId/test-gestaoclick",
+  isAuth,
+  QueueIntegrationController.testGestaoClickContact
+);
+
 export default queueIntegrationRoutes;

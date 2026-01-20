@@ -92,6 +92,9 @@ export default function VerticalLinearStepper(props) {
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedQueue, setSelectedQueue] = useState("");
   const [selectedQueueOption, setSelectedQueueOption] = useState("");
+  const botIntegrations = integrations.filter(
+    (integration) => integration.type !== "gestaoclick"
+  );
 
   const { findAll: findAllQueues } = useQueues();
   const [allQueues, setAllQueues] = useState([]);
@@ -677,7 +680,7 @@ export default function VerticalLinearStepper(props) {
                                                 helpertext={touched?.options?.[index]?.optIntegrationId && errors?.options?.[index]?.optIntegrationId}
                                               // value={`options[${index}].optQueueId`}
                                               >
-                                                {integrations.map(integration => (
+                                                {botIntegrations.map(integration => (
                                                   <MenuItem key={integration.id} value={integration.id}>
                                                     {integration.name}
                                                   </MenuItem>
