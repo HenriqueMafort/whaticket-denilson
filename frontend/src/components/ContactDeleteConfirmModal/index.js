@@ -36,6 +36,7 @@ const ContactDeleteConfirmModal = ({
   deleteType, // 'selected' ou 'all'
   selectedCount,
   totalCount,
+  maxBulkDelete
 }) => {
   const classes = useStyles();
   const [confirmText, setConfirmText] = useState("");
@@ -91,6 +92,11 @@ const ContactDeleteConfirmModal = ({
         <Typography variant="body2">
           Os contatos selecionados e seus dados relacionados serão excluídos definitivamente.
         </Typography>
+        {maxBulkDelete ? (
+          <Typography variant="caption" display="block" color="textSecondary">
+            Limite por vez: {maxBulkDelete} contatos.
+          </Typography>
+        ) : null}
       </>
     );
   };

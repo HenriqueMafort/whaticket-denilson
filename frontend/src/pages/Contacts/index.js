@@ -187,6 +187,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Contacts = () => {
+  const MAX_BULK_DELETE = 1000;
   const classes = useStyles();
   const history = useHistory();
   const { user, socket } = useContext(AuthContext);
@@ -308,6 +309,10 @@ const Contacts = () => {
     if (selectAllMode) {
       setDeleteType('all');
     } else if (selectedContacts.size > 0) {
+      if (selectedContacts.size > MAX_BULK_DELETE) {
+        toast.warning(`Limite de exclus?o por vez: ${MAX_BULK_DELETE} contatos`);
+        return;
+      }
       setDeleteType('selected');
     } else {
       toast.warning("Selecione pelo menos um contato para excluir");
@@ -624,6 +629,7 @@ const Contacts = () => {
         deleteType={deleteType}
         selectedCount={selectedContacts.size}
         totalCount={totalContactsCount}
+        maxBulkDelete={MAX_BULK_DELETE}
       />
       
       {/* Modal para visualizar imagem de perfil */}
