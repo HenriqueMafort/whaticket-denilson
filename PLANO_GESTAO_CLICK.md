@@ -96,5 +96,47 @@ dos clientes com contatos do Whaticket, via job diario. Sem usar SGP.
 - Registrar falha e mostrar motivo no UI.
 
 ## Pendencias
-- Validar baseUrl real da API quando tokens estiverem disponiveis.
-- Definir horario exato do cron (03:00 e sugestao).
+~~- Validar baseUrl real da API quando tokens estiverem disponiveis.~~
+~~- Definir horario exato do cron (03:00 e sugestao).~~
+Status: pendencias resolvidas.
+
+## Plano tecnico - Correção de contatos com nome = numero/LID
+Objetivo: evitar contatos com nome numérico ou LID e corrigir os já existentes.
+
+### Diagnostico (onde acontece hoje)
+- `backend/src/queues.ts`: cria contato com `name: \`${validNumber}\`` (nome vira numero).
+- `backend/src/services/ContactServices/CreateOrUpdateContactService.ts`:
+  - só atualiza `name` quando `contact.name === number`, então nomes numéricos
+    permanecem se não houver outro gatilho.
+- `backend/src/jobs/LidSyncJob.ts`: sincroniza `lid` mas não corrige `name`.
+
+### Regras de normalizacao de nome
+- Considerar inválido se:
+  - `name` é só dígitos
+  - contém `@lid` ou padrão LID
+  - comprimento excessivo sem espaços (ex.: 16+ dígitos)
+- Fonte de nome (prioridade):
+  1) `pushName` da mensagem recebida
+  2) nome vindo da API/integração (quando aplicável)
+  3) nome do perfil no WA (quando disponível)
+  4) fallback: "Contato <numero>"
+
+### Ajustes em fluxo de criação/atualização (sem implementar)
+- `backend/src/queues.ts`:
+  - ao criar contato, usar `pushName` quando existir
+  - evitar `name = number` puro
+- `backend/src/services/ContactServices/CreateOrUpdateContactService.ts`:
+  - se `contact.name` inválido, substituir pelo melhor nome disponível
+  - preservar nomes válidos (não sobrescrever nomes bons)
+
+### Job de limpeza (backfill)
+- Script/Job:
+  - buscar contatos com `name` inválido
+  - tentar resolver nome real (pushName último, perfil WA)
+  - atualizar `name` quando encontrar valor válido
+- Log:
+  - total analisados / corrigidos
+
+### Observacoes
+- Não alterar contatos de grupo (isGroup = true) sem validação específica.
+- Evitar sobrescrever nomes ajustados manualmente por usuário.
