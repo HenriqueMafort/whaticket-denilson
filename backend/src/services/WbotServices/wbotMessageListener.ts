@@ -458,6 +458,17 @@ const getContactMessage = async (msg: proto.IWebMessageInfo, wbot: Session) => {
       logger.info(
         `[PUSHNAME-DEBUG] number=${candidate} fromMe=${msg.key.fromMe} isGroup=${isGroup} pushName=${msg.pushName || ""} remoteJid=${remoteJid} lid=${lid || ""}`
       );
+      if (process.env.PUSHNAME_DEBUG_PAYLOAD === "1") {
+        try {
+          logger.info(
+            `[PUSHNAME-PAYLOAD] number=${candidate} msg=${JSON.stringify(msg)}`
+          );
+        } catch (error) {
+          logger.warn(
+            `[PUSHNAME-PAYLOAD] number=${candidate} failed to stringify: ${error?.message || error}`
+          );
+        }
+      }
     }
   }
   // Usa o identificador normalizado que considera o lid
