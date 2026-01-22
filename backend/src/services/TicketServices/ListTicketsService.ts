@@ -44,6 +44,7 @@ interface Request {
   allTicket?: string;
   sortTickets?: string;
   searchOnMessages?: string;
+  awaiting?: string;
 }
 
 interface Response {
@@ -70,7 +71,8 @@ const ListTicketsService = async ({
   statusFilters,
   companyId,
   sortTickets = "DESC",
-  searchOnMessages = "false"
+  searchOnMessages = "false",
+  awaiting
 }: Request): Promise<Response> => {
   const user = await ShowUserService(userId, companyId);
 
@@ -273,6 +275,16 @@ const ListTicketsService = async ({
     whereCondition = {
       ...whereCondition,
       status: showAll === "true" && status === "pending" ? { [Op.or]: [status, "lgpd"] } : status
+    };
+  }
+
+  if (awaiting === "agent" || awaiting === "customer") {
+    whereCondition = {
+      ...whereCondition,
+      isGroup: false,
+      status: { [Op.in]: ["open", "pending"] },
+      fromMe: awaiting === "agent",
+      unreadMessages: awaiting === "customer" ? { [Op.gt]: 0 } : 0
     };
   }
 
@@ -531,7 +543,7 @@ const ListTicketsService = async ({
   const { count, rows: tickets } = await Ticket.findAndCountAll({
     where: whereCondition,
     include: includeCondition,
-    attributes: ["id", "uuid", "userId", "queueId", "isGroup", "channel", "status", "contactId", "useIntegration", "lastMessage", "updatedAt", "unreadMessages"],
+    attributes: ["id", "uuid", "userId", "queueId", "isGroup", "channel", "status", "contactId", "useIntegration", "lastMessage", "updatedAt", "unreadMessages", "fromMe"],
     distinct: true,
     limit,
     offset,

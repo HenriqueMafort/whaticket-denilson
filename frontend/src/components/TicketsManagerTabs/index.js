@@ -409,6 +409,8 @@ const TicketsManagerTabs = () => {
   const [openCount, setOpenCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
   const [groupingCount, setGroupingCount] = useState(0);
+  const [awaitingAgentCount, setAwaitingAgentCount] = useState(0);
+  const [awaitingCustomerCount, setAwaitingCustomerCount] = useState(0);
 
   const userQueueIds = user.queues.map((q) => q.id);
   const [selectedQueueIds, setSelectedQueueIds] = useState(userQueueIds || []);
@@ -1000,6 +1002,86 @@ const TicketsManagerTabs = () => {
             classes={{ root: classes.tabPanelItem }}
           />
 
+          {/* ATENDENTE AGUARDANDO */}
+          <Tab
+            label={
+              <Grid container alignItems="center" justifyContent="center" style={{ position: "relative", paddingTop: 10 }}>
+                <Grid item>
+                  <Badge
+                    overlap="circular"
+                    max={999}
+                    classes={{ badge: classes.customBadge }}
+                    badgeContent={awaitingAgentCount}
+                    color="primary"
+                  >
+                    <ClockIcon
+                      style={{
+                        fontSize: 20,
+                        color: tabOpen === "awaiting_agent" ? theme.palette.primary.main : "inherit",
+                      }}
+                    />
+                  </Badge>
+                </Grid>
+                <Grid item>
+                  <Typography
+                    style={{
+                      marginLeft: 8,
+                      fontSize: 11,
+                      fontWeight: tabOpen === "awaiting_agent" ? 700 : 500,
+                      color: tabOpen === "awaiting_agent" ? theme.palette.primary.main : "inherit",
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    Atendente aguardando
+                  </Typography>
+                </Grid>
+              </Grid>
+            }
+            value={"awaiting_agent"}
+            name="awaiting_agent"
+            classes={{ root: classes.tabPanelItem }}
+          />
+
+          {/* CLIENTE AGUARDANDO */}
+          <Tab
+            label={
+              <Grid container alignItems="center" justifyContent="center" style={{ position: "relative", paddingTop: 10 }}>
+                <Grid item>
+                  <Badge
+                    overlap="circular"
+                    max={999}
+                    classes={{ badge: classes.customBadge }}
+                    badgeContent={awaitingCustomerCount}
+                    color="primary"
+                  >
+                    <MessageSharpIcon
+                      style={{
+                        fontSize: 20,
+                        color: tabOpen === "awaiting_customer" ? theme.palette.primary.main : "inherit",
+                      }}
+                    />
+                  </Badge>
+                </Grid>
+                <Grid item>
+                  <Typography
+                    style={{
+                      marginLeft: 8,
+                      fontSize: 11,
+                      fontWeight: tabOpen === "awaiting_customer" ? 700 : 500,
+                      color: tabOpen === "awaiting_customer" ? theme.palette.primary.main : "inherit",
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    Cliente aguardando
+                  </Typography>
+                </Grid>
+              </Grid>
+            }
+            value={"awaiting_customer"}
+            name="awaiting_customer"
+            classes={{ root: classes.tabPanelItem }}
+          />
+
           {/* GRUPOS */}
           {user.allowGroup && (
             <Tab
@@ -1060,6 +1142,26 @@ const TicketsManagerTabs = () => {
             showAll={user.profile === "admin" || user.allUserChat === 'enabled' ? showAllTickets : false}
             updateCount={(val) => setPendingCount(val)}
             style={applyPanelStyle("pending")}
+            setTabOpen={setTabOpen}
+          />
+          <TicketsList
+            status="open"
+            awaiting="agent"
+            showAll={showAllTickets}
+            sortTickets={sortTickets ? "ASC" : "DESC"}
+            selectedQueueIds={selectedQueueIds}
+            updateCount={(val) => setAwaitingAgentCount(val)}
+            style={applyPanelStyle("awaiting_agent")}
+            setTabOpen={setTabOpen}
+          />
+          <TicketsList
+            status="open"
+            awaiting="customer"
+            showAll={showAllTickets}
+            sortTickets={sortTickets ? "ASC" : "DESC"}
+            selectedQueueIds={selectedQueueIds}
+            updateCount={(val) => setAwaitingCustomerCount(val)}
+            style={applyPanelStyle("awaiting_customer")}
             setTabOpen={setTabOpen}
           />
           {user.allowGroup && (

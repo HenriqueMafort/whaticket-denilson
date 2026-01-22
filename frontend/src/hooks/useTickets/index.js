@@ -19,7 +19,8 @@ const useTickets = ({
   forceSearch,
   userFilter,
   sortTickets,
-  searchOnMessages
+  searchOnMessages,
+  awaiting
 }) => {
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(false);
@@ -47,7 +48,8 @@ const useTickets = ({
                 whatsapps: whatsappIds,
                 statusFilter,
                 sortTickets,
-                searchOnMessages
+                searchOnMessages,
+                awaiting
               },
             });
             
@@ -115,7 +117,8 @@ const useTickets = ({
     statusFilter,
     forceSearch,
     sortTickets,
-    searchOnMessages
+    searchOnMessages,
+    awaiting
   ]);
 
   return { tickets, loading, hasMore, count };

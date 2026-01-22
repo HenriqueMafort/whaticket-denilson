@@ -212,7 +212,8 @@ const TicketsListCustom = (props) => {
         forceSearch,
         statusFilter,
         userFilter,
-        sortTickets
+        sortTickets,
+        awaiting
     } = props;
 
     const classes = useStyles();
@@ -228,12 +229,14 @@ const TicketsListCustom = (props) => {
     useEffect(() => {
         dispatch({ type: "RESET" });
         setPageNumber(1);
-    }, [status, searchParam, dispatch, showAll, tags, users, forceSearch, selectedQueueIds, whatsappIds, statusFilter, sortTickets, searchOnMessages]);
+    }, [status, searchParam, dispatch, showAll, tags, users, forceSearch, selectedQueueIds, whatsappIds, statusFilter, sortTickets, searchOnMessages, awaiting]);
+
+    const statusParam = awaiting ? undefined : status;
 
     const { tickets, hasMore, loading } = useTickets({
         pageNumber,
         searchParam,
-        status,
+        status: statusParam,
         showAll,
         searchOnMessages: searchOnMessages ? "true" : "false",
         tags: JSON.stringify(tags),
@@ -242,7 +245,8 @@ const TicketsListCustom = (props) => {
         whatsappIds: JSON.stringify(whatsappIds),
         statusFilter: JSON.stringify(statusFilter),
         userFilter,
-        sortTickets
+        sortTickets,
+        awaiting
     });
 
 
@@ -268,9 +272,22 @@ const TicketsListCustom = (props) => {
     }, [tickets]);
 
     useEffect(() => {
+        const matchesAwaiting = ticket => {
+            if (!awaiting) return true;
+            if (!ticket || ticket.isGroup) return false;
+            if (awaiting === "agent") {
+                return ticket.fromMe === true && Number(ticket.unreadMessages) === 0;
+            }
+            if (awaiting === "customer") {
+                return ticket.fromMe === false && Number(ticket.unreadMessages) > 0;
+            }
+            return true;
+        };
+
         const shouldUpdateTicket = ticket => {
             return (!ticket?.userId || ticket?.userId === user?.id || showAll) &&
-                ((!ticket?.queueId && showTicketWithoutQueue) || selectedQueueIds.indexOf(ticket?.queueId) > -1)
+                ((!ticket?.queueId && showTicketWithoutQueue) || selectedQueueIds.indexOf(ticket?.queueId) > -1) &&
+                matchesAwaiting(ticket);
             // (!blockNonDefaultConnections || (ticket.status == 'group' && ignoreUserConnectionForGroups) || !user?.whatsappId || ticket.whatsappId == user?.whatsappId);
         }
         // const shouldUpdateTicketUser = (ticket) =>
@@ -291,7 +308,7 @@ const TicketsListCustom = (props) => {
             }
             // console.log(shouldUpdateTicket(data.ticket))
             if (data.action === "update" &&
-                shouldUpdateTicket(data.ticket) && data.ticket.status === status) {
+                shouldUpdateTicket(data.ticket) && (awaiting || data.ticket.status === status)) {
                 dispatch({
                     type: "UPDATE_TICKET",
                     payload: data.ticket,
@@ -324,7 +341,7 @@ const TicketsListCustom = (props) => {
 
         const onCompanyAppMessageTicketsList = (data) => {
             if (data.action === "create" &&
-                shouldUpdateTicket(data.ticket) && data.ticket.status === status) {
+                shouldUpdateTicket(data.ticket) && (awaiting || data.ticket.status === status)) {
                 dispatch({
                     type: "UPDATE_TICKET_UNREAD_MESSAGES",
                     payload: data.ticket,
@@ -376,7 +393,7 @@ const TicketsListCustom = (props) => {
             socket.off(`company-${companyId}-contact`, onCompanyContactTicketsList);
         };
 
-    }, [status, showAll, user, selectedQueueIds, tags, users, profile, queues, sortTickets, showTicketWithoutQueue]);
+    }, [status, showAll, user, selectedQueueIds, tags, users, profile, queues, sortTickets, showTicketWithoutQueue, awaiting]);
 
     useEffect(() => {
         if (typeof updateCount === "function") {
@@ -399,7 +416,7 @@ const TicketsListCustom = (props) => {
         }
     };
 
-    if (status && status !== "search") {
+        if (!awaiting && status && status !== "search") {
         ticketsList = ticketsList.filter(ticket => ticket.status === status)
     }
 
