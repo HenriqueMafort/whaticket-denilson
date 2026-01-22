@@ -233,14 +233,24 @@ const useStyles = makeStyles((theme) => ({
   },
   
   modernTabs: {
-    minHeight: 54,
+    minHeight: 52,
+    height: 52,
     borderRadius: 8,
     backgroundColor: theme.mode === "light" ? "rgba(0, 0, 0, 0.02)" : "rgba(255, 255, 255, 0.02)",
     boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-    padding: "8px 4px 4px 4px", // Aumentamos o padding superior para dar espaço ao badge
+    padding: "6px 4px 4px 4px", // Reduzido para fixar a altura
     margin: "8px 0",
     transition: "all 0.3s ease",
     position: "relative",
+    overflowX: "auto",
+    overflowY: "hidden",
+    "& .MuiTabs-scroller": {
+      overflowY: "hidden !important",
+    },
+    "& .MuiTabs-flexContainer": {
+      flexWrap: "nowrap",
+      alignItems: "center",
+    },
   },
 
   show: {
@@ -929,7 +939,7 @@ const TicketsManagerTabs = () => {
           {/* ATENDENDO */}
           <Tab
             label={
-              <Grid container alignItems="center" justifyContent="center" style={{ position: "relative", paddingTop: 10 }}>
+              <Grid container alignItems="center" justifyContent="center" style={{ position: "relative", paddingTop: 6 }}>
                 <Grid item>
                   <Badge
                     overlap="circular"
@@ -969,7 +979,7 @@ const TicketsManagerTabs = () => {
           {/* AGUARDANDO */}
           <Tab
             label={
-              <Grid container alignItems="center" justifyContent="center" style={{ position: "relative", paddingTop: 10 }}>
+              <Grid container alignItems="center" justifyContent="center" style={{ position: "relative", paddingTop: 6 }}>
                 <Grid item>
                   <Badge
                     overlap="circular"
@@ -1009,7 +1019,7 @@ const TicketsManagerTabs = () => {
           {/* ATENDENTE AGUARDANDO */}
           <Tab
             label={
-              <Grid container alignItems="center" justifyContent="center" style={{ position: "relative", paddingTop: 10 }}>
+              <Grid container alignItems="center" justifyContent="center" style={{ position: "relative", paddingTop: 6 }}>
                 <Grid item>
                   <Badge
                     overlap="circular"
@@ -1049,7 +1059,7 @@ const TicketsManagerTabs = () => {
           {/* CLIENTE AGUARDANDO */}
           <Tab
             label={
-              <Grid container alignItems="center" justifyContent="center" style={{ position: "relative", paddingTop: 10 }}>
+              <Grid container alignItems="center" justifyContent="center" style={{ position: "relative", paddingTop: 6 }}>
                 <Grid item>
                   <Badge
                     overlap="circular"
@@ -1090,7 +1100,7 @@ const TicketsManagerTabs = () => {
           {user.allowGroup && (
             <Tab
               label={
-                <Grid container alignItems="center" justifyContent="center" style={{ position: "relative", paddingTop: 10 }}>
+                <Grid container alignItems="center" justifyContent="center" style={{ position: "relative", paddingTop: 6 }}>
                   <Grid item>
                     <Badge
                       overlap="circular"
