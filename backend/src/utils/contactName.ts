@@ -5,6 +5,7 @@ export const isInvalidContactName = (name?: string | null): boolean => {
 
   const lower = trimmed.toLowerCase();
   if (lower.includes("@lid")) return true;
+  if (lower.startsWith("contato ")) return true;
 
   const digitsOnly = trimmed.replace(/\D/g, "");
   if (digitsOnly && digitsOnly.length === trimmed.length) return true;
