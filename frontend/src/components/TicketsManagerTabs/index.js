@@ -164,6 +164,17 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.mode === "light" ? theme.palette.primary.main : "#FFF",
     color: theme.mode === "light" ? "#FFF" : theme.palette.primary.main,
   },
+  tabsBadgeAwaiting: {
+    top: "105%",
+    right: "55%",
+    transform: "translate(45%, 0)",
+    whiteSpace: "nowrap",
+    borderRadius: "12px",
+    padding: "0 6px",
+    backgroundColor: theme.mode === "light" ? theme.palette.primary.main : "#FFF",
+    color: theme.mode === "light" ? "#FFF" : theme.palette.primary.main,
+    fontSize: "0.65rem",
+  },
   ticketOptionsBox: {
     display: "flex",
     justifyContent: "space-between",
@@ -178,6 +189,8 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
     padding: theme.spacing(0.5),
+    flexWrap: "wrap",
+    rowGap: theme.spacing(0.5),
   },
 
   serachInputWrapper: {
@@ -960,36 +973,48 @@ const TicketsManagerTabs = () => {
 )}
 
 <Tooltip title="Atendente aguardando">
-  <Badge
-    color="primary"
-    invisible={!awaitingAgentCount}
-    badgeContent={awaitingAgentCount}
-    classes={{ badge: classes.tabsBadge }}
-  >
-    <IconButton
-      className={`${classes.awaitingSmallButton} ${
-        tabOpen === "awaiting_agent" ? classes.activeButton : ''
-      }`}
-      onClick={() => setTabOpen("awaiting_agent")}
+    <Badge
+      color="primary"
+      invisible={
+        !isHoveredAll ||
+        isHoveredNew ||
+        isHoveredResolve ||
+        isHoveredOpen ||
+        isHoveredClosed
+      }
+      badgeContent={"Ag. Atend."}
+      classes={{ badge: classes.tabsBadgeAwaiting }}
     >
-      <ClockIcon
-        className={`${classes.awaitingSmallIcon} ${
-          tabOpen === "awaiting_agent" ? classes.activeIcon : ''
+      <IconButton
+        className={`${classes.awaitingSmallButton} ${
+          tabOpen === "awaiting_agent" ? classes.activeButton : ''
         }`}
-      />
-    </IconButton>
-  </Badge>
+        onClick={() => setTabOpen("awaiting_agent")}
+      >
+        <ClockIcon
+          className={`${classes.awaitingSmallIcon} ${
+            tabOpen === "awaiting_agent" ? classes.activeIcon : ''
+          }`}
+        />
+      </IconButton>
+    </Badge>
 </Tooltip>
 <Tooltip title="Cliente aguardando">
-  <Badge
-    color="primary"
-    invisible={!awaitingCustomerCount}
-    badgeContent={awaitingCustomerCount}
-    classes={{ badge: classes.tabsBadge }}
-  >
-    <IconButton
-      className={`${classes.awaitingSmallButton} ${
-        tabOpen === "awaiting_customer" ? classes.activeButton : ''
+    <Badge
+      color="primary"
+      invisible={
+        !isHoveredAll ||
+        isHoveredNew ||
+        isHoveredResolve ||
+        isHoveredOpen ||
+        isHoveredClosed
+      }
+      badgeContent={"Ag. Cliente"}
+      classes={{ badge: classes.tabsBadgeAwaiting }}
+    >
+      <IconButton
+        className={`${classes.awaitingSmallButton} ${
+          tabOpen === "awaiting_customer" ? classes.activeButton : ''
       }`}
       onClick={() => setTabOpen("awaiting_customer")}
     >
