@@ -119,7 +119,7 @@ const useStyles = makeStyles((theme) => ({
 
   tabPanelItem: {
     minWidth: "25%",
-    fontSize: 11,
+    fontSize: 12,
     marginLeft: 0,
     transition: "all 0.3s ease",
     fontWeight: 500,
@@ -138,12 +138,12 @@ const useStyles = makeStyles((theme) => ({
     },
     [theme.breakpoints.down('sm')]: {
       minWidth: "28%",
-      fontSize: 9,
+      fontSize: 11,
       padding: theme.spacing(0.5),
     },
     [theme.breakpoints.down('xs')]: {
       minWidth: "26%",
-      fontSize: 8,
+      fontSize: 10,
     },
   },
 
@@ -386,17 +386,17 @@ const useStyles = makeStyles((theme) => ({
   },
   standardIcon: {
     color: "#aaa",
-    fontSize: 18,
+    fontSize: 20,
     "&:hover": {
       color: theme.mode === "light" ? theme.palette.primary.main : "#FFF",
     },
     [theme.breakpoints.down('sm')]: {
-      fontSize: 16,
+      fontSize: 18,
     },
   },
   awaitingSmallButton: {
-    height: 26,
-    width: 26,
+    height: 28,
+    width: 28,
     border: "2px solid #aaa",
     borderRadius: 8,
     marginRight: 6,
@@ -408,7 +408,7 @@ const useStyles = makeStyles((theme) => ({
   },
   awaitingSmallIcon: {
     color: "#aaa",
-    fontSize: 14,
+    fontSize: 16,
     "&:hover": {
       color: theme.mode === "light" ? theme.palette.primary.main : "#FFF",
     },
@@ -1040,7 +1040,7 @@ const TicketsManagerTabs = () => {
                   >
                     <MessageSharpIcon
                       style={{
-                        fontSize: 20,
+                        fontSize: 22,
                         color: tabOpen === "open" ? theme.palette.primary.main : "inherit",
                       }}
                     />
@@ -1050,7 +1050,7 @@ const TicketsManagerTabs = () => {
                   <Typography
                     style={{
                       marginLeft: 8,
-                      fontSize: 11,
+                      fontSize: isMobile ? 12 : 12,
                       fontWeight: tabOpen === "open" ? 700 : 500,
                       color: tabOpen === "open" ? theme.palette.primary.main : "inherit",
                       transition: "all 0.2s ease",
@@ -1080,7 +1080,7 @@ const TicketsManagerTabs = () => {
                   >
                     <ClockIcon
                       style={{
-                        fontSize: 20,
+                        fontSize: 22,
                         color: tabOpen === "pending" ? theme.palette.primary.main : "inherit",
                       }}
                     />
@@ -1090,7 +1090,7 @@ const TicketsManagerTabs = () => {
                   <Typography
                     style={{
                       marginLeft: 8,
-                      fontSize: 11,
+                      fontSize: isMobile ? 12 : 12,
                       fontWeight: tabOpen === "pending" ? 700 : 500,
                       color: tabOpen === "pending" ? theme.palette.primary.main : "inherit",
                       transition: "all 0.2s ease",
@@ -1121,7 +1121,7 @@ const TicketsManagerTabs = () => {
                     >
                       <Group
                         style={{
-                          fontSize: 20,
+                          fontSize: 22,
                           color: tabOpen === "group" ? theme.palette.primary.main : "inherit",
                         }}
                       />
@@ -1131,7 +1131,7 @@ const TicketsManagerTabs = () => {
                     <Typography
                       style={{
                         marginLeft: 8,
-                        fontSize: 11,
+                      fontSize: isMobile ? 12 : 12,
                         fontWeight: tabOpen === "group" ? 700 : 500,
                         color: tabOpen === "group" ? theme.palette.primary.main : "inherit",
                         transition: "all 0.2s ease",
