@@ -456,7 +456,6 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
                           <MenuItem value="n8n">N8N</MenuItem>
                           <MenuItem value="webhook">WebHooks</MenuItem>
                           <MenuItem value="typebot">Typebot</MenuItem>
-                          <MenuItem value="flowbuilder">Flowbuilder</MenuItem>
                         </Field>
                       </FormControl>
                     </Grid>

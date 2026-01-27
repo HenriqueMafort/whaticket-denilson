@@ -1,5 +1,6 @@
 import AppError from "../../errors/AppError";
 import { FlowBuilderModel } from "../../models/FlowBuilder";
+import QueueIntegrations from "../../models/QueueIntegrations";
 
 const DeleteFlowBuilderService = async (id: number): Promise<FlowBuilderModel> => {
   
@@ -12,6 +13,14 @@ const DeleteFlowBuilderService = async (id: number): Promise<FlowBuilderModel> =
   }
 
   await flow.destroy();
+
+  await QueueIntegrations.destroy({
+    where: {
+      companyId: flow.company_id,
+      type: "flowbuilder",
+      name: flow.name
+    }
+  });
 
   return flow;
 };
