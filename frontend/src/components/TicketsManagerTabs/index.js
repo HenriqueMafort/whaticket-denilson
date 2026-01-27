@@ -119,7 +119,8 @@ const useStyles = makeStyles((theme) => ({
 
   tabPanelItem: {
     minWidth: "25%",
-    fontSize: 13,
+    fontSize: 14,
+    minHeight: 46,
     marginLeft: 0,
     transition: "all 0.3s ease",
     fontWeight: 500,
@@ -138,12 +139,12 @@ const useStyles = makeStyles((theme) => ({
     },
     [theme.breakpoints.down('sm')]: {
       minWidth: "28%",
-      fontSize: 12,
+      fontSize: 13,
       padding: theme.spacing(0.5),
     },
     [theme.breakpoints.down('xs')]: {
       minWidth: "26%",
-      fontSize: 11,
+      fontSize: 12,
     },
   },
 
@@ -247,12 +248,12 @@ const useStyles = makeStyles((theme) => ({
   },
   
   modernTabs: {
-    minHeight: 52,
-    height: 52,
+    minHeight: 58,
+    height: 58,
     borderRadius: 8,
     backgroundColor: theme.mode === "light" ? "rgba(0, 0, 0, 0.02)" : "rgba(255, 255, 255, 0.02)",
     boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-    padding: "6px 4px 4px 4px", // Reduzido para fixar a altura
+    padding: "8px 4px 6px 4px", // Ajuste para dar mais presenÃ§a Ã  aba
     margin: "8px 0",
     transition: "all 0.3s ease",
     position: "relative",
@@ -1091,7 +1092,7 @@ const TicketsManagerTabs = () => {
                   >
                     <MessageSharpIcon
                       style={{
-                        fontSize: 22,
+                        fontSize: 24,
                         color: tabOpen === "open" ? theme.palette.primary.main : "inherit",
                       }}
                     />
@@ -1101,7 +1102,7 @@ const TicketsManagerTabs = () => {
                   <Typography
                     style={{
                       marginLeft: 8,
-                      fontSize: isMobile ? 12 : 13,
+                      fontSize: isMobile ? 13 : 14,
                       fontWeight: tabOpen === "open" ? 700 : 500,
                       color: tabOpen === "open" ? theme.palette.primary.main : "inherit",
                       transition: "all 0.2s ease",
@@ -1131,7 +1132,7 @@ const TicketsManagerTabs = () => {
                   >
                     <ClockIcon
                       style={{
-                        fontSize: 22,
+                        fontSize: 24,
                         color: tabOpen === "pending" ? theme.palette.primary.main : "inherit",
                       }}
                     />
@@ -1141,7 +1142,7 @@ const TicketsManagerTabs = () => {
                   <Typography
                     style={{
                       marginLeft: 8,
-                      fontSize: isMobile ? 12 : 13,
+                      fontSize: isMobile ? 13 : 14,
                       fontWeight: tabOpen === "pending" ? 700 : 500,
                       color: tabOpen === "pending" ? theme.palette.primary.main : "inherit",
                       transition: "all 0.2s ease",
@@ -1172,7 +1173,7 @@ const TicketsManagerTabs = () => {
                     >
                       <Group
                         style={{
-                          fontSize: 22,
+                          fontSize: 24,
                           color: tabOpen === "group" ? theme.palette.primary.main : "inherit",
                         }}
                       />
@@ -1180,13 +1181,13 @@ const TicketsManagerTabs = () => {
                   </Grid>
                   <Grid item>
                     <Typography
-                      style={{
-                        marginLeft: 8,
-                      fontSize: isMobile ? 12 : 13,
-                        fontWeight: tabOpen === "group" ? 700 : 500,
-                        color: tabOpen === "group" ? theme.palette.primary.main : "inherit",
-                        transition: "all 0.2s ease",
-                      }}
+                        style={{
+                          marginLeft: 8,
+                      fontSize: isMobile ? 13 : 14,
+                          fontWeight: tabOpen === "group" ? 700 : 500,
+                          color: tabOpen === "group" ? theme.palette.primary.main : "inherit",
+                          transition: "all 0.2s ease",
+                        }}
                     >
                       {i18n.t("ticketsList.groupingHeader")}
                     </Typography>
