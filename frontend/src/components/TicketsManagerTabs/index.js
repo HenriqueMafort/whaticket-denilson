@@ -119,7 +119,7 @@ const useStyles = makeStyles((theme) => ({
 
   tabPanelItem: {
     minWidth: "25%",
-    fontSize: 12,
+    fontSize: 13,
     marginLeft: 0,
     transition: "all 0.3s ease",
     fontWeight: 500,
@@ -138,12 +138,12 @@ const useStyles = makeStyles((theme) => ({
     },
     [theme.breakpoints.down('sm')]: {
       minWidth: "28%",
-      fontSize: 11,
+      fontSize: 12,
       padding: theme.spacing(0.5),
     },
     [theme.breakpoints.down('xs')]: {
       minWidth: "26%",
-      fontSize: 10,
+      fontSize: 11,
     },
   },
 
@@ -177,7 +177,7 @@ const useStyles = makeStyles((theme) => ({
   },
   ticketOptionsBox: {
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     alignItems: "center",
     background: theme.palette.optionsBackground,
     borderRadius: 8,
@@ -191,6 +191,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(0.5),
     flexWrap: "wrap",
     rowGap: theme.spacing(0.5),
+    columnGap: theme.spacing(0.5),
   },
 
   serachInputWrapper: {
@@ -399,17 +400,17 @@ const useStyles = makeStyles((theme) => ({
   },
   standardIcon: {
     color: "#aaa",
-    fontSize: 20,
+    fontSize: 21,
     "&:hover": {
       color: theme.mode === "light" ? theme.palette.primary.main : "#FFF",
     },
     [theme.breakpoints.down('sm')]: {
-      fontSize: 18,
+      fontSize: 19,
     },
   },
   awaitingSmallButton: {
-    height: 28,
-    width: 28,
+    height: 30,
+    width: 30,
     border: "2px solid #aaa",
     borderRadius: 8,
     marginRight: 6,
@@ -418,12 +419,19 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       borderColor: theme.mode === "light" ? theme.palette.primary.main : "#FFF",
     },
+    [theme.breakpoints.down('sm')]: {
+      height: 28,
+      width: 28,
+    },
   },
   awaitingSmallIcon: {
     color: "#aaa",
-    fontSize: 16,
+    fontSize: 20,
     "&:hover": {
       color: theme.mode === "light" ? theme.palette.primary.main : "#FFF",
+    },
+    [theme.breakpoints.down('sm')]: {
+      fontSize: 19,
     },
   },
   activeIcon: {
@@ -473,6 +481,8 @@ const TicketsManagerTabs = () => {
   const [isHoveredOpen, setIsHoveredOpen] = useState(false);
   const [isHoveredClosed, setIsHoveredClosed] = useState(false);
   const [isHoveredSort, setIsHoveredSort] = useState(false);
+  const [isHoveredAwaitingAgent, setIsHoveredAwaitingAgent] = useState(false);
+  const [isHoveredAwaitingCustomer, setIsHoveredAwaitingCustomer] = useState(false);
 
   const [isFilterActive, setIsFilterActive] = useState(false);
 
@@ -976,16 +986,24 @@ const TicketsManagerTabs = () => {
     <Badge
       color="primary"
       invisible={
-        !isHoveredAll ||
-        isHoveredNew ||
-        isHoveredResolve ||
-        isHoveredOpen ||
-        isHoveredClosed
+        !(
+          (tabOpen === "awaiting_agent" &&
+            !isHoveredAll &&
+            !isHoveredNew &&
+            !isHoveredResolve &&
+            !isHoveredOpen &&
+            !isHoveredClosed &&
+            !isHoveredSort &&
+            !isHoveredAwaitingCustomer
+          ) || isHoveredAwaitingAgent
+        )
       }
       badgeContent={"Ag. Atend."}
       classes={{ badge: classes.tabsBadgeAwaiting }}
     >
       <IconButton
+        onMouseEnter={() => setIsHoveredAwaitingAgent(true)}
+        onMouseLeave={() => setIsHoveredAwaitingAgent(false)}
         className={`${classes.awaitingSmallButton} ${
           tabOpen === "awaiting_agent" ? classes.activeButton : ''
         }`}
@@ -1003,16 +1021,24 @@ const TicketsManagerTabs = () => {
     <Badge
       color="primary"
       invisible={
-        !isHoveredAll ||
-        isHoveredNew ||
-        isHoveredResolve ||
-        isHoveredOpen ||
-        isHoveredClosed
+        !(
+          (tabOpen === "awaiting_customer" &&
+            !isHoveredAll &&
+            !isHoveredNew &&
+            !isHoveredResolve &&
+            !isHoveredOpen &&
+            !isHoveredClosed &&
+            !isHoveredSort &&
+            !isHoveredAwaitingAgent
+          ) || isHoveredAwaitingCustomer
+        )
       }
       badgeContent={"Ag. Cliente"}
       classes={{ badge: classes.tabsBadgeAwaiting }}
     >
       <IconButton
+        onMouseEnter={() => setIsHoveredAwaitingCustomer(true)}
+        onMouseLeave={() => setIsHoveredAwaitingCustomer(false)}
         className={`${classes.awaitingSmallButton} ${
           tabOpen === "awaiting_customer" ? classes.activeButton : ''
       }`}
@@ -1075,7 +1101,7 @@ const TicketsManagerTabs = () => {
                   <Typography
                     style={{
                       marginLeft: 8,
-                      fontSize: isMobile ? 12 : 12,
+                      fontSize: isMobile ? 12 : 13,
                       fontWeight: tabOpen === "open" ? 700 : 500,
                       color: tabOpen === "open" ? theme.palette.primary.main : "inherit",
                       transition: "all 0.2s ease",
@@ -1115,7 +1141,7 @@ const TicketsManagerTabs = () => {
                   <Typography
                     style={{
                       marginLeft: 8,
-                      fontSize: isMobile ? 12 : 12,
+                      fontSize: isMobile ? 12 : 13,
                       fontWeight: tabOpen === "pending" ? 700 : 500,
                       color: tabOpen === "pending" ? theme.palette.primary.main : "inherit",
                       transition: "all 0.2s ease",
@@ -1156,7 +1182,7 @@ const TicketsManagerTabs = () => {
                     <Typography
                       style={{
                         marginLeft: 8,
-                      fontSize: isMobile ? 12 : 12,
+                      fontSize: isMobile ? 12 : 13,
                         fontWeight: tabOpen === "group" ? 700 : 500,
                         color: tabOpen === "group" ? theme.palette.primary.main : "inherit",
                         transition: "all 0.2s ease",
