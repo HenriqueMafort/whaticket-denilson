@@ -85,3 +85,33 @@ Objetivo: adicionar duas abas na tela de atendimento:
 - Definir se grupos entram nas abas (provavel **nao**).
 - Validar comportamento para status "pending" vs "open".
 - Ajustar traducoes em `frontend/src/translate/languages/pt.js` etc.
+
+
+## Alterar posi??o das abas (?cones no topo)
+Objetivo: remover as abas ?Atendente aguardando / Cliente aguardando? da linha de tabs e colocar ?cones pequenos na barra superior (onde ficam os bot?es e o olho).
+
+Verifica??o no c?digo (pontos exatos)
+- Tabs atuais ficam em `frontend/src/components/TicketsManagerTabs/index.js` dentro do `<Tabs ...>`.
+  - As duas abas est?o como:
+    - value="awaiting_agent"
+    - value="awaiting_customer"
+- Barra superior dos bot?es (olho/novo/fechar/sort) est? em:
+  - `frontend/src/components/TicketsManagerTabs/index.js` dentro de `<Paper className={classes.ticketOptionsBox}>`.
+  - Bot?es usam `classes.standardButton` + `classes.standardIcon`.
+
+Plano de altera??o (sem implementar)
+1) Remover as duas `<Tab>` de aguardando do `<Tabs>`.
+2) Criar ?cones pequenos na barra superior (ticketOptionsBox):
+   - Reaproveitar `ClockIcon` e `MessageSharpIcon`.
+   - Exibir badge com `awaitingAgentCount` e `awaitingCustomerCount`.
+   - Ao clicar, chamar `setTabOpen('awaiting_agent')` ou `setTabOpen('awaiting_customer')`.
+3) Ajustar estilo dos ?cones para ficarem menores e sutis:
+   - Reduzir `fontSize` em `classes.standardIcon` quando for mobile.
+   - Opcional: criar classe espec?fica (ex: `classes.awaitingIconSmall`).
+4) Manter o comportamento do filtro/contagem j? existente:
+   - As listas j? usam `awaiting` em `TicketsListCustom`.
+   - `awaitingAgentCount` e `awaitingCustomerCount` j? s?o atualizados.
+
+Notas
+- A barra superior j? tem ?olho? (showAll), ?novo? e ?resolver?; os ?cones de aguardando podem ficar ao lado do open/closed.
+- Mant?m compatibilidade com desktop e mobile (apenas muda a posi??o visual).

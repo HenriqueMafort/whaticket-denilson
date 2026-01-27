@@ -394,6 +394,25 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 16,
     },
   },
+  awaitingSmallButton: {
+    height: 26,
+    width: 26,
+    border: "2px solid #aaa",
+    borderRadius: 8,
+    marginRight: 6,
+    padding: 0,
+    minWidth: 'auto',
+    "&:hover": {
+      borderColor: theme.mode === "light" ? theme.palette.primary.main : "#FFF",
+    },
+  },
+  awaitingSmallIcon: {
+    color: "#aaa",
+    fontSize: 14,
+    "&:hover": {
+      color: theme.mode === "light" ? theme.palette.primary.main : "#FFF",
+    },
+  },
   activeIcon: {
     color: theme.mode === "light" ? theme.palette.primary.main : "#FFF",
   },
@@ -443,6 +462,19 @@ const TicketsManagerTabs = () => {
   const [isHoveredSort, setIsHoveredSort] = useState(false);
 
   const [isFilterActive, setIsFilterActive] = useState(false);
+
+  const showAllStorageKey = `ticketsShowAll-${user?.companyId}-${user?.id}`;
+
+  useEffect(() => {
+    const stored = localStorage.getItem(showAllStorageKey);
+    if (stored === "true") {
+      setShowAllTickets(true);
+    }
+  }, [showAllStorageKey]);
+
+  useEffect(() => {
+    localStorage.setItem(showAllStorageKey, showAllTickets ? "true" : "false");
+  }, [showAllTickets, showAllStorageKey]);
 
   useEffect(() => {
     setSelectedQueuesMessage(selectedQueueIds);
@@ -912,6 +944,45 @@ const TicketsManagerTabs = () => {
   </Badge>
 )}
 
+<Badge
+  color="primary"
+  invisible={!awaitingAgentCount}
+  badgeContent={awaitingAgentCount}
+  classes={{ badge: classes.tabsBadge }}
+>
+  <IconButton
+    className={`${classes.awaitingSmallButton} ${
+      tabOpen === "awaiting_agent" ? classes.activeButton : ''
+    }`}
+    onClick={() => setTabOpen("awaiting_agent")}
+  >
+    <ClockIcon
+      className={`${classes.awaitingSmallIcon} ${
+        tabOpen === "awaiting_agent" ? classes.activeIcon : ''
+      }`}
+    />
+  </IconButton>
+</Badge>
+<Badge
+  color="primary"
+  invisible={!awaitingCustomerCount}
+  badgeContent={awaitingCustomerCount}
+  classes={{ badge: classes.tabsBadge }}
+>
+  <IconButton
+    className={`${classes.awaitingSmallButton} ${
+      tabOpen === "awaiting_customer" ? classes.activeButton : ''
+    }`}
+    onClick={() => setTabOpen("awaiting_customer")}
+  >
+    <MessageSharpIcon
+      className={`${classes.awaitingSmallIcon} ${
+        tabOpen === "awaiting_customer" ? classes.activeIcon : ''
+      }`}
+    />
+  </IconButton>
+</Badge>
+
 {/* Movido o seletor de filas para a mesma linha dos botões */}
 <span className="MuiBadge-root">
   <TicketsQueueSelect
@@ -926,7 +997,7 @@ const TicketsManagerTabs = () => {
 
       <TabPanel value={tab} name="open" className={classes.ticketsWrapper}>
         <Tabs
-          value={tabOpen}
+          value={["open", "pending", "group"].includes(tabOpen) ? tabOpen : "open"}
           onChange={handleChangeTabOpen}
           indicatorColor="primary"
           textColor="primary"
@@ -1013,86 +1084,6 @@ const TicketsManagerTabs = () => {
             }
             value={"pending"}
             name="pending"
-            classes={{ root: classes.tabPanelItem }}
-          />
-
-          {/* ATENDENTE AGUARDANDO */}
-          <Tab
-            label={
-              <Grid container alignItems="center" justifyContent="center" style={{ position: "relative", paddingTop: 6 }}>
-                <Grid item>
-                  <Badge
-                    overlap="circular"
-                    max={999}
-                    classes={{ badge: classes.customBadge }}
-                    badgeContent={awaitingAgentCount}
-                    color="primary"
-                  >
-                    <ClockIcon
-                      style={{
-                        fontSize: 20,
-                        color: tabOpen === "awaiting_agent" ? theme.palette.primary.main : "inherit",
-                      }}
-                    />
-                  </Badge>
-                </Grid>
-                <Grid item>
-                  <Typography
-                    style={{
-                      marginLeft: 8,
-                      fontSize: 11,
-                      fontWeight: tabOpen === "awaiting_agent" ? 700 : 500,
-                      color: tabOpen === "awaiting_agent" ? theme.palette.primary.main : "inherit",
-                      transition: "all 0.2s ease",
-                    }}
-                  >
-                    {isMobile ? "Atend. aguard." : "Atendente aguardando"}
-                  </Typography>
-                </Grid>
-              </Grid>
-            }
-            value={"awaiting_agent"}
-            name="awaiting_agent"
-            classes={{ root: classes.tabPanelItem }}
-          />
-
-          {/* CLIENTE AGUARDANDO */}
-          <Tab
-            label={
-              <Grid container alignItems="center" justifyContent="center" style={{ position: "relative", paddingTop: 6 }}>
-                <Grid item>
-                  <Badge
-                    overlap="circular"
-                    max={999}
-                    classes={{ badge: classes.customBadge }}
-                    badgeContent={awaitingCustomerCount}
-                    color="primary"
-                  >
-                    <MessageSharpIcon
-                      style={{
-                        fontSize: 20,
-                        color: tabOpen === "awaiting_customer" ? theme.palette.primary.main : "inherit",
-                      }}
-                    />
-                  </Badge>
-                </Grid>
-                <Grid item>
-                  <Typography
-                    style={{
-                      marginLeft: 8,
-                      fontSize: 11,
-                      fontWeight: tabOpen === "awaiting_customer" ? 700 : 500,
-                      color: tabOpen === "awaiting_customer" ? theme.palette.primary.main : "inherit",
-                      transition: "all 0.2s ease",
-                    }}
-                  >
-                    {isMobile ? "Cliente aguard." : "Cliente aguardando"}
-                  </Typography>
-                </Grid>
-              </Grid>
-            }
-            value={"awaiting_customer"}
-            name="awaiting_customer"
             classes={{ root: classes.tabPanelItem }}
           />
 
