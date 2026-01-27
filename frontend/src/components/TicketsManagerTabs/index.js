@@ -481,10 +481,13 @@ const TicketsManagerTabs = () => {
   }, [selectedQueueIds]);
 
   useEffect(() => {
-    if (user.profile.toUpperCase() === "ADMIN" || user.allUserChat.toUpperCase() === "ENABLED") {
+    const canShowAll =
+      user.profile.toUpperCase() === "ADMIN" ||
+      user.allUserChat.toUpperCase() === "ENABLED";
+    if (!canShowAll) {
       setShowAllTickets(false);
     }
-  }, []);
+  }, [user.profile, user.allUserChat]);
 
   useEffect(() => {
     if (tab === "search") {
@@ -737,33 +740,35 @@ const TicketsManagerTabs = () => {
               role={user.allUserChat === 'enabled' && user.profile === 'user' ? 'admin' : user.profile}
               perform="tickets-manager:showall"
               yes={() => (
-<Badge
-  color="primary"
-  invisible={
-    !isHoveredAll ||
-    isHoveredNew ||
-    isHoveredResolve ||
-    isHoveredOpen ||
-    isHoveredClosed
-  }
-  badgeContent={"Todos"}
-  classes={{ badge: classes.tabsBadge }}
->
-  <ToggleButton
-    onMouseEnter={() => setIsHoveredAll(true)}
-    onMouseLeave={() => setIsHoveredAll(false)}
-    className={`${classes.standardButton} ${showAllTickets ? classes.activeButton : ''}`}
-    value="uncheck"
-    selected={showAllTickets}
-    onChange={() => setShowAllTickets((prevState) => !prevState)}
+<Tooltip title={showAllTickets ? "Ocultar todos" : "Mostrar todos"}>
+  <Badge
+    color="primary"
+    invisible={
+      !isHoveredAll ||
+      isHoveredNew ||
+      isHoveredResolve ||
+      isHoveredOpen ||
+      isHoveredClosed
+    }
+    badgeContent={"Todos"}
+    classes={{ badge: classes.tabsBadge }}
   >
-    {showAllTickets ? (
-      <VisibilityIcon className={`${classes.standardIcon} ${classes.activeIcon}`} />
-    ) : (
-      <VisibilityOffIcon className={classes.standardIcon} />
-    )}
-  </ToggleButton>
-</Badge>
+    <ToggleButton
+      onMouseEnter={() => setIsHoveredAll(true)}
+      onMouseLeave={() => setIsHoveredAll(false)}
+      className={`${classes.standardButton} ${showAllTickets ? classes.activeButton : ''}`}
+      value="uncheck"
+      selected={showAllTickets}
+      onChange={() => setShowAllTickets((prevState) => !prevState)}
+    >
+      {showAllTickets ? (
+        <VisibilityIcon className={`${classes.standardIcon} ${classes.activeIcon}`} />
+      ) : (
+        <VisibilityOffIcon className={classes.standardIcon} />
+      )}
+    </ToggleButton>
+  </Badge>
+</Tooltip>
               )}
             />
             <Snackbar
@@ -792,196 +797,210 @@ const TicketsManagerTabs = () => {
                 </>
               }
             />
-<Badge
-  color="primary"
-  invisible={
-    isHoveredAll ||
-    !isHoveredNew ||
-    isHoveredResolve ||
-    isHoveredOpen ||
-    isHoveredClosed
-  }
-  badgeContent={i18n.t("tickets.inbox.newTicket")}
-  classes={{ badge: classes.tabsBadge }}
->
-  <IconButton
-    onMouseEnter={() => setIsHoveredNew(true)}
-    onMouseLeave={() => setIsHoveredNew(false)}
-    className={classes.standardButton}
-    onClick={() => {
-      setNewTicketModalOpen(true);
-    }}
-  >
-    <AddIcon className={classes.standardIcon} />
-  </IconButton>
-</Badge>
-{user.profile === "admin" && (
+<Tooltip title={i18n.t("tickets.inbox.newTicket")}>
   <Badge
     color="primary"
     invisible={
       isHoveredAll ||
-      isHoveredNew ||
-      !isHoveredResolve ||
-      isHoveredOpen ||
-      isHoveredClosed
-    }
-    badgeContent={i18n.t("tickets.inbox.closedAll")}
-    classes={{ badge: classes.tabsBadge }}
-  >
-    <IconButton
-      onMouseEnter={() => setIsHoveredResolve(true)}
-      onMouseLeave={() => setIsHoveredResolve(false)}
-      className={classes.standardButton}
-      onClick={handleSnackbarOpen}
-    >
-      <PlaylistAddCheckOutlined className={classes.standardIcon} />
-    </IconButton>
-  </Badge>
-)}
-{/* Botão "Abertos" */}
-<Badge
-  invisible={
-    !(
-      tab === "open" &&
-      !isHoveredAll &&
-      !isHoveredNew &&
-      !isHoveredResolve &&
-      !isHoveredClosed &&
-      !isHoveredSort
-    ) && !isHoveredOpen
-  }
-  badgeContent={i18n.t("tickets.inbox.open")}
-  classes={{ badge: classes.tabsBadge }}
->
-  <IconButton
-    onMouseEnter={() => {
-      setIsHoveredOpen(true);
-      setHoveredButton("open");
-    }}
-    onMouseLeave={() => {
-      setIsHoveredOpen(false);
-      setHoveredButton(null);
-    }}
-    className={`${classes.standardButton} ${
-      (tab === "open" || isHoveredOpen) ? classes.activeButton : ''
-    }`}
-    onClick={() => handleChangeTab(null, "open")}
-  >
-    <MoveToInboxIcon
-      className={`${classes.standardIcon} ${
-        (tab === "open" || isHoveredOpen) ? classes.activeIcon : ''
-      }`}
-    />
-  </IconButton>
-</Badge>
-
-{/* Botão "Resolvidos" */}
-<Badge
-  color="primary"
-  invisible={
-    !(
-      tab === "closed" &&
-      !isHoveredAll &&
-      !isHoveredNew &&
-      !isHoveredResolve &&
-      !isHoveredOpen &&
-      !isHoveredSort
-    ) && !isHoveredClosed
-  }
-  badgeContent={i18n.t("tickets.inbox.resolverd")}
-  classes={{ badge: classes.tabsBadge }}
->
-  <IconButton
-    onMouseEnter={() => {
-      setIsHoveredClosed(true);
-      setHoveredButton("closed");
-    }}
-    onMouseLeave={() => {
-      setIsHoveredClosed(false);
-      setHoveredButton(null);
-    }}
-    className={`${classes.standardButton} ${
-      (tab === "closed" || isHoveredClosed) ? classes.activeButton : ''
-    }`}
-    onClick={() => handleChangeTab(null, "closed")}
-  >
-    <CheckBoxIcon
-      className={`${classes.standardIcon} ${
-        (tab === "closed" || isHoveredClosed) ? classes.activeIcon : ''
-      }`}
-    />
-  </IconButton>
-</Badge>
-
-{tab !== "closed" && tab !== "search" && (
-  <Badge
-    color="primary"
-    invisible={
-      !isHoveredSort ||
-      isHoveredAll ||
-      isHoveredNew ||
+      !isHoveredNew ||
       isHoveredResolve ||
       isHoveredOpen ||
       isHoveredClosed
     }
-    badgeContent={!sortTickets ? "Crescente" : "Decrescente"}
+    badgeContent={i18n.t("tickets.inbox.newTicket")}
     classes={{ badge: classes.tabsBadge }}
   >
-    <ToggleButton
-      onMouseEnter={() => setIsHoveredSort(true)}
-      onMouseLeave={() => setIsHoveredSort(false)}
-      className={`${classes.standardButton} ${sortTickets ? classes.activeButton : ''}`}
-      value="uncheck"
-      selected={sortTickets}
-      onChange={() => setSortTickets((prevState) => !prevState)}
+    <IconButton
+      onMouseEnter={() => setIsHoveredNew(true)}
+      onMouseLeave={() => setIsHoveredNew(false)}
+      className={classes.standardButton}
+      onClick={() => {
+        setNewTicketModalOpen(true);
+      }}
     >
-      {!sortTickets ? (
-        <TextRotateUp className={`${classes.standardIcon} ${sortTickets ? classes.activeIcon : ''}`} />
-      ) : (
-        <TextRotationDown className={`${classes.standardIcon} ${classes.activeIcon}`} />
-      )}
-    </ToggleButton>
+      <AddIcon className={classes.standardIcon} />
+    </IconButton>
   </Badge>
+</Tooltip>
+{user.profile === "admin" && (
+  <Tooltip title={i18n.t("tickets.inbox.closedAll")}>
+    <Badge
+      color="primary"
+      invisible={
+        isHoveredAll ||
+        isHoveredNew ||
+        !isHoveredResolve ||
+        isHoveredOpen ||
+        isHoveredClosed
+      }
+      badgeContent={i18n.t("tickets.inbox.closedAll")}
+      classes={{ badge: classes.tabsBadge }}
+    >
+      <IconButton
+        onMouseEnter={() => setIsHoveredResolve(true)}
+        onMouseLeave={() => setIsHoveredResolve(false)}
+        className={classes.standardButton}
+        onClick={handleSnackbarOpen}
+      >
+        <PlaylistAddCheckOutlined className={classes.standardIcon} />
+      </IconButton>
+    </Badge>
+  </Tooltip>
+)}
+{/* Botão "Abertos" */}
+<Tooltip title={i18n.t("tickets.inbox.open")}>
+  <Badge
+    invisible={
+      !(
+        tab === "open" &&
+        !isHoveredAll &&
+        !isHoveredNew &&
+        !isHoveredResolve &&
+        !isHoveredClosed &&
+        !isHoveredSort
+      ) && !isHoveredOpen
+    }
+    badgeContent={i18n.t("tickets.inbox.open")}
+    classes={{ badge: classes.tabsBadge }}
+  >
+    <IconButton
+      onMouseEnter={() => {
+        setIsHoveredOpen(true);
+        setHoveredButton("open");
+      }}
+      onMouseLeave={() => {
+        setIsHoveredOpen(false);
+        setHoveredButton(null);
+      }}
+      className={`${classes.standardButton} ${
+        (tab === "open" || isHoveredOpen) ? classes.activeButton : ''
+      }`}
+      onClick={() => handleChangeTab(null, "open")}
+    >
+      <MoveToInboxIcon
+        className={`${classes.standardIcon} ${
+          (tab === "open" || isHoveredOpen) ? classes.activeIcon : ''
+        }`}
+      />
+    </IconButton>
+  </Badge>
+</Tooltip>
+
+{/* Botão "Resolvidos" */}
+<Tooltip title={i18n.t("tickets.inbox.resolverd")}>
+  <Badge
+    color="primary"
+    invisible={
+      !(
+        tab === "closed" &&
+        !isHoveredAll &&
+        !isHoveredNew &&
+        !isHoveredResolve &&
+        !isHoveredOpen &&
+        !isHoveredSort
+      ) && !isHoveredClosed
+    }
+    badgeContent={i18n.t("tickets.inbox.resolverd")}
+    classes={{ badge: classes.tabsBadge }}
+  >
+    <IconButton
+      onMouseEnter={() => {
+        setIsHoveredClosed(true);
+        setHoveredButton("closed");
+      }}
+      onMouseLeave={() => {
+        setIsHoveredClosed(false);
+        setHoveredButton(null);
+      }}
+      className={`${classes.standardButton} ${
+        (tab === "closed" || isHoveredClosed) ? classes.activeButton : ''
+      }`}
+      onClick={() => handleChangeTab(null, "closed")}
+    >
+      <CheckBoxIcon
+        className={`${classes.standardIcon} ${
+          (tab === "closed" || isHoveredClosed) ? classes.activeIcon : ''
+        }`}
+      />
+    </IconButton>
+  </Badge>
+</Tooltip>
+
+{tab !== "closed" && tab !== "search" && (
+  <Tooltip title={!sortTickets ? "Ordenação crescente" : "Ordenação decrescente"}>
+    <Badge
+      color="primary"
+      invisible={
+        !isHoveredSort ||
+        isHoveredAll ||
+        isHoveredNew ||
+        isHoveredResolve ||
+        isHoveredOpen ||
+        isHoveredClosed
+      }
+      badgeContent={!sortTickets ? "Crescente" : "Decrescente"}
+      classes={{ badge: classes.tabsBadge }}
+    >
+      <ToggleButton
+        onMouseEnter={() => setIsHoveredSort(true)}
+        onMouseLeave={() => setIsHoveredSort(false)}
+        className={`${classes.standardButton} ${sortTickets ? classes.activeButton : ''}`}
+        value="uncheck"
+        selected={sortTickets}
+        onChange={() => setSortTickets((prevState) => !prevState)}
+      >
+        {!sortTickets ? (
+          <TextRotateUp className={`${classes.standardIcon} ${sortTickets ? classes.activeIcon : ''}`} />
+        ) : (
+          <TextRotationDown className={`${classes.standardIcon} ${classes.activeIcon}`} />
+        )}
+      </ToggleButton>
+    </Badge>
+  </Tooltip>
 )}
 
-<Badge
-  color="primary"
-  invisible={!awaitingAgentCount}
-  badgeContent={awaitingAgentCount}
-  classes={{ badge: classes.tabsBadge }}
->
-  <IconButton
-    className={`${classes.awaitingSmallButton} ${
-      tabOpen === "awaiting_agent" ? classes.activeButton : ''
-    }`}
-    onClick={() => setTabOpen("awaiting_agent")}
+<Tooltip title="Atendente aguardando">
+  <Badge
+    color="primary"
+    invisible={!awaitingAgentCount}
+    badgeContent={awaitingAgentCount}
+    classes={{ badge: classes.tabsBadge }}
   >
-    <ClockIcon
-      className={`${classes.awaitingSmallIcon} ${
-        tabOpen === "awaiting_agent" ? classes.activeIcon : ''
+    <IconButton
+      className={`${classes.awaitingSmallButton} ${
+        tabOpen === "awaiting_agent" ? classes.activeButton : ''
       }`}
-    />
-  </IconButton>
-</Badge>
-<Badge
-  color="primary"
-  invisible={!awaitingCustomerCount}
-  badgeContent={awaitingCustomerCount}
-  classes={{ badge: classes.tabsBadge }}
->
-  <IconButton
-    className={`${classes.awaitingSmallButton} ${
-      tabOpen === "awaiting_customer" ? classes.activeButton : ''
-    }`}
-    onClick={() => setTabOpen("awaiting_customer")}
+      onClick={() => setTabOpen("awaiting_agent")}
+    >
+      <ClockIcon
+        className={`${classes.awaitingSmallIcon} ${
+          tabOpen === "awaiting_agent" ? classes.activeIcon : ''
+        }`}
+      />
+    </IconButton>
+  </Badge>
+</Tooltip>
+<Tooltip title="Cliente aguardando">
+  <Badge
+    color="primary"
+    invisible={!awaitingCustomerCount}
+    badgeContent={awaitingCustomerCount}
+    classes={{ badge: classes.tabsBadge }}
   >
-    <MessageSharpIcon
-      className={`${classes.awaitingSmallIcon} ${
-        tabOpen === "awaiting_customer" ? classes.activeIcon : ''
+    <IconButton
+      className={`${classes.awaitingSmallButton} ${
+        tabOpen === "awaiting_customer" ? classes.activeButton : ''
       }`}
-    />
-  </IconButton>
-</Badge>
+      onClick={() => setTabOpen("awaiting_customer")}
+    >
+      <MessageSharpIcon
+        className={`${classes.awaitingSmallIcon} ${
+          tabOpen === "awaiting_customer" ? classes.activeIcon : ''
+        }`}
+      />
+    </IconButton>
+  </Badge>
+</Tooltip>
 
 {/* Movido o seletor de filas para a mesma linha dos botões */}
 <span className="MuiBadge-root">
