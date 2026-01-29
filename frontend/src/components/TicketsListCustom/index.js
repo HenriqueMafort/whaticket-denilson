@@ -213,7 +213,8 @@ const TicketsListCustom = (props) => {
         statusFilter,
         userFilter,
         sortTickets,
-        awaiting
+        awaiting,
+        refreshKey
     } = props;
 
     const classes = useStyles();
@@ -229,7 +230,7 @@ const TicketsListCustom = (props) => {
     useEffect(() => {
         dispatch({ type: "RESET" });
         setPageNumber(1);
-    }, [status, searchParam, dispatch, showAll, tags, users, forceSearch, selectedQueueIds, whatsappIds, statusFilter, sortTickets, searchOnMessages, awaiting]);
+    }, [status, searchParam, dispatch, showAll, tags, users, forceSearch, selectedQueueIds, whatsappIds, statusFilter, sortTickets, searchOnMessages, awaiting, refreshKey]);
 
     const statusParam = status;
 
@@ -246,7 +247,8 @@ const TicketsListCustom = (props) => {
         statusFilter: JSON.stringify(statusFilter),
         userFilter,
         sortTickets,
-        awaiting
+        awaiting,
+        refreshKey
     });
 
 

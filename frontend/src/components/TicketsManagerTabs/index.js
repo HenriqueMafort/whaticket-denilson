@@ -475,6 +475,7 @@ const TicketsManagerTabs = () => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [selectedWhatsapp, setSelectedWhatsapp] = useState([]);
   const [forceSearch, setForceSearch] = useState(false);
+  const [listRefreshKey, setListRefreshKey] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState([]);
   const [filter, setFilter] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -593,6 +594,7 @@ const TicketsManagerTabs = () => {
   const handleChangeTabOpen = (e, newValue) => {
     handleBack();
     setTabOpen(newValue);
+    setListRefreshKey((prev) => prev + 1);
   };
 
   const applyPanelStyle = (status) => {
@@ -1251,6 +1253,7 @@ const TicketsManagerTabs = () => {
             style={applyPanelStyle("open")}
             setTabOpen={setTabOpen}
             awaiting={awaitingFilter}
+            refreshKey={listRefreshKey}
           />
           <TicketsList
             status="pending"
@@ -1261,6 +1264,7 @@ const TicketsManagerTabs = () => {
             style={applyPanelStyle("pending")}
             setTabOpen={setTabOpen}
             awaiting={awaitingFilter}
+            refreshKey={listRefreshKey}
           />
           {user.allowGroup && (
             <TicketsList
@@ -1271,6 +1275,7 @@ const TicketsManagerTabs = () => {
               updateCount={(val) => setGroupingCount(val)}
               style={applyPanelStyle("group")}
               setTabOpen={setTabOpen}
+              refreshKey={listRefreshKey}
             />
           )}
         </Paper>

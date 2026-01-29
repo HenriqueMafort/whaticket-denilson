@@ -20,7 +20,8 @@ const useTickets = ({
   userFilter,
   sortTickets,
   searchOnMessages,
-  awaiting
+  awaiting,
+  refreshKey
 }) => {
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(false);
@@ -118,7 +119,8 @@ const useTickets = ({
     forceSearch,
     sortTickets,
     searchOnMessages,
-    awaiting
+    awaiting,
+    refreshKey
   ]);
 
   return { tickets, loading, hasMore, count };
