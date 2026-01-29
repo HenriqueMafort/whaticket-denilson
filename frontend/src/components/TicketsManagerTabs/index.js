@@ -1004,7 +1004,7 @@ const TicketsManagerTabs = () => {
   </Tooltip>
 )}
 
-<Tooltip title="Atendente aguardando">
+<Tooltip title="Cliente aguardando">
     <Badge
       color="primary"
       invisible={
@@ -1020,7 +1020,7 @@ const TicketsManagerTabs = () => {
           ) || isHoveredAwaitingAgent
         )
       }
-      badgeContent={"Ag. Atend."}
+      badgeContent={"Ag. Cliente"}
       classes={{ badge: classes.tabsBadgeAwaiting }}
     >
       <IconButton
@@ -1039,7 +1039,7 @@ const TicketsManagerTabs = () => {
       </IconButton>
     </Badge>
 </Tooltip>
-<Tooltip title="Cliente aguardando">
+<Tooltip title="Atendente aguardando">
     <Badge
       color="primary"
       invisible={
@@ -1055,7 +1055,7 @@ const TicketsManagerTabs = () => {
           ) || isHoveredAwaitingCustomer
         )
       }
-      badgeContent={"Ag. Cliente"}
+      badgeContent={"Ag. Atend."}
       classes={{ badge: classes.tabsBadgeAwaiting }}
     >
       <IconButton
