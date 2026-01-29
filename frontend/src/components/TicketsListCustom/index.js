@@ -463,7 +463,7 @@ const TicketsListCustom = (props) => {
                 className={classes.ticketsList}
                 onScroll={handleScroll}
             >
-                {isRefreshing && (
+                {(isRefreshing || loading) && (
                     <div className={classes.refreshingOverlay}>
                         Carregando...
                     </div>
@@ -492,7 +492,7 @@ const TicketsListCustom = (props) => {
                             ))}
                         </>
                     )}
-                    {loading && <TicketsListSkeleton />}
+                    {loading && ticketsList.length === 0 && <TicketsListSkeleton />}
                 </List>
             </Paper>
         </Paper>
