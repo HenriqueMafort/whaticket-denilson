@@ -33,13 +33,31 @@ const useStyles = makeStyles((theme) => ({
         position: "sticky",
         top: 0,
         zIndex: 2,
-        width: "100%",
-        padding: "6px 12px",
-        backgroundColor: "rgba(255, 255, 255, 0.9)",
-        borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
-        color: "rgb(104, 121, 146)",
+        display: "flex",
+        justifyContent: "center",
+        padding: "6px 0",
+    },
+    refreshingPill: {
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 4,
+        padding: "4px 10px",
+        borderRadius: 999,
+        backgroundColor: "rgba(103, 120, 148, 0.12)",
+        color: "rgb(96, 114, 138)",
         fontSize: "12px",
-        textAlign: "center",
+        fontWeight: 500,
+        boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+    },
+    refreshingDots: {
+        display: "inline-block",
+        overflow: "hidden",
+        width: 0,
+        animation: "$dots 1s steps(3, end) infinite",
+    },
+    "@keyframes dots": {
+        "0%": { width: 0 },
+        "100%": { width: 12 },
     },
 
     ticketsListHeader: {
@@ -465,7 +483,10 @@ const TicketsListCustom = (props) => {
             >
                 {(isRefreshing || loading) && (
                     <div className={classes.refreshingOverlay}>
-                        Carregando...
+                        <div className={classes.refreshingPill}>
+                            Atualizando
+                            <span className={classes.refreshingDots}>...</span>
+                        </div>
                     </div>
                 )}
                 <List style={{ paddingTop: 0 }} >
