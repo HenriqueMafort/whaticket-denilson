@@ -95,7 +95,7 @@ const TicketAdvanced = (props) => {
     return (
         <QueueSelectedProvider>
 
-            <TicketAdvancedLayout>
+            <TicketAdvancedLayout hideHeader={isMobile}>
                 {!isMobile && (
                     <Box className={classes.header}>
                         <BottomNavigation
