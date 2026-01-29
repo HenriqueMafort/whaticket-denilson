@@ -231,7 +231,7 @@ const TicketsListCustom = (props) => {
         setPageNumber(1);
     }, [status, searchParam, dispatch, showAll, tags, users, forceSearch, selectedQueueIds, whatsappIds, statusFilter, sortTickets, searchOnMessages, awaiting]);
 
-    const statusParam = awaiting ? undefined : status;
+    const statusParam = status;
 
     const { tickets, hasMore, loading } = useTickets({
         pageNumber,
@@ -308,14 +308,14 @@ const TicketsListCustom = (props) => {
             }
             // console.log(shouldUpdateTicket(data.ticket))
             if (data.action === "update") {
-                if (shouldUpdateTicket(data.ticket) && (awaiting || data.ticket.status === status)) {
+                if (shouldUpdateTicket(data.ticket) && data.ticket.status === status) {
                     dispatch({
                         type: "UPDATE_TICKET",
                         payload: data.ticket,
                         status: status,
                         sortDir: sortTickets
                     });
-                } else if (awaiting && data.ticket?.id) {
+                } else if (data.ticket?.id && data.ticket.status === status) {
                     dispatch({
                         type: "DELETE_TICKET",
                         payload: data.ticket.id,
@@ -349,14 +349,14 @@ const TicketsListCustom = (props) => {
 
         const onCompanyAppMessageTicketsList = (data) => {
             if (data.action === "create") {
-                if (shouldUpdateTicket(data.ticket) && (awaiting || data.ticket.status === status)) {
+                if (shouldUpdateTicket(data.ticket) && data.ticket.status === status) {
                     dispatch({
                         type: "UPDATE_TICKET_UNREAD_MESSAGES",
                         payload: data.ticket,
                         status: status,
                         sortDir: sortTickets
                     });
-                } else if (awaiting && data.ticket?.id) {
+                } else if (data.ticket?.id && data.ticket.status === status) {
                     dispatch({
                         type: "DELETE_TICKET",
                         payload: data.ticket.id,
@@ -385,10 +385,7 @@ const TicketsListCustom = (props) => {
         };
 
         const onConnectTicketsList = () => {
-        if (awaiting) {
-            socket.emit("joinTickets", "open");
-            socket.emit("joinTickets", "pending");
-        } else if (status) {
+        if (status) {
             socket.emit("joinTickets", status);
         } else {
             socket.emit("joinNotification");
@@ -401,10 +398,7 @@ const TicketsListCustom = (props) => {
         socket.on(`company-${companyId}-contact`, onCompanyContactTicketsList);
 
         return () => {
-            if (awaiting) {
-                socket.emit("leaveTickets", "open");
-                socket.emit("leaveTickets", "pending");
-            } else if (status) {
+            if (status) {
                 socket.emit("leaveTickets", status);
             } else {
                 socket.emit("leaveNotification");
@@ -438,7 +432,7 @@ const TicketsListCustom = (props) => {
         }
     };
 
-        if (!awaiting && status && status !== "search") {
+        if (status && status !== "search") {
         ticketsList = ticketsList.filter(ticket => ticket.status === status)
     }
 

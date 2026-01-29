@@ -467,8 +467,7 @@ const TicketsManagerTabs = () => {
   const [openCount, setOpenCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
   const [groupingCount, setGroupingCount] = useState(0);
-  const [awaitingAgentCount, setAwaitingAgentCount] = useState(0);
-  const [awaitingCustomerCount, setAwaitingCustomerCount] = useState(0);
+  const [awaitingFilter, setAwaitingFilter] = useState(null);
 
   const userQueueIds = user.queues.map((q) => q.id);
   const [selectedQueueIds, setSelectedQueueIds] = useState(userQueueIds || []);
@@ -493,6 +492,7 @@ const TicketsManagerTabs = () => {
 
   const showAllStorageKey = `ticketsShowAll-${user?.companyId}-${user?.id}`;
   const tabOpenStorageKey = `ticketsTabOpen-${user?.companyId}-${user?.id}`;
+  const awaitingFilterStorageKey = `ticketsAwaitingFilter-${user?.companyId}-${user?.id}`;
 
   useEffect(() => {
     const stored = localStorage.getItem(showAllStorageKey);
@@ -504,7 +504,7 @@ const TicketsManagerTabs = () => {
   useEffect(() => {
     const storedTabOpen = localStorage.getItem(tabOpenStorageKey);
     if (storedTabOpen && tabOpen !== storedTabOpen) {
-      const allowed = ["open", "pending", "group", "awaiting_agent", "awaiting_customer"];
+      const allowed = ["open", "pending", "group"];
       if (allowed.includes(storedTabOpen)) {
         setTabOpen(storedTabOpen);
       }
@@ -516,6 +516,24 @@ const TicketsManagerTabs = () => {
       localStorage.setItem(tabOpenStorageKey, tabOpen);
     }
   }, [tabOpen, tabOpenStorageKey]);
+
+  useEffect(() => {
+    const storedAwaiting = localStorage.getItem(awaitingFilterStorageKey);
+    if (storedAwaiting && storedAwaiting !== awaitingFilter) {
+      const allowed = ["agent", "customer"];
+      if (allowed.includes(storedAwaiting)) {
+        setAwaitingFilter(storedAwaiting);
+      }
+    }
+  }, [awaitingFilterStorageKey, awaitingFilter]);
+
+  useEffect(() => {
+    if (awaitingFilter) {
+      localStorage.setItem(awaitingFilterStorageKey, awaitingFilter);
+    } else {
+      localStorage.removeItem(awaitingFilterStorageKey);
+    }
+  }, [awaitingFilter, awaitingFilterStorageKey]);
 
   useEffect(() => {
     localStorage.setItem(showAllStorageKey, showAllTickets ? "true" : "false");
@@ -1009,7 +1027,7 @@ const TicketsManagerTabs = () => {
       color="primary"
       invisible={
         !(
-          (tabOpen === "awaiting_agent" &&
+          (awaitingFilter === "agent" &&
             !isHoveredAll &&
             !isHoveredNew &&
             !isHoveredResolve &&
@@ -1027,13 +1045,13 @@ const TicketsManagerTabs = () => {
         onMouseEnter={() => setIsHoveredAwaitingAgent(true)}
         onMouseLeave={() => setIsHoveredAwaitingAgent(false)}
         className={`${classes.awaitingSmallButton} ${
-          tabOpen === "awaiting_agent" ? classes.activeButton : ''
+          awaitingFilter === "agent" ? classes.activeButton : ''
         }`}
-        onClick={() => setTabOpen("awaiting_agent")}
+        onClick={() => setAwaitingFilter((prev) => (prev === "agent" ? null : "agent"))}
       >
         <ClockIcon
           className={`${classes.awaitingSmallIcon} ${
-            tabOpen === "awaiting_agent" ? classes.activeIcon : ''
+            awaitingFilter === "agent" ? classes.activeIcon : ''
           }`}
         />
       </IconButton>
@@ -1044,7 +1062,7 @@ const TicketsManagerTabs = () => {
       color="primary"
       invisible={
         !(
-          (tabOpen === "awaiting_customer" &&
+          (awaitingFilter === "customer" &&
             !isHoveredAll &&
             !isHoveredNew &&
             !isHoveredResolve &&
@@ -1062,13 +1080,13 @@ const TicketsManagerTabs = () => {
         onMouseEnter={() => setIsHoveredAwaitingCustomer(true)}
         onMouseLeave={() => setIsHoveredAwaitingCustomer(false)}
         className={`${classes.awaitingSmallButton} ${
-          tabOpen === "awaiting_customer" ? classes.activeButton : ''
+          awaitingFilter === "customer" ? classes.activeButton : ''
       }`}
-      onClick={() => setTabOpen("awaiting_customer")}
+      onClick={() => setAwaitingFilter((prev) => (prev === "customer" ? null : "customer"))}
     >
       <MessageSharpIcon
         className={`${classes.awaitingSmallIcon} ${
-          tabOpen === "awaiting_customer" ? classes.activeIcon : ''
+          awaitingFilter === "customer" ? classes.activeIcon : ''
         }`}
       />
     </IconButton>
@@ -1232,6 +1250,7 @@ const TicketsManagerTabs = () => {
             updateCount={(val) => setOpenCount(val)}
             style={applyPanelStyle("open")}
             setTabOpen={setTabOpen}
+            awaiting={awaitingFilter}
           />
           <TicketsList
             status="pending"
@@ -1241,26 +1260,7 @@ const TicketsManagerTabs = () => {
             updateCount={(val) => setPendingCount(val)}
             style={applyPanelStyle("pending")}
             setTabOpen={setTabOpen}
-          />
-          <TicketsList
-            status="open"
-            awaiting="agent"
-            showAll={showAllTickets}
-            sortTickets={sortTickets ? "ASC" : "DESC"}
-            selectedQueueIds={selectedQueueIds}
-            updateCount={(val) => setAwaitingAgentCount(val)}
-            style={applyPanelStyle("awaiting_agent")}
-            setTabOpen={setTabOpen}
-          />
-          <TicketsList
-            status="open"
-            awaiting="customer"
-            showAll={showAllTickets}
-            sortTickets={sortTickets ? "ASC" : "DESC"}
-            selectedQueueIds={selectedQueueIds}
-            updateCount={(val) => setAwaitingCustomerCount(val)}
-            style={applyPanelStyle("awaiting_customer")}
-            setTabOpen={setTabOpen}
+            awaiting={awaitingFilter}
           />
           {user.allowGroup && (
             <TicketsList
