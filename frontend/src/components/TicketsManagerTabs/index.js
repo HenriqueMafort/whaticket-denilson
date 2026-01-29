@@ -525,7 +525,7 @@ const TicketsManagerTabs = () => {
         setAwaitingFilter(storedAwaiting);
       }
     }
-  }, [awaitingFilterStorageKey, awaitingFilter]);
+  }, [awaitingFilterStorageKey]);
 
   useEffect(() => {
     if (awaitingFilter) {
