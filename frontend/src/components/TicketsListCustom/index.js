@@ -29,6 +29,18 @@ const useStyles = makeStyles((theme) => ({
         ...theme.scrollbarStyles,
         borderTop: "2px solid rgba(0, 0, 0, 0.12)",
     },
+    refreshingOverlay: {
+        position: "sticky",
+        top: 0,
+        zIndex: 2,
+        width: "100%",
+        padding: "6px 12px",
+        backgroundColor: "rgba(255, 255, 255, 0.9)",
+        borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
+        color: "rgb(104, 121, 146)",
+        fontSize: "12px",
+        textAlign: "center",
+    },
 
     ticketsListHeader: {
         color: "rgb(67, 83, 105)",
@@ -220,6 +232,7 @@ const TicketsListCustom = (props) => {
     const classes = useStyles();
     const [pageNumber, setPageNumber] = useState(1);
     let [ticketsList, dispatch] = useReducer(reducer, []);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     //   const socketManager = useContext(SocketContext);
     const { user, socket } = useContext(AuthContext);
 
@@ -228,7 +241,7 @@ const TicketsListCustom = (props) => {
     const companyId = user.companyId;
 
     useEffect(() => {
-        dispatch({ type: "RESET" });
+        setIsRefreshing(true);
         setPageNumber(1);
     }, [status, searchParam, dispatch, showAll, tags, users, forceSearch, selectedQueueIds, whatsappIds, statusFilter, sortTickets, searchOnMessages, awaiting, refreshKey]);
 
@@ -266,12 +279,15 @@ const TicketsListCustom = (props) => {
                 status,
                 sortDir: sortTickets
             });
+            if (isRefreshing) {
+                setIsRefreshing(false);
+            }
         }
         // } else {
         //  dispatch({ type: "LOAD_TICKETS", payload: filteredTickets });
         // }
 
-    }, [tickets]);
+    }, [tickets, companyId, status, sortTickets, isRefreshing]);
 
     useEffect(() => {
         const matchesAwaiting = ticket => {
@@ -447,6 +463,11 @@ const TicketsListCustom = (props) => {
                 className={classes.ticketsList}
                 onScroll={handleScroll}
             >
+                {isRefreshing && (
+                    <div className={classes.refreshingOverlay}>
+                        Carregando...
+                    </div>
+                )}
                 <List style={{ paddingTop: 0 }} >
                     {ticketsList.length === 0 && !loading ? (
                         <div className={classes.noTicketsDiv}>
