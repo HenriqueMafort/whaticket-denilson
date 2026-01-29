@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import BottomNavigation from '@material-ui/core/BottomNavigation';
@@ -41,6 +42,8 @@ const TicketAdvanced = (props) => {
     const { ticketId } = useParams();
     const [option, setOption] = useState(0);
     const { currentTicket, setCurrentTicket } = useContext(TicketsContext)
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
     useEffect(() => {
         if (currentTicket.id !== null) {
@@ -86,19 +89,21 @@ const TicketAdvanced = (props) => {
         <QueueSelectedProvider>
 
             <TicketAdvancedLayout>
-                <Box className={classes.header}>
-                    <BottomNavigation
-                        value={option}
-                        onChange={(event, newValue) => {
-                            setOption(newValue);
-                        }}
-                        showLabels
-                        className={classes.root}
-                    >
-                        <BottomNavigationAction label="Ticket" icon={<ChatIcon />} />
-                        <BottomNavigationAction label="Atendimentos" icon={<QuestionAnswerIcon />} />
-                    </BottomNavigation>
-                </Box>
+                {!isMobile && (
+                    <Box className={classes.header}>
+                        <BottomNavigation
+                            value={option}
+                            onChange={(event, newValue) => {
+                                setOption(newValue);
+                            }}
+                            showLabels
+                            className={classes.root}
+                        >
+                            <BottomNavigationAction label="Ticket" icon={<ChatIcon />} />
+                            <BottomNavigationAction label="Atendimentos" icon={<QuestionAnswerIcon />} />
+                        </BottomNavigation>
+                    </Box>
+                )}
                 <Box className={classes.content}>
                     {option === 0 ? renderMessageContext() : renderTicketsManagerTabs()}
                 </Box>

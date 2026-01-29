@@ -170,7 +170,11 @@ const Ticket = () => {
 
   const handleDrawerClose = useCallback(() => {
     setDrawerOpen(false);
-  }, []);
+    if (isMobile) {
+      setTabOpen("open");
+      history.push("/tickets");
+    }
+  }, [history, isMobile, setTabOpen]);
 
   const handleQuickMessageSelect = (quickMessage) => {
     try {
