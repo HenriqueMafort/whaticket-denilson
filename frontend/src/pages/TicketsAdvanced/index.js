@@ -47,7 +47,7 @@ const TicketAdvanced = (props) => {
 
     useEffect(() => {
         if (currentTicket.id !== null) {
-            setCurrentTicket({ id: currentTicket.id, code: '#open' })
+            setCurrentTicket((prevState) => ({ ...prevState, code: '#open' }))
         }
         if (!ticketId) {
             setOption(1)
