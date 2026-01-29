@@ -52,6 +52,9 @@ const TicketAdvanced = (props) => {
         if (!ticketId) {
             setOption(1)
         }
+        if (isMobile) {
+            setOption(1)
+        }
         return () => {
             setCurrentTicket({ id: null, code: null })
         }
@@ -59,10 +62,14 @@ const TicketAdvanced = (props) => {
     }, [])
 
     useEffect(() => {
+        if (isMobile) {
+            setOption(1);
+            return;
+        }
         if (currentTicket.id !== null) {
             setOption(0)
         }
-    }, [currentTicket])
+    }, [currentTicket, isMobile])
 
     const renderPlaceholder = () => {
         return <Box className={classes.placeholderContainer}>
