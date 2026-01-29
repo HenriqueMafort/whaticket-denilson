@@ -112,7 +112,10 @@ const TicketAdvanced = (props) => {
                     </Box>
                 )}
                 <Box className={classes.content}>
-                    {option === 0 ? renderMessageContext() : renderTicketsManagerTabs()}
+                    {isMobile
+                        ? (ticketId && ticketId !== "undefined" ? renderMessageContext() : renderTicketsManagerTabs())
+                        : (option === 0 ? renderMessageContext() : renderTicketsManagerTabs())
+                    }
                 </Box>
             </TicketAdvancedLayout>
         </QueueSelectedProvider>
