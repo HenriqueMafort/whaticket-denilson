@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 
 import { Can } from "../Can";
 import { makeStyles } from "@material-ui/core/styles";
-import { IconButton, Menu, CircularProgress } from "@material-ui/core";
+import { IconButton, Menu, CircularProgress, Hidden } from "@material-ui/core";
 import {
   DeviceHubOutlined,
   History,
@@ -178,7 +178,7 @@ const TicketActionButtonsCustom = ({
     const planConfigs = await getPlanCompany(undefined, companyId);
 
     console.log("DEBUG planConfigs:", planConfigs);
-    
+
     if (isMounted.current) {
       setShowSchedules(planConfigs.plan.useSchedules);
       setShowWavoipCall(planConfigs.plan.wavoip);
@@ -854,11 +854,13 @@ const TicketActionButtonsCustom = ({
                 </Tooltip>
               </IconButton>
 
-              <IconButton className={classes.bottomButtonVisibilityIcon}>
-                <Tooltip title={i18n.t("messagesList.header.buttons.resolve")}>
-                  <HighlightOffIcon onClick={handleClickResolver} />
-                </Tooltip>
-              </IconButton>
+              <Hidden only={['xs', 'sm']}>
+                <IconButton className={classes.bottomButtonVisibilityIcon}>
+                  <Tooltip title={i18n.t("messagesList.header.buttons.resolve")}>
+                    <HighlightOffIcon onClick={handleClickResolver} />
+                  </Tooltip>
+                </IconButton>
+              </Hidden>
 
               <IconButton className={classes.bottomButtonVisibilityIcon}>
                 <Tooltip title={i18n.t("tickets.buttons.returnQueue")}>
@@ -871,14 +873,16 @@ const TicketActionButtonsCustom = ({
                 </Tooltip>
               </IconButton>
 
-              <IconButton className={classes.bottomButtonVisibilityIcon}>
-                <Tooltip title="Transferir Ticket">
-                  <SwapHorizOutlined
-                    // color="primary"
-                    onClick={handleOpenTransferModal}
-                  />
-                </Tooltip>
-              </IconButton>
+              <Hidden only={['xs', 'sm']}>
+                <IconButton className={classes.bottomButtonVisibilityIcon}>
+                  <Tooltip title="Transferir Ticket">
+                    <SwapHorizOutlined
+                      // color="primary"
+                      onClick={handleOpenTransferModal}
+                    />
+                  </Tooltip>
+                </IconButton>
+              </Hidden>
 
               {/* Botão de vincular à carteira só aparece se NÃO houver carteira vinculada E se a configuração DirectTicketsToWallets estiver ativa */}
               {directTicketsToWallets && !(
@@ -995,6 +999,12 @@ const TicketActionButtonsCustom = ({
           open={menuOpen}
           onClose={handleCloseMenu}
         >
+          <MenuItem onClick={handleOpenTransferModal}>
+            Transferir Ticket
+          </MenuItem>
+          <MenuItem onClick={handleClickResolver}>
+            {i18n.t("messagesList.header.buttons.resolve")}
+          </MenuItem>
           <MenuItem onClick={handleOpenConfirmationModal}>
             <Can
               role={user.profile}
