@@ -284,7 +284,6 @@ const ListTicketsService = async ({
     whereCondition = {
       ...whereCondition,
       isGroup: false,
-      status: { [Op.in]: ["open", "pending"] },
       fromMe: awaiting === "agent"
     };
   }
