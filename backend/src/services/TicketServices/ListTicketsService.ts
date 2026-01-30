@@ -279,12 +279,13 @@ const ListTicketsService = async ({
   }
 
   if (awaiting === "agent" || awaiting === "customer") {
+    // Filtra apenas pela direcao da ultima mensagem (fromMe),
+    // sem depender de unreadMessages.
     whereCondition = {
       ...whereCondition,
       isGroup: false,
       status: { [Op.in]: ["open", "pending"] },
-      fromMe: awaiting === "agent",
-      unreadMessages: awaiting === "customer" ? { [Op.gt]: 0 } : 0
+      fromMe: awaiting === "agent"
     };
   }
 
