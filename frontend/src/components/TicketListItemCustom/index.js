@@ -407,11 +407,8 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
 
   const handleMobileMenuTransfer = () => {
     handleSelectTicket(ticket);
-    // Navega para o chat passando o estado 'transfer: true'
-    history.push({
-      pathname: `/tickets/${ticket.uuid}`,
-      state: { transfer: true },
-    });
+    // Navega para o chat passando o parâmetro na URL
+    history.push(`/tickets/${ticket.uuid}?transfer=true`);
     setLoading(true);
     if (isMounted.current) {
       setLoading(false);

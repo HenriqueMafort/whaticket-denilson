@@ -156,8 +156,10 @@ const TicketActionButtonsCustom = ({
   );
 
   useEffect(() => {
-    if (location.state && location.state.transfer) {
-      console.log("TicketActionButtonsCustom: Recebido estado de transferência", location.state);
+    // Verifica parâmetros na URL (Query Params)
+    const params = new URLSearchParams(location.search);
+    if (params.get("transfer") === "true") {
+      console.log("TicketActionButtonsCustom: Recebido parâmetro de URL transfer=true");
       // Pequeno delay para garantir que o modal abra após renderização
       const timer = setTimeout(() => {
         setTransferTicketModalOpen(true);
@@ -165,7 +167,7 @@ const TicketActionButtonsCustom = ({
 
       return () => clearTimeout(timer);
     }
-  }, [location.state, history, location.pathname]);
+  }, [location.search]);
 
   useEffect(() => {
     fetchData();
@@ -419,12 +421,13 @@ const TicketActionButtonsCustom = ({
   const handleCloseTransferTicketModal = useCallback(() => {
     if (isMounted.current) {
       setTransferTicketModalOpen(false);
-      // Limpa o estado da history APENAS quando o modal é fechado manualmente
-      if (location.state && location.state.transfer) {
-        history.replace(location.pathname, {});
+      // Remove o parâmetro transfer da URL
+      const params = new URLSearchParams(location.search);
+      if (params.get("transfer")) {
+        history.replace(location.pathname);
       }
     }
-  }, [history, location.pathname, location.state]);
+  }, [history, location.pathname, location.search]);
 
   const handleOpenNewTicketModal = () => {
     setNewTicketModalOpen(true);
