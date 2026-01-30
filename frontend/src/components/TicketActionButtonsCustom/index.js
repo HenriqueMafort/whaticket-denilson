@@ -796,9 +796,11 @@ const TicketActionButtonsCustom = ({
 
       <div className={classes.actionButtons}>
         {showWavoipCall && (
-          <IconButton color="secondary" onClick={handleOpenWavoipCall}>
-            <Phone />
-          </IconButton>
+          <Hidden only={['xs', 'sm']}>
+            <IconButton color="secondary" onClick={handleOpenWavoipCall}>
+              <Phone />
+            </IconButton>
+          </Hidden>
         )}
         {ticket.status === "closed" && (
           <ButtonWithSpinner
@@ -834,25 +836,28 @@ const TicketActionButtonsCustom = ({
                             </IconButton> */}
 
               {/* Ícone para copiar telefone */}
-              <IconButton
-                className={classes.bottomButtonVisibilityIcon}
-                onClick={handleCopyPhone}
-                disabled={!contact?.number}
-              >
-                <Tooltip title={getCopyPhoneTooltip()}>
-                  <FileCopyIcon />
-                </Tooltip>
-              </IconButton>
+              <Hidden only={['xs', 'sm']}>
+                {/* Ícone para copiar telefone */}
+                <IconButton
+                  className={classes.bottomButtonVisibilityIcon}
+                  onClick={handleCopyPhone}
+                  disabled={!contact?.number}
+                >
+                  <Tooltip title={getCopyPhoneTooltip()}>
+                    <FileCopyIcon />
+                  </Tooltip>
+                </IconButton>
 
-              {/* Ícone para respostas rápidas */}
-              <IconButton
-                className={classes.bottomButtonVisibilityIcon}
-                onClick={handleOpenQuickMessageModal}
-              >
-                <Tooltip title={i18n.t("ticketInfo.quickMessages")}>
-                  <FlashOn />
-                </Tooltip>
-              </IconButton>
+                {/* Ícone para respostas rápidas */}
+                <IconButton
+                  className={classes.bottomButtonVisibilityIcon}
+                  onClick={handleOpenQuickMessageModal}
+                >
+                  <Tooltip title={i18n.t("ticketInfo.quickMessages")}>
+                    <FlashOn />
+                  </Tooltip>
+                </IconButton>
+              </Hidden>
 
               <Hidden only={['xs', 'sm']}>
                 <IconButton className={classes.bottomButtonVisibilityIcon}>
@@ -887,24 +892,26 @@ const TicketActionButtonsCustom = ({
               </Hidden>
 
               {/* Botão de vincular à carteira só aparece se NÃO houver carteira vinculada E se a configuração DirectTicketsToWallets estiver ativa */}
-              {directTicketsToWallets && !(
-                ticket.contact?.contactWallets &&
-                ticket.contact.contactWallets.length > 0
-              ) && (
-                  <IconButton
-                    className={classes.bottomButtonVisibilityIcon}
-                    onClick={handleLinkToWallet}
-                    disabled={linkingWallet}
-                  >
-                    <Tooltip title="Vincular à minha carteira">
-                      {linkingWallet ? (
-                        <CircularProgress size={20} />
-                      ) : (
-                        <AccountBalanceWallet />
-                      )}
-                    </Tooltip>
-                  </IconButton>
-                )}
+              <Hidden only={['xs', 'sm']}>
+                {directTicketsToWallets && !(
+                  ticket.contact?.contactWallets &&
+                  ticket.contact.contactWallets.length > 0
+                ) && (
+                    <IconButton
+                      className={classes.bottomButtonVisibilityIcon}
+                      onClick={handleLinkToWallet}
+                      disabled={linkingWallet}
+                    >
+                      <Tooltip title="Vincular à minha carteira">
+                        {linkingWallet ? (
+                          <CircularProgress size={20} />
+                        ) : (
+                          <AccountBalanceWallet />
+                        )}
+                      </Tooltip>
+                    </IconButton>
+                  )}
+              </Hidden>
             </>
 
             {/* {showSchedules && (
@@ -920,16 +927,18 @@ const TicketActionButtonsCustom = ({
                             </>
                         )} */}
 
-            <MenuItem className={classes.bottomButtonVisibilityIcon}>
-              <Tooltip title={i18n.t("contactModal.form.chatBotContact")}>
-                <Switch
-                  size="small"
-                  // color="primary"
-                  checked={disableBot}
-                  onChange={() => handleContactToggleDisableBot()}
-                />
-              </Tooltip>
-            </MenuItem>
+            <Hidden only={['xs', 'sm']}>
+              <MenuItem className={classes.bottomButtonVisibilityIcon}>
+                <Tooltip title={i18n.t("contactModal.form.chatBotContact")}>
+                  <Switch
+                    size="small"
+                    // color="primary"
+                    checked={disableBot}
+                    onChange={() => handleContactToggleDisableBot()}
+                  />
+                </Tooltip>
+              </MenuItem>
+            </Hidden>
 
             {confirmationOpen && (
               <ConfirmationModal
