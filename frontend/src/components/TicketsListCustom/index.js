@@ -259,6 +259,7 @@ const TicketsListCustom = (props) => {
     const companyId = user.companyId;
 
     useEffect(() => {
+        dispatch({ type: "RESET" });
         setIsRefreshing(true);
         setPageNumber(1);
     }, [status, searchParam, dispatch, showAll, tags, users, forceSearch, selectedQueueIds, whatsappIds, statusFilter, sortTickets, searchOnMessages, awaiting, refreshKey]);
@@ -291,21 +292,23 @@ const TicketsListCustom = (props) => {
         // const allticket = user.allTicket === 'enabled';
         // if (profile === "admin" || allTicket || allowGroup || allHistoric) {
         if (companyId) {
-            dispatch({
-                type: "LOAD_TICKETS",
-                payload: tickets,
-                status,
-                sortDir: sortTickets
-            });
-            if (isRefreshing) {
-                setIsRefreshing(false);
+            if (!loading) {
+                dispatch({
+                    type: "LOAD_TICKETS",
+                    payload: tickets,
+                    status,
+                    sortDir: sortTickets
+                });
+                if (isRefreshing) {
+                    setIsRefreshing(false);
+                }
             }
         }
         // } else {
         //  dispatch({ type: "LOAD_TICKETS", payload: filteredTickets });
         // }
 
-    }, [tickets, companyId, status, sortTickets, isRefreshing]);
+    }, [tickets, companyId, status, sortTickets, isRefreshing, loading]);
 
     useEffect(() => {
         const matchesAwaiting = ticket => {
