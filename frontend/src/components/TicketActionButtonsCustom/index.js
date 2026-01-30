@@ -90,6 +90,7 @@ const TicketActionButtonsCustom = ({
   ticket,
   contact,
   onQuickMessageSelect,
+  forceOpenTransfer
   // , showSelectMessageCheckbox,
   // selectedMessages,
   // forwardMessageModalOpen,
@@ -156,18 +157,12 @@ const TicketActionButtonsCustom = ({
   );
 
   useEffect(() => {
-    // Verifica parâmetros na URL (Query Params)
-    const params = new URLSearchParams(location.search);
-    if (params.get("transfer") === "true") {
-      console.log("TicketActionButtonsCustom: Recebido parâmetro de URL transfer=true");
-      // Pequeno delay para garantir que o modal abra após renderização
-      const timer = setTimeout(() => {
-        setTransferTicketModalOpen(true);
-      }, 1000);
-
-      return () => clearTimeout(timer);
+    // Verifica prop passada pelo componente pai (Ticket)
+    if (forceOpenTransfer) {
+      console.log("TicketActionButtonsCustom: Forçando abertura do modal via prop");
+      setTransferTicketModalOpen(true);
     }
-  }, [location.search]);
+  }, [forceOpenTransfer]);
 
   useEffect(() => {
     fetchData();

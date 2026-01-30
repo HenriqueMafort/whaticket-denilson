@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef, useCallback } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useHistory, useLocation } from "react-router-dom";
 
 import clsx from "clsx";
 
@@ -69,6 +69,7 @@ const useStyles = makeStyles((theme) => ({
 const Ticket = () => {
   const { ticketId } = useParams();
   const history = useHistory();
+  const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const classes = useStyles();
@@ -184,9 +185,9 @@ const Ticket = () => {
           detail: { message: quickMessage.message }
         });
         window.dispatchEvent(event);
-        
+
       }
-      
+
       if (quickMessage.mediaPath) {
         // Tratar mídia se necessário
       }
@@ -241,11 +242,12 @@ const Ticket = () => {
               />
             </div>
           )}
-        <TicketActionButtons
-          ticket={ticket}
-          contact={contact}
-          onQuickMessageSelect={handleQuickMessageSelect}
-        />
+          <TicketActionButtons
+            ticket={ticket}
+            contact={contact}
+            onQuickMessageSelect={handleQuickMessageSelect}
+            forceOpenTransfer={!loading && new URLSearchParams(location.search).get("transfer") === "true"}
+          />
         </TicketHeader>
         {/* </div> */}
         <Paper>
