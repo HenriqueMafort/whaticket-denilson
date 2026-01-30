@@ -862,16 +862,18 @@ const TicketActionButtonsCustom = ({
                 </IconButton>
               </Hidden>
 
-              <IconButton className={classes.bottomButtonVisibilityIcon}>
-                <Tooltip title={i18n.t("tickets.buttons.returnQueue")}>
-                  <UndoIcon
-                    // color="primary"
-                    onClick={(e) =>
-                      handleUpdateTicketStatus(e, "pending", null)
-                    }
-                  />
-                </Tooltip>
-              </IconButton>
+              <Hidden only={['xs', 'sm']}>
+                <IconButton className={classes.bottomButtonVisibilityIcon}>
+                  <Tooltip title={i18n.t("tickets.buttons.returnQueue")}>
+                    <UndoIcon
+                      // color="primary"
+                      onClick={(e) =>
+                        handleUpdateTicketStatus(e, "pending", null)
+                      }
+                    />
+                  </Tooltip>
+                </IconButton>
+              </Hidden>
 
               <Hidden only={['xs', 'sm']}>
                 <IconButton className={classes.bottomButtonVisibilityIcon}>
@@ -999,12 +1001,21 @@ const TicketActionButtonsCustom = ({
           open={menuOpen}
           onClose={handleCloseMenu}
         >
-          <MenuItem onClick={handleOpenTransferModal}>
-            Transferir Ticket
-          </MenuItem>
-          <MenuItem onClick={handleClickResolver}>
-            {i18n.t("messagesList.header.buttons.resolve")}
-          </MenuItem>
+          {(ticket.status === "open" || ticket.status === "group") && (
+            <>
+              <Hidden mdUp>
+                <MenuItem onClick={(e) => handleUpdateTicketStatus(e, "pending", null)}>
+                  {i18n.t("tickets.buttons.returnQueue")}
+                </MenuItem>
+              </Hidden>
+              <MenuItem onClick={handleOpenTransferModal}>
+                Transferir Ticket
+              </MenuItem>
+              <MenuItem onClick={handleClickResolver}>
+                {i18n.t("messagesList.header.buttons.resolve")}
+              </MenuItem>
+            </>
+          )}
           <MenuItem onClick={handleOpenConfirmationModal}>
             <Can
               role={user.profile}
