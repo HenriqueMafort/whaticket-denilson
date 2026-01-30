@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect, useRef, useCallback } from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 import { Can } from "../Can";
 import { makeStyles } from "@material-ui/core/styles";
@@ -90,7 +90,6 @@ const TicketActionButtonsCustom = ({
   ticket,
   contact,
   onQuickMessageSelect,
-  forceOpenTransfer
   // , showSelectMessageCheckbox,
   // selectedMessages,
   // forwardMessageModalOpen,
@@ -99,7 +98,6 @@ const TicketActionButtonsCustom = ({
   const classes = useStyles();
   const theme = useTheme();
   const history = useHistory();
-  const location = useLocation();
   const isMounted = useRef(true);
   const [loading, setLoading] = useState(false);
   const { user } = useContext(AuthContext);
@@ -155,14 +153,6 @@ const TicketActionButtonsCustom = ({
     "DEBUG user.finalizacaoComValorVendaAtiva:",
     user?.finalizacaoComValorVendaAtiva
   );
-
-  useEffect(() => {
-    // Verifica prop passada pelo componente pai (Ticket)
-    if (forceOpenTransfer) {
-      console.log("TicketActionButtonsCustom: Forçando abertura do modal via prop");
-      setTransferTicketModalOpen(true);
-    }
-  }, [forceOpenTransfer]);
 
   useEffect(() => {
     fetchData();
@@ -416,13 +406,8 @@ const TicketActionButtonsCustom = ({
   const handleCloseTransferTicketModal = useCallback(() => {
     if (isMounted.current) {
       setTransferTicketModalOpen(false);
-      // Remove o parâmetro transfer da URL
-      const params = new URLSearchParams(location.search);
-      if (params.get("transfer")) {
-        history.replace(location.pathname);
-      }
     }
-  }, [history, location.pathname, location.search]);
+  }, []);
 
   const handleOpenNewTicketModal = () => {
     setNewTicketModalOpen(true);

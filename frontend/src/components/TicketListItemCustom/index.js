@@ -406,13 +406,8 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
   };
 
   const handleMobileMenuTransfer = () => {
-    handleSelectTicket(ticket);
-    // Navega para o chat passando o parâmetro na URL
-    history.push(`/tickets/${ticket.uuid}?transfer=true`);
-    setLoading(true);
-    if (isMounted.current) {
-      setLoading(false);
-    }
+    // Abre o modal de transferência diretamente na lista
+    setTransferTicketModalOpen(true);
   };
 
   const handleOpenNewTicketModal = () => {
