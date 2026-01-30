@@ -161,9 +161,7 @@ const TicketActionButtonsCustom = ({
       // Pequeno delay para garantir que o modal abra após renderização
       const timer = setTimeout(() => {
         setTransferTicketModalOpen(true);
-        // Limpa o estado
-        history.replace(location.pathname, {});
-      }, 500);
+      }, 1000);
 
       return () => clearTimeout(timer);
     }
@@ -418,9 +416,15 @@ const TicketActionButtonsCustom = ({
     }
   };
 
-  const handleCloseTransferTicketModal = () => {
-    setTransferTicketModalOpen(false);
-  };
+  const handleCloseTransferTicketModal = useCallback(() => {
+    if (isMounted.current) {
+      setTransferTicketModalOpen(false);
+      // Limpa o estado da history APENAS quando o modal é fechado manualmente
+      if (location.state && location.state.transfer) {
+        history.replace(location.pathname, {});
+      }
+    }
+  }, [history, location.pathname, location.state]);
 
   const handleOpenNewTicketModal = () => {
     setNewTicketModalOpen(true);
