@@ -312,10 +312,10 @@ const TicketsListCustom = (props) => {
             if (!awaiting) return true;
             if (!ticket || ticket.isGroup) return false;
             if (awaiting === "agent") {
-                return ticket.fromMe === true && Number(ticket.unreadMessages) === 0;
+                return ticket.fromMe === true;
             }
             if (awaiting === "customer") {
-                return ticket.fromMe === false && Number(ticket.unreadMessages) > 0;
+                return ticket.fromMe === false;
             }
             return true;
         };
