@@ -1016,13 +1016,15 @@ const TicketActionButtonsCustom = ({
               </MenuItem>
             </>
           )}
-          <MenuItem onClick={handleOpenConfirmationModal}>
-            <Can
-              role={user.profile}
-              perform="ticket-options:deleteTicket"
-              yes={() => i18n.t("tickets.buttons.deleteTicket")}
-            />
-          </MenuItem>
+          <Can
+            role={user.profile}
+            perform="ticket-options:deleteTicket"
+            yes={() => (
+              <MenuItem onClick={handleOpenConfirmationModal}>
+                {i18n.t("tickets.buttons.deleteTicket")}
+              </MenuItem>
+            )}
+          />
           <MenuItem onClick={handleEnableIntegration}>
             {enableIntegration === true
               ? i18n.t("messagesList.header.buttons.disableIntegration")

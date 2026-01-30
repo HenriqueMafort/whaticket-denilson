@@ -32,7 +32,7 @@ import ShowTicketOpen from "../ShowTicketOpenModal";
 import FinalizacaoVendaModal from "../FinalizacaoVendaModal";
 import { isNil } from "lodash";
 import { toast } from "react-toastify";
-import { Done, HighlightOff, SwapHoriz, Add } from "@material-ui/icons";
+import { Done, HighlightOff, SwapHoriz, Add, MoreVert } from "@material-ui/icons";
 import VisibilityIcon from "@material-ui/icons/Visibility"; // Ícone de spy
 import useCompanySettings from "../../hooks/useSettings/companySettings";
 import NewTicketModal from "../NewTicketModal";
@@ -49,6 +49,9 @@ import {
   DialogActions,
   Button,
   DialogContent,
+  Menu,
+  MenuItem,
+  Hidden,
 } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
@@ -254,6 +257,17 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
   const [showFinalizacaoOptions, setShowFinalizacaoOptions] = useState(false);
 
   const [imageModalOpen, setImageModalOpen] = useState(false); // Estado para o modal da imagem
+  const [anchorEl, setAnchorEl] = useState(null);
+  const menuOpen = Boolean(anchorEl);
+
+  const handleMenu = (event) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
 
   const { ticketId } = useParams();
   const isMounted = useRef(true);
@@ -674,8 +688,8 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
                           ticket.channel === "whatsapp"
                             ? ticket.whatsapp?.color || "#25D366"
                             : ticket.channel === "facebook"
-                            ? "#4267B2"
-                            : "#E1306C",
+                              ? "#4267B2"
+                              : "#E1306C",
                       }}
                     >
                       {ticket.whatsapp?.name.toUpperCase()}
@@ -693,8 +707,8 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
                       {ticket.queueId
                         ? ticket.queue?.name.toUpperCase()
                         : ticket.status === "lgpd"
-                        ? "LGPD"
-                        : `${i18n.t("momentsUser.noqueue")}`}
+                          ? "LGPD"
+                          : `${i18n.t("momentsUser.noqueue")}`}
                     </Badge>
                   }
                   {ticket?.user && (
@@ -855,70 +869,39 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
                   </ButtonWithSpinner>
                 )}
               </span>
-              <span className={classes.secondaryContentSecond1}>
-                {(ticket.status === "pending" ||
-                  ticket.status === "open" ||
-                  ticket.status === "group") && (
-                  <ButtonWithSpinner
-                    style={{
-                      backgroundColor: "transparent",
-                      boxShadow: "none",
-                      border: "none",
-                      color: theme.mode === "light" ? "purple" : "#FFF",
-                      padding: "0px",
-                      borderRadius: "50%",
-                      right: "26px",
-                      position: "absolute",
-                      fontSize: "0.6rem",
-                      bottom: "-30px",
-                      minWidth: "2em",
-                      width: "auto",
-                    }}
-                    variant="contained"
-                    className={classes.acceptButton}
-                    size="small"
-                    loading={loading}
-                    onClick={handleOpenTransferModal}
-                  >
-                    <Tooltip title={`${i18n.t("ticketsList.buttons.transfer")}`}>
-                      <SwapHoriz />
-                    </Tooltip>
-                  </ButtonWithSpinner>
-                )}
-              </span>
-              <span className={classes.secondaryContentSecond}>
-                {(ticket.status === "open" || ticket.status === "group") && (
-                  <ButtonWithSpinner
-                    style={{
-                      backgroundColor: "transparent",
-                      boxShadow: "none",
-                      border: "none",
-                      color: theme.mode === "light" ? "red" : "#FFF",
-                      padding: "0px",
-                      bottom: "0px",
-                      borderRadius: "50%",
-                      right: "1px",
-                      fontSize: "0.6rem",
-                      bottom: "-30px",
-                      minWidth: "2em",
-                      width: "auto",
-                    }}
-                    variant="contained"
-                    className={classes.acceptButton}
-                    size="small"
-                    loading={loading}
-                    onClick={(e) => handleCloseTicket(ticket.id)}
-                  >
-                    <Tooltip title={`${i18n.t("ticketsList.buttons.closed")}`}>
-                      <HighlightOff />
-                    </Tooltip>
-                  </ButtonWithSpinner>
-                )}
-              </span>
-              <span className={classes.secondaryContentSecond}>
-                {(ticket.status === "pending" || ticket.status === "lgpd") &&
-                  (user.userClosePendingTicket === "enabled" ||
-                    user.profile === "admin") && (
+              <Hidden only={['xs', 'sm']}>
+                <span className={classes.secondaryContentSecond1}>
+                  {(ticket.status === "open" ||
+                    ticket.status === "group") && (
+                      <ButtonWithSpinner
+                        style={{
+                          backgroundColor: "transparent",
+                          boxShadow: "none",
+                          border: "none",
+                          color: theme.mode === "light" ? "purple" : "#FFF",
+                          padding: "0px",
+                          borderRadius: "50%",
+                          right: "26px",
+                          position: "absolute",
+                          fontSize: "0.6rem",
+                          bottom: "-30px",
+                          minWidth: "2em",
+                          width: "auto",
+                        }}
+                        variant="contained"
+                        className={classes.acceptButton}
+                        size="small"
+                        loading={loading}
+                        onClick={handleOpenTransferModal}
+                      >
+                        <Tooltip title={`${i18n.t("ticketsList.buttons.transfer")}`}>
+                          <SwapHoriz />
+                        </Tooltip>
+                      </ButtonWithSpinner>
+                    )}
+                </span>
+                <span className={classes.secondaryContentSecond}>
+                  {(ticket.status === "open" || ticket.status === "group") && (
                     <ButtonWithSpinner
                       style={{
                         backgroundColor: "transparent",
@@ -938,14 +921,108 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
                       className={classes.acceptButton}
                       size="small"
                       loading={loading}
-                      onClick={(e) => handleCloseIgnoreTicket(ticket.id)}
+                      onClick={(e) => handleCloseTicket(ticket.id)}
                     >
-                      <Tooltip title={`${i18n.t("ticketsList.buttons.ignore")}`}>
+                      <Tooltip title={`${i18n.t("ticketsList.buttons.closed")}`}>
                         <HighlightOff />
                       </Tooltip>
                     </ButtonWithSpinner>
                   )}
-              </span>
+                </span>
+                <span className={classes.secondaryContentSecond}>
+                  {(ticket.status === "pending" || ticket.status === "lgpd") &&
+                    (user.userClosePendingTicket === "enabled" ||
+                      user.profile === "admin") && (
+                      <ButtonWithSpinner
+                        style={{
+                          backgroundColor: "transparent",
+                          boxShadow: "none",
+                          border: "none",
+                          color: theme.mode === "light" ? "red" : "#FFF",
+                          padding: "0px",
+                          bottom: "0px",
+                          borderRadius: "50%",
+                          right: "1px",
+                          fontSize: "0.6rem",
+                          bottom: "-30px",
+                          minWidth: "2em",
+                          width: "auto",
+                        }}
+                        variant="contained"
+                        className={classes.acceptButton}
+                        size="small"
+                        loading={loading}
+                        onClick={(e) => handleCloseIgnoreTicket(ticket.id)}
+                      >
+                        <Tooltip title={`${i18n.t("ticketsList.buttons.ignore")}`}>
+                          <HighlightOff />
+                        </Tooltip>
+                      </ButtonWithSpinner>
+                    )}
+                </span>
+              </Hidden>
+              <Hidden mdUp>
+                {(ticket.status === "open" || ticket.status === "group" || (ticket.status === "pending" && (user.userClosePendingTicket === "enabled" || user.profile === "admin"))) && (
+                  <span className={classes.secondaryContentSecond}>
+                    <ButtonWithSpinner
+                      style={{
+                        backgroundColor: "transparent",
+                        boxShadow: "none",
+                        border: "none",
+                        color: theme.mode === "light" ? "grey" : "#FFF",
+                        padding: "0px",
+                        bottom: "0px",
+                        borderRadius: "50%",
+                        right: "1px",
+                        fontSize: "0.6rem",
+                        bottom: "-30px",
+                        minWidth: "2em",
+                        width: "auto",
+                      }}
+                      variant="contained"
+                      className={classes.acceptButton}
+                      size="small"
+                      loading={loading}
+                      onClick={handleMenu}
+                    >
+                      <MoreVert />
+                    </ButtonWithSpinner>
+                    <Menu
+                      anchorEl={anchorEl}
+                      keepMounted
+                      open={menuOpen}
+                      onClose={handleCloseMenu}
+                      anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: "right",
+                      }}
+                      transformOrigin={{
+                        vertical: "top",
+                        horizontal: "right",
+                      }}
+                      onClick={handleCloseMenu}
+                    >
+                      {(ticket.status === "open" || ticket.status === "group") && (
+                        <MenuItem onClick={handleOpenTransferModal}>
+                          {i18n.t("ticketsList.buttons.transfer")}
+                        </MenuItem>
+                      )}
+                      {(ticket.status === "open" || ticket.status === "group") && (
+                        <MenuItem onClick={(e) => handleCloseTicket(ticket.id)}>
+                          {i18n.t("ticketsList.buttons.closed")}
+                        </MenuItem>
+                      )}
+                      {(ticket.status === "pending" || ticket.status === "lgpd") &&
+                        (user.userClosePendingTicket === "enabled" ||
+                          user.profile === "admin") && (
+                          <MenuItem onClick={(e) => handleCloseIgnoreTicket(ticket.id)}>
+                            {i18n.t("ticketsList.buttons.ignore")}
+                          </MenuItem>
+                        )}
+                    </Menu>
+                  </span>
+                )}
+              </Hidden>
               <span className={classes.secondaryContentSecond}>
                 {ticket.status === "closed" && (
                   <ButtonWithSpinner
@@ -1047,8 +1124,8 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
         fullWidth
       >
         <DialogContent className={classes.imageModalContent}>
-          <img 
-            src={ticket?.contact?.urlPicture} 
+          <img
+            src={ticket?.contact?.urlPicture}
             alt={ticket?.contact?.name || "Foto do contato"}
             className={classes.expandedImage}
           />
