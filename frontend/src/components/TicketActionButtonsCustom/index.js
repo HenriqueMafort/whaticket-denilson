@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect, useRef, useCallback } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 import { Can } from "../Can";
 import { makeStyles } from "@material-ui/core/styles";
@@ -98,6 +98,7 @@ const TicketActionButtonsCustom = ({
   const classes = useStyles();
   const theme = useTheme();
   const history = useHistory();
+  const location = useLocation();
   const isMounted = useRef(true);
   const [loading, setLoading] = useState(false);
   const { user } = useContext(AuthContext);
@@ -153,6 +154,14 @@ const TicketActionButtonsCustom = ({
     "DEBUG user.finalizacaoComValorVendaAtiva:",
     user?.finalizacaoComValorVendaAtiva
   );
+
+  useEffect(() => {
+    if (location.state && location.state.transfer) {
+      setTransferTicketModalOpen(true);
+      // Limpa o estado para evitar reabertura ao atualizar
+      history.replace(location.pathname, {});
+    }
+  }, [location.state, history, location.pathname]);
 
   useEffect(() => {
     fetchData();

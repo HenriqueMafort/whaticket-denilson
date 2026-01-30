@@ -405,6 +405,16 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
     history.push(`/tickets/${ticket.uuid}`);
   };
 
+  const handleMobileMenuTransfer = () => {
+    handleSelectTicket(ticket);
+    // Navega para o chat passando o estado 'transfer: true'
+    history.push(`/tickets/${ticket.uuid}`, { transfer: true });
+    setLoading(true);
+    if (isMounted.current) {
+      setLoading(false);
+    }
+  };
+
   const handleOpenNewTicketModal = () => {
     setNewTicketModalOpen(true);
   };
@@ -1003,7 +1013,7 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
                       onClick={handleCloseMenu}
                     >
                       {(ticket.status === "open" || ticket.status === "group") && (
-                        <MenuItem onClick={handleOpenTransferModal}>
+                        <MenuItem onClick={handleMobileMenuTransfer}>
                           {i18n.t("ticketsList.buttons.transfer")}
                         </MenuItem>
                       )}
