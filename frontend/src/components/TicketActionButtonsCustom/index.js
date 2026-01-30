@@ -157,9 +157,15 @@ const TicketActionButtonsCustom = ({
 
   useEffect(() => {
     if (location.state && location.state.transfer) {
-      setTransferTicketModalOpen(true);
-      // Limpa o estado para evitar reabertura ao atualizar
-      history.replace(location.pathname, {});
+      console.log("TicketActionButtonsCustom: Recebido estado de transferência", location.state);
+      // Pequeno delay para garantir que o modal abra após renderização
+      const timer = setTimeout(() => {
+        setTransferTicketModalOpen(true);
+        // Limpa o estado
+        history.replace(location.pathname, {});
+      }, 500);
+
+      return () => clearTimeout(timer);
     }
   }, [location.state, history, location.pathname]);
 
