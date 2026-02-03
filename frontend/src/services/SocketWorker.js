@@ -3,25 +3,48 @@ import api from "../services/api";
 
 
 class SocketWorker {
-  constructor(companyId , userId) {
+  constructor(companyId, userId) {
     const sessionToken = api.defaults.headers.Authorization
 
-    if (!SocketWorker.instance) {
-      this.companyId = companyId
-      this.userId = userId
-      this.token = sessionToken
-      this.socket = null;
-      this.configureSocket();
-      this.eventListeners = {}; // Armazena os ouvintes de eventos registrados
-      SocketWorker.instance = this;
+    if (SocketWorker.instance) {
+      const instance = SocketWorker.instance;
+      // Atualiza o token se houver um novo disponível e for diferente do atual
+      if (sessionToken && instance.token !== sessionToken) {
+        // console.log("SocketWorker: Atualizando token na instância Singleton");
+        instance.token = sessionToken;
+        instance.userId = userId; // Atualiza userId também caso mude
 
-    } 
+        if (instance.socket) {
+          // Atualiza os parâmetros de query para a próxima reconexão
+          instance.socket.io.opts.query = {
+            userId: instance.userId,
+            token: instance.token
+          };
+
+          // Se estiver desconectado, tenta reconectar agora com o novo token
+          if (!instance.socket.connected) {
+            // console.log("SocketWorker: Forçando reconexão com novo token");
+            instance.socket.connect();
+          }
+        }
+      }
+      return SocketWorker.instance;
+    }
+
+    this.companyId = companyId
+    this.userId = userId
+    this.token = sessionToken
+    this.socket = null;
+    this.configureSocket();
+    this.eventListeners = {}; // Armazena os ouvintes de eventos registrados
+    SocketWorker.instance = this;
 
     return SocketWorker.instance;
   }
 
+
   configureSocket() {
-    this.socket = io(`${process.env.REACT_APP_BACKEND_URL}/${this?.companyId}` , {
+    this.socket = io(`${process.env.REACT_APP_BACKEND_URL}/${this?.companyId}`, {
       autoConnect: true,
       reconnection: true,
       reconnectionDelay: 1000,

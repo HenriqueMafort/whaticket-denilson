@@ -20,7 +20,9 @@ export const initIO = (httpServer: Server): SocketIO => {
   io = new SocketIO(httpServer, {
     cors: {
       origin: allowedOrigins.length ? allowedOrigins : true
-    }
+    },
+    pingTimeout: 30000,
+    pingInterval: 25000
   });
 
   if (process.env.SOCKET_ADMIN && JSON.parse(process.env.SOCKET_ADMIN)) {
@@ -303,7 +305,7 @@ export const emitBirthdayEvents = async (companyId: number) => {
       });
     }
   } catch (error) {
-    logger.error(` [RDS-SOCKET] Erro ao emitir eventos de aniversário para empresa ${companyId}:`, 
+    logger.error(` [RDS-SOCKET] Erro ao emitir eventos de aniversário para empresa ${companyId}:`,
       error instanceof Error ? error.message : "Unknown error");
     if (error instanceof Error && error.stack) {
       logger.debug(" [RDS-SOCKET] Error stack:", error.stack);
