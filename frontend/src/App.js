@@ -435,15 +435,6 @@ const App = () => {
     fetchVersionData();
   }, []);
 
-  // ERUDA: Mobile Console Debugger (Remover depois)
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "//cdn.jsdelivr.net/npm/eruda";
-    script.async = true;
-    script.onload = () => window.eruda.init();
-    document.body.appendChild(script);
-  }, []);
-
   return (
     <>
       <Favicon
