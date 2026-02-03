@@ -154,6 +154,12 @@ const Ticket = () => {
       socket.on(`company-${companyId}-ticket`, onCompanyTicket);
       socket.on(`company-${companyId}-contact`, onCompanyContactTicket);
 
+      // FIX: Se o socket já estiver conectado (ex: mobile wake-up ou navegação),
+      // forçamos a entrada na sala do ticket, pois o evento "connect" não dispara novamente.
+      if (socket.connected) {
+        onConnectTicket();
+      }
+
       return () => {
 
         socket.emit("joinChatBoxLeave", `${ticket.id}`);

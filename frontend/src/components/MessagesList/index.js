@@ -569,6 +569,11 @@ const MessagesList = ({
     socket.on("connect", connectEventMessagesList);
     socket.on(`company-${companyId}-appMessage`, onAppMessageMessagesList);
 
+    // FIX: Se já estiver conectado, executa imediatamente para garantir recebimento de mensagens
+    if (socket.connected) {
+      connectEventMessagesList();
+    }
+
     return () => {
       socket.emit("joinChatBoxLeave", `${ticketId}`)
       socket.off("connect", connectEventMessagesList);
@@ -686,10 +691,10 @@ const MessagesList = ({
       let linkLocation = locationParts[1];
       let descriptionLocation = locationParts.length > 2 ? locationParts[2] : null;
 
-      return <LocationPreview 
-        image={imageLocation} 
-        link={linkLocation} 
-        description={descriptionLocation} 
+      return <LocationPreview
+        image={imageLocation}
+        link={linkLocation}
+        description={descriptionLocation}
       />;
     }
 
@@ -698,7 +703,7 @@ const MessagesList = ({
       let array = message.body.split("\n");
       let obj = [];
       let contact = "";
-      
+
       for (let index = 0; index < array.length; index++) {
         const v = array[index];
         let values = v.split(":");
@@ -711,13 +716,13 @@ const MessagesList = ({
           }
         }
       }
-      
-      return <VcardPreview 
-        contact={contact} 
-        numbers={obj[0]?.number} 
-        queueId={message?.ticket?.queueId} 
-        whatsappId={message?.ticket?.whatsappId} 
-        channel={channel} 
+
+      return <VcardPreview
+        contact={contact}
+        numbers={obj[0]?.number}
+        queueId={message?.ticket?.queueId}
+        whatsappId={message?.ticket?.whatsappId}
+        channel={channel}
       />;
     }
 
@@ -725,24 +730,24 @@ const MessagesList = ({
       console.log("Entrou no MetaPreview");
       // ✅ CORREÇÃO: Parse correto dos dados - formato: image|sourceUrl|title|body|messageUser
       let [image, sourceUrl, title, body, messageUser] = message.body.split('|');
-      
+
       // Fallback para messageUser se não estiver presente
       if (!messageUser || messageUser.trim() === "") {
         messageUser = "Olá! Tenho interesse e queria mais informações, por favor.";
       }
-      
-      return <AdMetaPreview 
-        image={image} 
-        sourceUrl={sourceUrl} 
-        title={title} 
-        body={body} 
-        messageUser={messageUser} 
+
+      return <AdMetaPreview
+        image={image}
+        sourceUrl={sourceUrl}
+        title={title}
+        body={body}
+        messageUser={messageUser}
       />;
     }
 
     // PDF e Documentos - SÓ DOWNLOAD
     else if (isPdfUrl(message.mediaUrl, message.body, message.mediaType)) {
-      
+
       console.log("📄 Renderizando como documento/PDF:", message.id);
       const pdfInfo = extractPdfInfoFromMessage(message);
 
@@ -787,7 +792,7 @@ const MessagesList = ({
     // Vídeos
     else if (message.mediaType === "video") {
       console.log("🎥 Renderizando como vídeo");
-      
+
       return (
         <div style={{ maxWidth: "400px", width: "100%", position: "relative" }}>
           {/* Loading indicator */}
@@ -809,7 +814,7 @@ const MessagesList = ({
               </Typography>
             </div>
           )}
-          
+
           {/* Vídeo player melhorado */}
           <video
             className={classes.messageMedia}
@@ -817,9 +822,9 @@ const MessagesList = ({
             controls
             preload="metadata"
             playsInline
-            style={{ 
-              width: "100%", 
-              height: "auto", 
+            style={{
+              width: "100%",
+              height: "auto",
               maxHeight: "300px",
               borderRadius: "8px",
               backgroundColor: "#f0f0f0",
@@ -850,16 +855,16 @@ const MessagesList = ({
             <source src={message.mediaUrl} type="video/mp4" />
             <source src={message.mediaUrl} type="video/webm" />
             <source src={message.mediaUrl} type="video/ogg" />
-            
+
             {/* Fallback para navegadores antigos */}
             Seu navegador não suporta reprodução de vídeo.
           </video>
-          
+
           {/* Error state */}
           {videoError && (
-            <div style={{ 
-              padding: "20px", 
-              textAlign: "center", 
+            <div style={{
+              padding: "20px",
+              textAlign: "center",
               backgroundColor: "#f5f5f5",
               borderRadius: "8px",
               color: "#666",
@@ -1058,9 +1063,9 @@ const MessagesList = ({
                   src={message.quotedMsg.mediaUrl}
                   controls
                   preload="metadata"
-                  style={{ 
-                    width: "100%", 
-                    height: "auto", 
+                  style={{
+                    width: "100%",
+                    height: "auto",
                     maxHeight: "200px",
                     borderRadius: "6px",
                     backgroundColor: "#f0f0f0"
@@ -1421,7 +1426,7 @@ const MessagesList = ({
       return <div>Diga olá para seu novo contato!</div>;
     }
   };
-const shouldBlurMessages = ticketStatus === "pending" && user.allowSeeMessagesInPendingTickets === "disabled";
+  const shouldBlurMessages = ticketStatus === "pending" && user.allowSeeMessagesInPendingTickets === "disabled";
 
   return (
     <div className={classes.messagesListWrapper} onDragEnter={handleDrag}>
@@ -1435,19 +1440,19 @@ const shouldBlurMessages = ticketStatus === "pending" && user.allowSeeMessagesIn
         whatsappId={whatsappId}
         queueId={queueId}
       />
-      
 
-<div
-  id="messagesList"
-  className={classes.messagesList}
-  onScroll={handleScroll}
-  style={{
-    filter: shouldBlurMessages ? "blur(4px)" : "none",
-    pointerEvents: shouldBlurMessages ? "none" : "auto"
-  }}
->
-  {messagesList.length > 0 ? renderMessages() : []}
-</div>
+
+      <div
+        id="messagesList"
+        className={classes.messagesList}
+        onScroll={handleScroll}
+        style={{
+          filter: shouldBlurMessages ? "blur(4px)" : "none",
+          pointerEvents: shouldBlurMessages ? "none" : "auto"
+        }}
+      >
+        {messagesList.length > 0 ? renderMessages() : []}
+      </div>
 
       {(channel !== "whatsapp" && channel !== undefined) && (
         <div
@@ -1473,7 +1478,7 @@ const shouldBlurMessages = ticketStatus === "pending" && user.allowSeeMessagesIn
           </span>
         </div>
       )}
-      
+
       {loading && (
         <div>
           <CircularProgress className={classes.circleLoading} />

@@ -130,6 +130,10 @@ class SocketWorker {
     }
   }
 
+  get connected() {
+    return this.socket?.connected || false;
+  }
+
   forceReconnect() {
 
   }
