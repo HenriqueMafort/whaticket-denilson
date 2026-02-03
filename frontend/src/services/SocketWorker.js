@@ -10,7 +10,7 @@ class SocketWorker {
       const instance = SocketWorker.instance;
       // Atualiza o token se houver um novo disponível e for diferente do atual
       if (sessionToken && instance.token !== sessionToken) {
-        // console.log("SocketWorker: Atualizando token na instância Singleton");
+        console.log("SocketWorker: Atualizando token na instância Singleton");
         instance.token = sessionToken;
         instance.userId = userId; // Atualiza userId também caso mude
 
@@ -23,7 +23,7 @@ class SocketWorker {
 
           // Se estiver desconectado, tenta reconectar agora com o novo token
           if (!instance.socket.connected) {
-            // console.log("SocketWorker: Forçando reconexão com novo token");
+            console.log("SocketWorker: Forçando reconexão com novo token");
             instance.socket.connect();
           }
         }
