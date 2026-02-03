@@ -20,3 +20,8 @@ auth_info/
 
 # Git lixo local
 .git/objects/
+
+# Environment Variables
+.env
+backend/.env
+frontend/.env
