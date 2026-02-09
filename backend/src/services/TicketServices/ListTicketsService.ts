@@ -81,7 +81,7 @@ const ListTicketsService = async ({
   const showGroups = user.allowGroup === true;
   const showPendingNotification = await FindCompanySettingOneService({ companyId, column: "showNotificationPending" });
   const showNotificationPendingValue = showPendingNotification[0].showNotificationPending;
-    let whereCondition: Filterable["where"];
+  let whereCondition: Filterable["where"];
 
   whereCondition = {
     [Op.or]: [{ userId }, { status: "pending" }],
@@ -259,15 +259,10 @@ const ListTicketsService = async ({
             }
 
   if (showAll === "true" && (user.profile === "admin" || user.allUserChat === "enabled") && status !== "search") {
-    if (user.allHistoric === "enabled" && showTicketWithoutQueue) {
-      whereCondition = { companyId };
-    } else if (user.allHistoric === "enabled" && !showTicketWithoutQueue) {
-      whereCondition = { companyId, queueId: { [Op.ne]: null } };
-    } else if (user.allHistoric === "disabled" && showTicketWithoutQueue) {
-      whereCondition = { companyId, queueId: { [Op.or]: [queueIds, null] } };
-    } else if (user.allHistoric === "disabled" && !showTicketWithoutQueue) {
-      whereCondition = { companyId, queueId: queueIds };
-    }
+    whereCondition = {
+      companyId,
+      queueId: showTicketWithoutQueue ? { [Op.or]: [queueIds, null] } : queueIds
+    };
   }
 
 
