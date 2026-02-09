@@ -704,6 +704,7 @@ const TicketActionButtonsCustom = ({
 
   const handleClickResolver = () => {
     console.log("DEBUG handleClickResolver chamado");
+    handleCloseMenu();
     if (
       user.finalizacaoComValorVendaAtiva === true ||
       user.finalizacaoComValorVendaAtiva === "true"
