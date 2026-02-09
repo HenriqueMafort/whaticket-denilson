@@ -817,9 +817,38 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
           {/* Para todos os outros status, manter os botões originais */}
           {ticket.status !== "chatbot" && (
             <>
-              <span className={classes.secondaryContentSecond}>
-                {ticket.status === "pending" &&
-                  (ticket.queueId === null || ticket.queueId === undefined) && (
+              <Hidden only={['xs', 'sm']}>
+                <span className={classes.secondaryContentSecond}>
+                  {ticket.status === "pending" &&
+                    (ticket.queueId === null || ticket.queueId === undefined) && (
+                      <ButtonWithSpinner
+                        style={{
+                          backgroundColor: "transparent",
+                          boxShadow: "none",
+                          border: "none",
+                          color: theme.mode === "light" ? "green" : "#FFF",
+                          padding: "0px",
+                          borderRadius: "50%",
+                          right: "51px",
+                          fontSize: "0.6rem",
+                          bottom: "-30px",
+                          minWidth: "2em",
+                          width: "auto",
+                        }}
+                        variant="contained"
+                        className={classes.acceptButton}
+                        size="small"
+                        loading={loading}
+                        onClick={(e) => handleOpenAcceptTicketWithouSelectQueue()}
+                      >
+                        <Tooltip title={`${i18n.t("ticketsList.buttons.accept")}`}>
+                          <Done />
+                        </Tooltip>
+                      </ButtonWithSpinner>
+                    )}
+                </span>
+                <span className={classes.secondaryContentSecond}>
+                  {ticket.status === "pending" && ticket.queueId !== null && (
                     <ButtonWithSpinner
                       style={{
                         backgroundColor: "transparent",
@@ -838,42 +867,15 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
                       className={classes.acceptButton}
                       size="small"
                       loading={loading}
-                      onClick={(e) => handleOpenAcceptTicketWithouSelectQueue()}
+                      onClick={(e) => handleAcepptTicket(ticket.id)}
                     >
                       <Tooltip title={`${i18n.t("ticketsList.buttons.accept")}`}>
                         <Done />
                       </Tooltip>
                     </ButtonWithSpinner>
                   )}
-              </span>
-              <span className={classes.secondaryContentSecond}>
-                {ticket.status === "pending" && ticket.queueId !== null && (
-                  <ButtonWithSpinner
-                    style={{
-                      backgroundColor: "transparent",
-                      boxShadow: "none",
-                      border: "none",
-                      color: theme.mode === "light" ? "green" : "#FFF",
-                      padding: "0px",
-                      borderRadius: "50%",
-                      right: "51px",
-                      fontSize: "0.6rem",
-                      bottom: "-30px",
-                      minWidth: "2em",
-                      width: "auto",
-                    }}
-                    variant="contained"
-                    className={classes.acceptButton}
-                    size="small"
-                    loading={loading}
-                    onClick={(e) => handleAcepptTicket(ticket.id)}
-                  >
-                    <Tooltip title={`${i18n.t("ticketsList.buttons.accept")}`}>
-                      <Done />
-                    </Tooltip>
-                  </ButtonWithSpinner>
-                )}
-              </span>
+                </span>
+              </Hidden>
               <Hidden only={['xs', 'sm']}>
                 <span className={classes.secondaryContentSecond1}>
                   {(ticket.status === "open" ||
@@ -1007,6 +1009,18 @@ const TicketListItemCustom = ({ setTabOpen, ticket }) => {
                       }}
                       onClick={handleCloseMenu}
                     >
+                      {ticket.status === "pending" && (
+                        <MenuItem onClick={() => {
+                          handleCloseMenu();
+                          if (ticket.queueId === null || ticket.queueId === undefined) {
+                            handleOpenAcceptTicketWithouSelectQueue();
+                          } else {
+                            handleAcepptTicket(ticket.id);
+                          }
+                        }}>
+                          {i18n.t("ticketsList.buttons.accept")}
+                        </MenuItem>
+                      )}
                       {(ticket.status === "open" || ticket.status === "group") && (
                         <MenuItem onClick={handleMobileMenuTransfer}>
                           {i18n.t("ticketsList.buttons.transfer")}
