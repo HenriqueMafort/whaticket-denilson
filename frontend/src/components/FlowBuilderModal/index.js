@@ -96,7 +96,7 @@ const FlowBuilderModal = ({
         });
         onSave(values.name);
         handleClose();
-        toast.success(i18n.t("webhookModal.toasts.update"));
+        toast.success(i18n.t("flowBuilderModal.toasts.update"));
       } catch (err) {
         toastError(err);
       }
@@ -107,7 +107,7 @@ const FlowBuilderModal = ({
         });
         onSave(values.name);
         handleClose();
-        toast.success(i18n.t("webhookModal.saveSuccess"));
+        toast.success(i18n.t("flowBuilderModal.saveSuccess"));
       } catch (err) {
         toastError(err);
       }
