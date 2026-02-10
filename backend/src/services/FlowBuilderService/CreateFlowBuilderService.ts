@@ -52,7 +52,7 @@ const CreateFlowBuilderService = async ({
       await CreateQueueIntegrationService({
         type: "flowbuilder",
         name: flow.name,
-        companyId: flow.companyId,
+        companyId: flow.company_id,
         projectName: flow.name,
         jsonContent: "{}",
         language: "pt",
