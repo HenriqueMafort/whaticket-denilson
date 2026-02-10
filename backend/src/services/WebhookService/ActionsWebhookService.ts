@@ -888,7 +888,7 @@ export const ActionsWebhookService = async (
           );
 
           const rightValue = nodeSelected.data.operator !== "isEmpty" &&
-          nodeSelected.data.operator !== "isNotEmpty"
+            nodeSelected.data.operator !== "isNotEmpty"
             ? processVariableValue(
               nodeSelected.data.rightValue || "",
               dataWebhook,
@@ -1147,8 +1147,7 @@ export const ActionsWebhookService = async (
           flowStopped: idFlowDb.toString()
         });
 
-        if(queue.integrationId)
-        {
+        if (queue.integrationId) {
           await ticket.update({
             integrationId: queue.integrationId,
             useIntegration: true
@@ -1173,8 +1172,7 @@ export const ActionsWebhookService = async (
           companyId
         });
 
-        if(queue.integrationId)
-        {
+        if (queue.integrationId) {
           await UpdateTicketService({
             ticketData: {
               integrationId: queue.integrationId,
@@ -1547,6 +1545,11 @@ export const ActionsWebhookService = async (
           noAlterNext = true;
         }
         isRandomizer = true;
+      }
+
+      if (nodeSelected.type === "interval") {
+        console.log(`[INTERVAL NODE] Aguardando ${nodeSelected.data.sec} segundos...`);
+        await intervalWhats(nodeSelected.data.sec);
       }
 
       let isMenu: boolean;
