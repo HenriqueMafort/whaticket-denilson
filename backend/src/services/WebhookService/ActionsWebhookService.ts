@@ -382,7 +382,10 @@ export const ActionsWebhookService = async (
 
     const whatsapp = await Whatsapp.findByPk(whatsappId);
 
+    console.log(`[FLOW DEBUG] Whatsapp encontrado: ID=${whatsapp?.id}, Status=${whatsapp?.status}, Name=${whatsapp?.name}`);
+
     if (whatsapp.status !== "CONNECTED") {
+      console.log(`[FLOW DEBUG] Whatsapp não conectado ("${whatsapp?.status}"), abortando fluxo.`);
       return;
     }
 
