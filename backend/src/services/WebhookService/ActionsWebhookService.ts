@@ -261,8 +261,7 @@ export const ActionsWebhookService = async (
     let next = nextStage;
 
     console.log(`[FLOW DEBUG] Iniciando ActionsWebhookService`);
-    console.log(`[FLOW DEBUG] Total de nós: ${nodes.length}`);
-    console.log(`[FLOW DEBUG] Nós: ${JSON.stringify(nodes.map(n => ({ id: n.id, type: n.type })))}`);
+
 
     let createFieldJsonName = "";
     let ticket = null;
@@ -382,10 +381,7 @@ export const ActionsWebhookService = async (
 
     const whatsapp = await Whatsapp.findByPk(whatsappId);
 
-    console.log(`[FLOW DEBUG] Whatsapp encontrado: ID=${whatsapp?.id}, Status=${whatsapp?.status}, Name=${whatsapp?.name}`);
-
     if (whatsapp.status !== "CONNECTED") {
-      console.log(`[FLOW DEBUG] Whatsapp não conectado ("${whatsapp?.status}"), abortando fluxo.`);
       return;
     }
 
@@ -401,7 +397,7 @@ export const ActionsWebhookService = async (
       console.log(`[FLOW LOOP] ========== Iteração ${i + 1}/${lengthLoop} - Next: ${next}, ExecCount: ${execCount} ==========`);
 
       // Log para identificar qual nó o sistema está PROCURANDO
-      console.log(`[FLOW DEBUG] Procurando nó com ID: ${next}`);
+
 
       let nodeSelected: any;
       let ticketInit: Ticket;
@@ -1541,7 +1537,6 @@ export const ActionsWebhookService = async (
             const intervalValue = nodeSelected.data.elements.filter(
               item => item.number === elementNowSelected
             )[0].value;
-            console.log(`[SINGLE BLOCK] Aguardando ${intervalValue} segundos...`);
             await intervalWhats(intervalValue);
           }
         }
@@ -1567,7 +1562,6 @@ export const ActionsWebhookService = async (
       }
 
       if (nodeSelected.type === "interval") {
-        console.log(`[INTERVAL NODE] Aguardando ${nodeSelected.data.sec} segundos...`);
         await intervalWhats(nodeSelected.data.sec);
       }
 
