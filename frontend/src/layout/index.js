@@ -435,28 +435,28 @@ const LoggedInLayout = ({ children, themeToggle, hideMenu = false }) => {
   const settings = useSettings();
 
   const fetchAnnouncements = useCallback(async () => {
-      try {
-        const { data } = await api.get("/announcements/for-company", {
-          params: {
-            status: true,
-            pageNumber: "1"
-          }
-        });
+    try {
+      const { data } = await api.get("/announcements/for-company", {
+        params: {
+          status: true,
+          pageNumber: "1"
+        }
+      });
 
-        // Filtra apenas os informativos ativos e não expirados
-        const activeAnnouncementsRaw = data.records.filter(announcement => {
-          const isActive = announcement.status === true || announcement.status === "true";
-          const isNotExpired = !announcement.expiresAt || new Date(announcement.expiresAt) > new Date();
-          return isActive && isNotExpired;
-        });
+      // Filtra apenas os informativos ativos e não expirados
+      const activeAnnouncementsRaw = data.records.filter(announcement => {
+        const isActive = announcement.status === true || announcement.status === "true";
+        const isNotExpired = !announcement.expiresAt || new Date(announcement.expiresAt) > new Date();
+        return isActive && isNotExpired;
+      });
 
-        // Backend já filtra por empresa excluindo os reconhecidos
-        const activeAnnouncements = activeAnnouncementsRaw;
-        setAnnouncements(activeAnnouncements);
-        setShowAnnouncementsModal(activeAnnouncements.length > 0);
-      } catch (err) {
-        toastError(err);
-      }
+      // Backend já filtra por empresa excluindo os reconhecidos
+      const activeAnnouncements = activeAnnouncementsRaw;
+      setAnnouncements(activeAnnouncements);
+      setShowAnnouncementsModal(activeAnnouncements.length > 0);
+    } catch (err) {
+      toastError(err);
+    }
   }, [user?.id]);
 
   useEffect(() => {
@@ -497,7 +497,7 @@ const LoggedInLayout = ({ children, themeToggle, hideMenu = false }) => {
   };
 
   useEffect(() => {
-    
+
 
     if (document.body.offsetWidth > 600) {
       if (user.defaultMenu === "closed") {
@@ -805,10 +805,10 @@ const LoggedInLayout = ({ children, themeToggle, hideMenu = false }) => {
 
           {!hideMenu && (
             <>
-              <VersionControl
+              {/* <VersionControl
                 onUpdateStart={handleUpdateStart}
                 onUpdateComplete={handleUpdateComplete}
-              />
+              /> */}
 
               <div
                 style={{ position: "relative", display: "inline-block" }}
