@@ -1533,6 +1533,14 @@ export const ActionsWebhookService = async (
 
             await intervalWhats("1");
           }
+
+          if (elementNowSelected.includes("interval")) {
+            const intervalValue = nodeSelected.data.elements.filter(
+              item => item.number === elementNowSelected
+            )[0].value;
+            console.log(`[SINGLE BLOCK] Aguardando ${intervalValue} segundos...`);
+            await intervalWhats(intervalValue);
+          }
         }
       }
 
