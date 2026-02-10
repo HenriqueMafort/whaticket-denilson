@@ -35,7 +35,7 @@ const CreateQueueIntegrationService = async ({
   typebotUnknownMessage,
   typebotDelayMessage,
   typebotKeywordRestart,
-  typebotRestartMessage 
+  typebotRestartMessage
 }: Request): Promise<QueueIntegrations> => {
   const schema = Yup.object().shape({
     name: Yup.string()
@@ -47,7 +47,7 @@ const CreateQueueIntegrationService = async ({
         async value => {
           if (!value) return false;
           const nameExists = await QueueIntegrations.findOne({
-            where: { name: value }
+            where: { name: value, companyId }
           });
           return !nameExists;
         }
@@ -78,7 +78,7 @@ const CreateQueueIntegrationService = async ({
       typebotUnknownMessage,
       typebotDelayMessage,
       typebotKeywordRestart,
-      typebotRestartMessage 
+      typebotRestartMessage
     }
   );
 
