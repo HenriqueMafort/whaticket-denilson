@@ -260,6 +260,10 @@ export const ActionsWebhookService = async (
     const io = getIO()
     let next = nextStage;
 
+    console.log(`[FLOW DEBUG] Iniciando ActionsWebhookService`);
+    console.log(`[FLOW DEBUG] Total de nós: ${nodes.length}`);
+    console.log(`[FLOW DEBUG] Nós: ${JSON.stringify(nodes.map(n => ({ id: n.id, type: n.type })))}`);
+
     let createFieldJsonName = "";
     let ticket = null;
     const connectStatic = connects;
@@ -393,6 +397,9 @@ export const ActionsWebhookService = async (
     for (var i = 0; i < lengthLoop; i++) {
       console.log(`[FLOW LOOP] ========== Iteração ${i + 1}/${lengthLoop} - Next: ${next}, ExecCount: ${execCount} ==========`);
 
+      // Log para identificar qual nó o sistema está PROCURANDO
+      console.log(`[FLOW DEBUG] Procurando nó com ID: ${next}`);
+
       let nodeSelected: any;
       let ticketInit: Ticket;
       if (idTicket) {
@@ -474,6 +481,7 @@ export const ActionsWebhookService = async (
       }
 
       console.log(`[FLOW LOOP] Nó selecionado: ${nodeSelected?.id} (${nodeSelected?.type})`);
+      console.log(`[FLOW DEBUG] Processando nó do tipo: ${nodeSelected?.type}`);
 
       let msg;
 
