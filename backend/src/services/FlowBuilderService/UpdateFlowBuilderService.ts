@@ -1,6 +1,7 @@
 import { FlowBuilderModel } from "../../models/FlowBuilder";
 import { WebhookModel } from "../../models/Webhook";
 import { randomString } from "../../utils/randomCode";
+import QueueIntegrations from "../../models/QueueIntegrations";
 
 interface Request {
   companyId: number;
@@ -22,13 +23,43 @@ const UpdateFlowBuilderService = async ({
       }
     })
 
-    if(nameExist){
+    if (nameExist) {
       return 'exist'
     }
 
-    const flow = await FlowBuilderModel.update({ name }, {
-      where: {id: flowId, company_id: companyId}
+    const flowInstance = await FlowBuilderModel.findOne({
+      where: { id: flowId, company_id: companyId }
     });
+
+    if (!flowInstance) {
+      return 'error';
+    }
+
+    const oldName = flowInstance.name;
+
+    await flowInstance.update({ name });
+
+    // Atualizar integração associada se o nome mudou
+    if (oldName !== name) {
+      try {
+        const integration = await QueueIntegrations.findOne({
+          where: {
+            name: oldName,
+            companyId: companyId,
+            type: 'flowbuilder'
+          }
+        });
+
+        if (integration) {
+          await integration.update({
+            name: name,
+            projectName: name
+          });
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar integração automática:", error);
+      }
+    }
 
     return 'ok';
   } catch (error) {
