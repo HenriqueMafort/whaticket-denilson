@@ -238,8 +238,7 @@ const QueueIntegration = () => {
       <ConfirmationModal
         title={
           deletingUser &&
-          `${i18n.t("queueIntegration.confirmationModal.deleteTitle")} ${
-            deletingUser.name
+          `${i18n.t("queueIntegration.confirmationModal.deleteTitle")} ${deletingUser.name
           }?`
         }
         open={confirmModalOpen}
@@ -330,22 +329,26 @@ const QueueIntegration = () => {
                       <TableCell align="center">{integration.id}</TableCell>
                       <TableCell align="center">{integration.name}</TableCell>
                       <TableCell align="center">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleEditIntegration(integration)}
-                        >
-                          <Edit color="secondary" />
-                        </IconButton>
+                        {integration.type !== "flowbuilder" && (
+                          <>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleEditIntegration(integration)}
+                            >
+                              <Edit color="secondary" />
+                            </IconButton>
 
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            setConfirmModalOpen(true);
-                            setDeletingUser(integration);
-                          }}
-                        >
-                          <DeleteOutline color="secondary" />
-                        </IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                setConfirmModalOpen(true);
+                                setDeletingUser(integration);
+                              }}
+                            >
+                              <DeleteOutline color="secondary" />
+                            </IconButton>
+                          </>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}

@@ -281,7 +281,7 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
         let baseJson = {};
         try {
           baseJson = values.jsonContent ? JSON.parse(values.jsonContent) : {};
-        } catch {}
+        } catch { }
         const jsonContent = {
           ...baseJson,
           sgpIeSenha: values.sgpIeSenha,
@@ -301,7 +301,7 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
         let baseJson = {};
         try {
           baseJson = values.jsonContent ? JSON.parse(values.jsonContent) : {};
-        } catch {}
+        } catch { }
         const jsonContent = {
           ...baseJson,
           gcAccessToken: values.gcAccessToken,
@@ -456,7 +456,6 @@ const QueueIntegration = ({ open, onClose, integrationId }) => {
                           <MenuItem value="n8n">N8N</MenuItem>
                           <MenuItem value="webhook">WebHooks</MenuItem>
                           <MenuItem value="typebot">Typebot</MenuItem>
-                          <MenuItem value="flowbuilder">Flowbuilder</MenuItem>
                         </Field>
                       </FormControl>
                     </Grid>
