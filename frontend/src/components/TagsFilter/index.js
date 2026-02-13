@@ -37,8 +37,9 @@ export function TagsFilter({ onFiltered, initialTags }) {
   };
 
   const onChange = async (value) => {
-    setSelecteds(value);
-    onFiltered(value);
+    const cleaned = (value || []).filter(v => v !== null);
+    setSelecteds(cleaned);
+    onFiltered(cleaned);
   };
 
   return (
@@ -57,19 +58,23 @@ export function TagsFilter({ onFiltered, initialTags }) {
           );
         }}
         renderTags={(value, getTagProps) =>
-          value.map((option, index) => (
-            <Chip
-              variant="outlined"
-              style={{
-                backgroundColor: option.color || "#eee",
-                textShadow: "1px 1px 1px #000",
-                color: "white",
-              }}
-              label={option.name}
-              {...getTagProps({ index })}
-              size="small"
-            />
-          ))
+          value.map((option, index) => {
+            if (!option) return null;
+            return (
+              <Chip
+                key={index}
+                variant="outlined"
+                style={{
+                  backgroundColor: option.color || "#eee",
+                  textShadow: "1px 1px 1px #000",
+                  color: "white",
+                }}
+                label={option.name}
+                {...getTagProps({ index })}
+                size="small"
+              />
+            );
+          })
         }
         renderInput={(params) => (
           <TextField

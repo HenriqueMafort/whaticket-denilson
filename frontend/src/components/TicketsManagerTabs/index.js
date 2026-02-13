@@ -488,8 +488,11 @@ const TicketsManagerTabs = () => {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object') {
-          return parsed;
+        if (Array.isArray(parsed)) {
+          const validTags = parsed.filter(t => t && typeof t === 'object' && t.id);
+          if (validTags.length === parsed.length) {
+            return parsed;
+          }
         }
       } catch (e) {
         console.error("Error parsing ticketsSelectedTags", e);
@@ -502,8 +505,11 @@ const TicketsManagerTabs = () => {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object') {
-          return parsed;
+        if (Array.isArray(parsed)) {
+          const validUsers = parsed.filter(u => u && typeof u === 'object' && u.id);
+          if (validUsers.length === parsed.length) {
+            return parsed;
+          }
         }
       } catch (e) {
         console.error("Error parsing ticketsSelectedUsers", e);
@@ -516,8 +522,11 @@ const TicketsManagerTabs = () => {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object') {
-          return parsed;
+        if (Array.isArray(parsed)) {
+          const validWhatsapps = parsed.filter(w => w && typeof w === 'object' && w.id);
+          if (validWhatsapps.length === parsed.length) {
+            return parsed;
+          }
         }
       } catch (e) {
         console.error("Error parsing ticketsSelectedWhatsapp", e);
@@ -532,8 +541,11 @@ const TicketsManagerTabs = () => {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object') {
-          return parsed;
+        if (Array.isArray(parsed)) {
+          const validStatus = parsed.filter(s => s && typeof s === 'object' && s.status);
+          if (validStatus.length === parsed.length) {
+            return parsed;
+          }
         }
       } catch (e) {
         console.error("Error parsing ticketsSelectedStatus", e);

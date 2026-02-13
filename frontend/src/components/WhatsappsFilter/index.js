@@ -39,8 +39,9 @@ export function WhatsappsFilter({ onFiltered, initialWhatsapps }) {
   };
 
   const onChange = async (value) => {
-    setSelecteds(value);
-    onFiltered(value);
+    const cleaned = (value || []).filter(v => v !== null);
+    setSelecteds(cleaned);
+    onFiltered(cleaned);
   };
 
   return (
@@ -59,19 +60,23 @@ export function WhatsappsFilter({ onFiltered, initialWhatsapps }) {
           );
         }}
         renderTags={(value, getWhatsappProps) =>
-          value.map((option, index) => (
-            <Chip
-              variant="outlined"
-              style={{
-                backgroundColor: "#bfbfbf",
-                textShadow: "1px 1px 1px #000",
-                color: "white",
-              }}
-              label={option.name}
-              {...getWhatsappProps({ index })}
-              size="small"
-            />
-          ))
+          value.map((option, index) => {
+            if (!option) return null;
+            return (
+              <Chip
+                key={index}
+                variant="outlined"
+                style={{
+                  backgroundColor: "#bfbfbf",
+                  textShadow: "1px 1px 1px #000",
+                  color: "white",
+                }}
+                label={option.name}
+                {...getWhatsappProps({ index })}
+                size="small"
+              />
+            );
+          })
         }
         renderInput={(params) => (
           <TextField
