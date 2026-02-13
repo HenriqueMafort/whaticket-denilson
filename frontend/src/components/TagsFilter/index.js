@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 
-export function TagsFilter({ onFiltered }) {
+export function TagsFilter({ onFiltered, initialTags }) {
   const [tags, setTags] = useState([]);
   const [selecteds, setSelecteds] = useState([]);
 
@@ -14,6 +14,18 @@ export function TagsFilter({ onFiltered }) {
     }
     fetchData();
   }, []);
+
+  useEffect(() => {
+    setSelecteds([]);
+    if (
+      Array.isArray(initialTags) &&
+      Array.isArray(tags) &&
+      tags.length > 0
+    ) {
+      onChange(initialTags);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialTags, tags]);
 
   const loadTags = async () => {
     try {
@@ -38,6 +50,12 @@ export function TagsFilter({ onFiltered }) {
         value={selecteds}
         onChange={(e, v, r) => onChange(v)}
         getOptionLabel={(option) => option.name}
+        getOptionSelected={(option, value) => {
+          return (
+            option?.id === value?.id ||
+            option?.name.toLowerCase() === value?.name.toLowerCase()
+          );
+        }}
         renderTags={(value, getTagProps) =>
           value.map((option, index) => (
             <Chip

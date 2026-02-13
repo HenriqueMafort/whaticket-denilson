@@ -249,7 +249,7 @@ const useStyles = makeStyles((theme) => ({
     zIndex: 10,
     boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
   },
-  
+
   modernTabs: {
     minHeight: 56,
     height: 56,
@@ -450,8 +450,14 @@ const TicketsManagerTabs = () => {
   const classes = useStyles();
   const history = useHistory();
 
-  const [searchParam, setSearchParam] = useState("");
-  const [tab, setTab] = useState("open");
+  const [searchParam, setSearchParam] = useState(() => {
+    const saved = localStorage.getItem("ticketsSearchParam");
+    return saved || "";
+  });
+  const [tab, setTab] = useState(() => {
+    const saved = localStorage.getItem("ticketsTab");
+    return saved || "open";
+  });
   const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
   const [showAllTickets, setShowAllTickets] = useState(false);
   const [sortTickets, setSortTickets] = useState(false);
@@ -470,14 +476,50 @@ const TicketsManagerTabs = () => {
   const [awaitingFilter, setAwaitingFilter] = useState(null);
 
   const userQueueIds = user.queues.map((q) => q.id);
-  const [selectedQueueIds, setSelectedQueueIds] = useState(userQueueIds || []);
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [selectedUsers, setSelectedUsers] = useState([]);
-  const [selectedWhatsapp, setSelectedWhatsapp] = useState([]);
+  const [selectedQueueIds, setSelectedQueueIds] = useState(() => {
+    const saved = localStorage.getItem("ticketsSelectedQueueIds");
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return userQueueIds || [];
+  });
+  const [selectedTags, setSelectedTags] = useState(() => {
+    const saved = localStorage.getItem("ticketsSelectedTags");
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return [];
+  });
+  const [selectedUsers, setSelectedUsers] = useState(() => {
+    const saved = localStorage.getItem("ticketsSelectedUsers");
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return [];
+  });
+  const [selectedWhatsapp, setSelectedWhatsapp] = useState(() => {
+    const saved = localStorage.getItem("ticketsSelectedWhatsapp");
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return [];
+  });
   const [forceSearch, setForceSearch] = useState(false);
   const [listRefreshKey, setListRefreshKey] = useState(0);
-  const [selectedStatus, setSelectedStatus] = useState([]);
-  const [filter, setFilter] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState(() => {
+    const saved = localStorage.getItem("ticketsSelectedStatus");
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return [];
+  });
+  const [filter, setFilter] = useState(() => {
+    const saved = localStorage.getItem("ticketsFilterOpen");
+    if (saved === "true") {
+      return true;
+    }
+    return false;
+  });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [hoveredButton, setHoveredButton] = useState(null);
   const [isHoveredAll, setIsHoveredAll] = useState(false);
@@ -489,7 +531,13 @@ const TicketsManagerTabs = () => {
   const [isHoveredAwaitingAgent, setIsHoveredAwaitingAgent] = useState(false);
   const [isHoveredAwaitingCustomer, setIsHoveredAwaitingCustomer] = useState(false);
 
-  const [isFilterActive, setIsFilterActive] = useState(false);
+  const [isFilterActive, setIsFilterActive] = useState(() => {
+    const saved = localStorage.getItem("ticketsFilterOpen");
+    if (saved === "true") {
+      return true;
+    }
+    return false;
+  });
 
   const showAllStorageKey = `ticketsShowAll-${user?.companyId}-${user?.id}`;
   const tabOpenStorageKey = `ticketsTabOpen-${user?.companyId}-${user?.id}`;
@@ -539,6 +587,38 @@ const TicketsManagerTabs = () => {
   useEffect(() => {
     localStorage.setItem(showAllStorageKey, showAllTickets ? "true" : "false");
   }, [showAllTickets, showAllStorageKey]);
+
+  useEffect(() => {
+    localStorage.setItem("ticketsSearchParam", searchParam);
+  }, [searchParam]);
+
+  useEffect(() => {
+    localStorage.setItem("ticketsTab", tab);
+  }, [tab]);
+
+  useEffect(() => {
+    localStorage.setItem("ticketsSelectedQueueIds", JSON.stringify(selectedQueueIds));
+  }, [selectedQueueIds]);
+
+  useEffect(() => {
+    localStorage.setItem("ticketsSelectedTags", JSON.stringify(selectedTags));
+  }, [selectedTags]);
+
+  useEffect(() => {
+    localStorage.setItem("ticketsSelectedUsers", JSON.stringify(selectedUsers));
+  }, [selectedUsers]);
+
+  useEffect(() => {
+    localStorage.setItem("ticketsSelectedWhatsapp", JSON.stringify(selectedWhatsapp));
+  }, [selectedWhatsapp]);
+
+  useEffect(() => {
+    localStorage.setItem("ticketsSelectedStatus", JSON.stringify(selectedStatus));
+  }, [selectedStatus]);
+
+  useEffect(() => {
+    localStorage.setItem("ticketsFilterOpen", filter);
+  }, [filter]);
 
   useEffect(() => {
     setSelectedQueuesMessage(selectedQueueIds);
@@ -787,12 +867,12 @@ const TicketsManagerTabs = () => {
 
       {filter === true && (
         <>
-          <TagsFilter onFiltered={handleSelectedTags} />
-          <WhatsappsFilter onFiltered={handleSelectedWhatsapps} />
-          <StatusFilter onFiltered={handleSelectedStatus} />
+          <TagsFilter onFiltered={handleSelectedTags} initialTags={selectedTags} />
+          <WhatsappsFilter onFiltered={handleSelectedWhatsapps} initialWhatsapps={selectedWhatsapp} />
+          <StatusFilter onFiltered={handleSelectedStatus} initialStatus={selectedStatus} />
           {profile === "admin" && (
             <>
-              <UsersFilter onFiltered={handleSelectedUsers} />
+              <UsersFilter onFiltered={handleSelectedUsers} initialUsers={selectedUsers} />
             </>
           )}
         </>
@@ -805,35 +885,35 @@ const TicketsManagerTabs = () => {
               role={user.allUserChat === 'enabled' && user.profile === 'user' ? 'admin' : user.profile}
               perform="tickets-manager:showall"
               yes={() => (
-<Tooltip title={showAllTickets ? "Ocultar todos" : "Mostrar todos"}>
-  <Badge
-    color="primary"
-    invisible={
-      !isHoveredAll ||
-      isHoveredNew ||
-      isHoveredResolve ||
-      isHoveredOpen ||
-      isHoveredClosed
-    }
-    badgeContent={"Todos"}
-    classes={{ badge: classes.tabsBadge }}
-  >
-    <ToggleButton
-      onMouseEnter={() => setIsHoveredAll(true)}
-      onMouseLeave={() => setIsHoveredAll(false)}
-      className={`${classes.standardButton} ${showAllTickets ? classes.activeButton : ''}`}
-      value="uncheck"
-      selected={showAllTickets}
-      onChange={() => setShowAllTickets((prevState) => !prevState)}
-    >
-      {showAllTickets ? (
-        <VisibilityIcon className={`${classes.standardIcon} ${classes.activeIcon}`} />
-      ) : (
-        <VisibilityOffIcon className={classes.standardIcon} />
-      )}
-    </ToggleButton>
-  </Badge>
-</Tooltip>
+                <Tooltip title={showAllTickets ? "Ocultar todos" : "Mostrar todos"}>
+                  <Badge
+                    color="primary"
+                    invisible={
+                      !isHoveredAll ||
+                      isHoveredNew ||
+                      isHoveredResolve ||
+                      isHoveredOpen ||
+                      isHoveredClosed
+                    }
+                    badgeContent={"Todos"}
+                    classes={{ badge: classes.tabsBadge }}
+                  >
+                    <ToggleButton
+                      onMouseEnter={() => setIsHoveredAll(true)}
+                      onMouseLeave={() => setIsHoveredAll(false)}
+                      className={`${classes.standardButton} ${showAllTickets ? classes.activeButton : ''}`}
+                      value="uncheck"
+                      selected={showAllTickets}
+                      onChange={() => setShowAllTickets((prevState) => !prevState)}
+                    >
+                      {showAllTickets ? (
+                        <VisibilityIcon className={`${classes.standardIcon} ${classes.activeIcon}`} />
+                      ) : (
+                        <VisibilityOffIcon className={classes.standardIcon} />
+                      )}
+                    </ToggleButton>
+                  </Badge>
+                </Tooltip>
               )}
             />
             <Snackbar
@@ -862,247 +942,239 @@ const TicketsManagerTabs = () => {
                 </>
               }
             />
-<Tooltip title={i18n.t("tickets.inbox.newTicket")}>
-  <Badge
-    color="primary"
-    invisible={
-      isHoveredAll ||
-      !isHoveredNew ||
-      isHoveredResolve ||
-      isHoveredOpen ||
-      isHoveredClosed
-    }
-    badgeContent={i18n.t("tickets.inbox.newTicket")}
-    classes={{ badge: classes.tabsBadge }}
-  >
-    <IconButton
-      onMouseEnter={() => setIsHoveredNew(true)}
-      onMouseLeave={() => setIsHoveredNew(false)}
-      className={classes.standardButton}
-      onClick={() => {
-        setNewTicketModalOpen(true);
-      }}
-    >
-      <AddIcon className={classes.standardIcon} />
-    </IconButton>
-  </Badge>
-</Tooltip>
-{user.profile === "admin" && (
-  <Tooltip title={i18n.t("tickets.inbox.closedAll")}>
-    <Badge
-      color="primary"
-      invisible={
-        isHoveredAll ||
-        isHoveredNew ||
-        !isHoveredResolve ||
-        isHoveredOpen ||
-        isHoveredClosed
-      }
-      badgeContent={i18n.t("tickets.inbox.closedAll")}
-      classes={{ badge: classes.tabsBadge }}
-    >
-      <IconButton
-        onMouseEnter={() => setIsHoveredResolve(true)}
-        onMouseLeave={() => setIsHoveredResolve(false)}
-        className={classes.standardButton}
-        onClick={handleSnackbarOpen}
-      >
-        <PlaylistAddCheckOutlined className={classes.standardIcon} />
-      </IconButton>
-    </Badge>
-  </Tooltip>
-)}
-{/* Botão "Abertos" */}
-<Tooltip title={i18n.t("tickets.inbox.open")}>
-  <Badge
-    invisible={
-      !(
-        tab === "open" &&
-        !isHoveredAll &&
-        !isHoveredNew &&
-        !isHoveredResolve &&
-        !isHoveredClosed &&
-        !isHoveredSort
-      ) && !isHoveredOpen
-    }
-    badgeContent={i18n.t("tickets.inbox.open")}
-    classes={{ badge: classes.tabsBadge }}
-  >
-    <IconButton
-      onMouseEnter={() => {
-        setIsHoveredOpen(true);
-        setHoveredButton("open");
-      }}
-      onMouseLeave={() => {
-        setIsHoveredOpen(false);
-        setHoveredButton(null);
-      }}
-      className={`${classes.standardButton} ${
-        (tab === "open" || isHoveredOpen) ? classes.activeButton : ''
-      }`}
-      onClick={() => handleChangeTab(null, "open")}
-    >
-      <MoveToInboxIcon
-        className={`${classes.standardIcon} ${
-          (tab === "open" || isHoveredOpen) ? classes.activeIcon : ''
-        }`}
-      />
-    </IconButton>
-  </Badge>
-</Tooltip>
+            <Tooltip title={i18n.t("tickets.inbox.newTicket")}>
+              <Badge
+                color="primary"
+                invisible={
+                  isHoveredAll ||
+                  !isHoveredNew ||
+                  isHoveredResolve ||
+                  isHoveredOpen ||
+                  isHoveredClosed
+                }
+                badgeContent={i18n.t("tickets.inbox.newTicket")}
+                classes={{ badge: classes.tabsBadge }}
+              >
+                <IconButton
+                  onMouseEnter={() => setIsHoveredNew(true)}
+                  onMouseLeave={() => setIsHoveredNew(false)}
+                  className={classes.standardButton}
+                  onClick={() => {
+                    setNewTicketModalOpen(true);
+                  }}
+                >
+                  <AddIcon className={classes.standardIcon} />
+                </IconButton>
+              </Badge>
+            </Tooltip>
+            {user.profile === "admin" && (
+              <Tooltip title={i18n.t("tickets.inbox.closedAll")}>
+                <Badge
+                  color="primary"
+                  invisible={
+                    isHoveredAll ||
+                    isHoveredNew ||
+                    !isHoveredResolve ||
+                    isHoveredOpen ||
+                    isHoveredClosed
+                  }
+                  badgeContent={i18n.t("tickets.inbox.closedAll")}
+                  classes={{ badge: classes.tabsBadge }}
+                >
+                  <IconButton
+                    onMouseEnter={() => setIsHoveredResolve(true)}
+                    onMouseLeave={() => setIsHoveredResolve(false)}
+                    className={classes.standardButton}
+                    onClick={handleSnackbarOpen}
+                  >
+                    <PlaylistAddCheckOutlined className={classes.standardIcon} />
+                  </IconButton>
+                </Badge>
+              </Tooltip>
+            )}
+            {/* Botão "Abertos" */}
+            <Tooltip title={i18n.t("tickets.inbox.open")}>
+              <Badge
+                invisible={
+                  !(
+                    tab === "open" &&
+                    !isHoveredAll &&
+                    !isHoveredNew &&
+                    !isHoveredResolve &&
+                    !isHoveredClosed &&
+                    !isHoveredSort
+                  ) && !isHoveredOpen
+                }
+                badgeContent={i18n.t("tickets.inbox.open")}
+                classes={{ badge: classes.tabsBadge }}
+              >
+                <IconButton
+                  onMouseEnter={() => {
+                    setIsHoveredOpen(true);
+                    setHoveredButton("open");
+                  }}
+                  onMouseLeave={() => {
+                    setIsHoveredOpen(false);
+                    setHoveredButton(null);
+                  }}
+                  className={`${classes.standardButton} ${(tab === "open" || isHoveredOpen) ? classes.activeButton : ''
+                    }`}
+                  onClick={() => handleChangeTab(null, "open")}
+                >
+                  <MoveToInboxIcon
+                    className={`${classes.standardIcon} ${(tab === "open" || isHoveredOpen) ? classes.activeIcon : ''
+                      }`}
+                  />
+                </IconButton>
+              </Badge>
+            </Tooltip>
 
-{/* Botão "Resolvidos" */}
-<Tooltip title={i18n.t("tickets.inbox.resolverd")}>
-  <Badge
-    color="primary"
-    invisible={
-      !(
-        tab === "closed" &&
-        !isHoveredAll &&
-        !isHoveredNew &&
-        !isHoveredResolve &&
-        !isHoveredOpen &&
-        !isHoveredSort
-      ) && !isHoveredClosed
-    }
-    badgeContent={i18n.t("tickets.inbox.resolverd")}
-    classes={{ badge: classes.tabsBadge }}
-  >
-    <IconButton
-      onMouseEnter={() => {
-        setIsHoveredClosed(true);
-        setHoveredButton("closed");
-      }}
-      onMouseLeave={() => {
-        setIsHoveredClosed(false);
-        setHoveredButton(null);
-      }}
-      className={`${classes.standardButton} ${
-        (tab === "closed" || isHoveredClosed) ? classes.activeButton : ''
-      }`}
-      onClick={() => handleChangeTab(null, "closed")}
-    >
-      <CheckBoxIcon
-        className={`${classes.standardIcon} ${
-          (tab === "closed" || isHoveredClosed) ? classes.activeIcon : ''
-        }`}
-      />
-    </IconButton>
-  </Badge>
-</Tooltip>
+            {/* Botão "Resolvidos" */}
+            <Tooltip title={i18n.t("tickets.inbox.resolverd")}>
+              <Badge
+                color="primary"
+                invisible={
+                  !(
+                    tab === "closed" &&
+                    !isHoveredAll &&
+                    !isHoveredNew &&
+                    !isHoveredResolve &&
+                    !isHoveredOpen &&
+                    !isHoveredSort
+                  ) && !isHoveredClosed
+                }
+                badgeContent={i18n.t("tickets.inbox.resolverd")}
+                classes={{ badge: classes.tabsBadge }}
+              >
+                <IconButton
+                  onMouseEnter={() => {
+                    setIsHoveredClosed(true);
+                    setHoveredButton("closed");
+                  }}
+                  onMouseLeave={() => {
+                    setIsHoveredClosed(false);
+                    setHoveredButton(null);
+                  }}
+                  className={`${classes.standardButton} ${(tab === "closed" || isHoveredClosed) ? classes.activeButton : ''
+                    }`}
+                  onClick={() => handleChangeTab(null, "closed")}
+                >
+                  <CheckBoxIcon
+                    className={`${classes.standardIcon} ${(tab === "closed" || isHoveredClosed) ? classes.activeIcon : ''
+                      }`}
+                  />
+                </IconButton>
+              </Badge>
+            </Tooltip>
 
-{tab !== "closed" && tab !== "search" && (
-  <Tooltip title={!sortTickets ? "Ordenação crescente" : "Ordenação decrescente"}>
-    <Badge
-      color="primary"
-      invisible={
-        !isHoveredSort ||
-        isHoveredAll ||
-        isHoveredNew ||
-        isHoveredResolve ||
-        isHoveredOpen ||
-        isHoveredClosed
-      }
-      badgeContent={!sortTickets ? "Crescente" : "Decrescente"}
-      classes={{ badge: classes.tabsBadge }}
-    >
-      <ToggleButton
-        onMouseEnter={() => setIsHoveredSort(true)}
-        onMouseLeave={() => setIsHoveredSort(false)}
-        className={`${classes.standardButton} ${sortTickets ? classes.activeButton : ''}`}
-        value="uncheck"
-        selected={sortTickets}
-        onChange={() => setSortTickets((prevState) => !prevState)}
-      >
-        {!sortTickets ? (
-          <TextRotateUp className={`${classes.standardIcon} ${sortTickets ? classes.activeIcon : ''}`} />
-        ) : (
-          <TextRotationDown className={`${classes.standardIcon} ${classes.activeIcon}`} />
-        )}
-      </ToggleButton>
-    </Badge>
-  </Tooltip>
-)}
+            {tab !== "closed" && tab !== "search" && (
+              <Tooltip title={!sortTickets ? "Ordenação crescente" : "Ordenação decrescente"}>
+                <Badge
+                  color="primary"
+                  invisible={
+                    !isHoveredSort ||
+                    isHoveredAll ||
+                    isHoveredNew ||
+                    isHoveredResolve ||
+                    isHoveredOpen ||
+                    isHoveredClosed
+                  }
+                  badgeContent={!sortTickets ? "Crescente" : "Decrescente"}
+                  classes={{ badge: classes.tabsBadge }}
+                >
+                  <ToggleButton
+                    onMouseEnter={() => setIsHoveredSort(true)}
+                    onMouseLeave={() => setIsHoveredSort(false)}
+                    className={`${classes.standardButton} ${sortTickets ? classes.activeButton : ''}`}
+                    value="uncheck"
+                    selected={sortTickets}
+                    onChange={() => setSortTickets((prevState) => !prevState)}
+                  >
+                    {!sortTickets ? (
+                      <TextRotateUp className={`${classes.standardIcon} ${sortTickets ? classes.activeIcon : ''}`} />
+                    ) : (
+                      <TextRotationDown className={`${classes.standardIcon} ${classes.activeIcon}`} />
+                    )}
+                  </ToggleButton>
+                </Badge>
+              </Tooltip>
+            )}
 
-<Tooltip title="Cliente aguardando">
-    <Badge
-      color="primary"
-      invisible={
-        !(
-          (awaitingFilter === "agent" &&
-            !isHoveredAll &&
-            !isHoveredNew &&
-            !isHoveredResolve &&
-            !isHoveredOpen &&
-            !isHoveredClosed &&
-            !isHoveredSort &&
-            !isHoveredAwaitingCustomer
-          ) || isHoveredAwaitingAgent
-        )
-      }
-      badgeContent={"Ag. Cliente"}
-      classes={{ badge: classes.tabsBadgeAwaiting }}
-    >
-      <IconButton
-        onMouseEnter={() => setIsHoveredAwaitingAgent(true)}
-        onMouseLeave={() => setIsHoveredAwaitingAgent(false)}
-        className={`${classes.awaitingSmallButton} ${
-          awaitingFilter === "agent" ? classes.activeButton : ''
-        }`}
-        onClick={() => setAwaitingFilter((prev) => (prev === "agent" ? null : "agent"))}
-      >
-        <ClockIcon
-          className={`${classes.awaitingSmallIcon} ${
-            awaitingFilter === "agent" ? classes.activeIcon : ''
-          }`}
-        />
-      </IconButton>
-    </Badge>
-</Tooltip>
-<Tooltip title="Atendente aguardando">
-    <Badge
-      color="primary"
-      invisible={
-        !(
-          (awaitingFilter === "customer" &&
-            !isHoveredAll &&
-            !isHoveredNew &&
-            !isHoveredResolve &&
-            !isHoveredOpen &&
-            !isHoveredClosed &&
-            !isHoveredSort &&
-            !isHoveredAwaitingAgent
-          ) || isHoveredAwaitingCustomer
-        )
-      }
-      badgeContent={"Ag. Atend."}
-      classes={{ badge: classes.tabsBadgeAwaiting }}
-    >
-      <IconButton
-        onMouseEnter={() => setIsHoveredAwaitingCustomer(true)}
-        onMouseLeave={() => setIsHoveredAwaitingCustomer(false)}
-        className={`${classes.awaitingSmallButton} ${
-          awaitingFilter === "customer" ? classes.activeButton : ''
-      }`}
-      onClick={() => setAwaitingFilter((prev) => (prev === "customer" ? null : "customer"))}
-    >
-      <MessageSharpIcon
-        className={`${classes.awaitingSmallIcon} ${
-          awaitingFilter === "customer" ? classes.activeIcon : ''
-        }`}
-      />
-    </IconButton>
-  </Badge>
-</Tooltip>
+            <Tooltip title="Cliente aguardando">
+              <Badge
+                color="primary"
+                invisible={
+                  !(
+                    (awaitingFilter === "agent" &&
+                      !isHoveredAll &&
+                      !isHoveredNew &&
+                      !isHoveredResolve &&
+                      !isHoveredOpen &&
+                      !isHoveredClosed &&
+                      !isHoveredSort &&
+                      !isHoveredAwaitingCustomer
+                    ) || isHoveredAwaitingAgent
+                  )
+                }
+                badgeContent={"Ag. Cliente"}
+                classes={{ badge: classes.tabsBadgeAwaiting }}
+              >
+                <IconButton
+                  onMouseEnter={() => setIsHoveredAwaitingAgent(true)}
+                  onMouseLeave={() => setIsHoveredAwaitingAgent(false)}
+                  className={`${classes.awaitingSmallButton} ${awaitingFilter === "agent" ? classes.activeButton : ''
+                    }`}
+                  onClick={() => setAwaitingFilter((prev) => (prev === "agent" ? null : "agent"))}
+                >
+                  <ClockIcon
+                    className={`${classes.awaitingSmallIcon} ${awaitingFilter === "agent" ? classes.activeIcon : ''
+                      }`}
+                  />
+                </IconButton>
+              </Badge>
+            </Tooltip>
+            <Tooltip title="Atendente aguardando">
+              <Badge
+                color="primary"
+                invisible={
+                  !(
+                    (awaitingFilter === "customer" &&
+                      !isHoveredAll &&
+                      !isHoveredNew &&
+                      !isHoveredResolve &&
+                      !isHoveredOpen &&
+                      !isHoveredClosed &&
+                      !isHoveredSort &&
+                      !isHoveredAwaitingAgent
+                    ) || isHoveredAwaitingCustomer
+                  )
+                }
+                badgeContent={"Ag. Atend."}
+                classes={{ badge: classes.tabsBadgeAwaiting }}
+              >
+                <IconButton
+                  onMouseEnter={() => setIsHoveredAwaitingCustomer(true)}
+                  onMouseLeave={() => setIsHoveredAwaitingCustomer(false)}
+                  className={`${classes.awaitingSmallButton} ${awaitingFilter === "customer" ? classes.activeButton : ''
+                    }`}
+                  onClick={() => setAwaitingFilter((prev) => (prev === "customer" ? null : "customer"))}
+                >
+                  <MessageSharpIcon
+                    className={`${classes.awaitingSmallIcon} ${awaitingFilter === "customer" ? classes.activeIcon : ''
+                      }`}
+                  />
+                </IconButton>
+              </Badge>
+            </Tooltip>
 
-{/* Movido o seletor de filas para a mesma linha dos botões */}
-<span className="MuiBadge-root">
-  <TicketsQueueSelect
-    selectedQueueIds={selectedQueueIds}
-    userQueues={user?.queues}
-    onChange={(values) => setSelectedQueueIds(values)}
-  />
-</span>
+            {/* Movido o seletor de filas para a mesma linha dos botões */}
+            <span className="MuiBadge-root">
+              <TicketsQueueSelect
+                selectedQueueIds={selectedQueueIds}
+                userQueues={user?.queues}
+                onChange={(values) => setSelectedQueueIds(values)}
+              />
+            </span>
           </Grid>
         </Grid>
       </Paper>
@@ -1223,13 +1295,13 @@ const TicketsManagerTabs = () => {
                   </Grid>
                   <Grid item>
                     <Typography
-                        style={{
-                          marginLeft: 8,
-                      fontSize: isMobile ? 13 : 14,
-                          fontWeight: tabOpen === "group" ? 700 : 500,
-                          color: tabOpen === "group" ? theme.palette.primary.main : "inherit",
-                          transition: "all 0.2s ease",
-                        }}
+                      style={{
+                        marginLeft: 8,
+                        fontSize: isMobile ? 13 : 14,
+                        fontWeight: tabOpen === "group" ? 700 : 500,
+                        color: tabOpen === "group" ? theme.palette.primary.main : "inherit",
+                        transition: "all 0.2s ease",
+                      }}
                     >
                       {i18n.t("ticketsList.groupingHeader")}
                     </Typography>

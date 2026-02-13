@@ -3,13 +3,24 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import React, { useEffect, useState } from "react";
 import { i18n } from "../../translate/i18n";
 
-export function StatusFilter({ onFiltered }) {
+export function StatusFilter({ onFiltered, initialStatus }) {
   const [selecteds, setSelecteds] = useState([]);
 
   useEffect(() => {
-    async function fetchData() {}
+    async function fetchData() { }
     fetchData();
   }, []);
+
+  useEffect(() => {
+    setSelecteds([]);
+    if (
+      Array.isArray(initialStatus) &&
+      initialStatus.length > 0
+    ) {
+      onChange(initialStatus);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialStatus]);
 
   const onChange = async (value) => {
     setSelecteds(value);
@@ -41,6 +52,12 @@ export function StatusFilter({ onFiltered }) {
         value={selecteds}
         onChange={(e, v, r) => onChange(v)}
         getOptionLabel={(option) => option.name}
+        getOptionSelected={(option, value) => {
+          return (
+            option?.status === value?.status ||
+            option?.name.toLowerCase() === value?.name.toLowerCase()
+          );
+        }}
         renderTags={(value, getTagProps) =>
           value.map((option, index) => (
             <Chip
