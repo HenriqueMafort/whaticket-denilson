@@ -172,7 +172,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, channel }) => {
     maxUseInactiveTime: 1,
     timeToReturnQueue: 0,
     triggerIntegrationOnClose: true,
-    wavoip: "",
+
   };
   const [whatsApp, setWhatsApp] = useState(initialState);
   const [selectedQueueIds, setSelectedQueueIds] = useState([]);
@@ -508,7 +508,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, channel }) => {
       triggerIntegrationOnClose: triggerIntegrationOnClose,
       integrationTypeId: triggerIntegrationOnClose ? integrationTypeId : null,
       color: values.color ? values.color : getRandomHexColor(),
-      wavoip: values.wavoip ? values.wavoip : null,
+
     };
     delete whatsappData["queues"];
     delete whatsappData["session"];
@@ -1270,18 +1270,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId, channel }) => {
                       selectedQueueIds={selectedQueueIds}
                       onChange={(selectedIds) => handleChangeQueue(selectedIds)}
                     />
-                    {showWavoipCall && (
-                      <div>
-                        <Field
-                          as={TextField}
-                          label="Wavoip"
-                          fullWidth
-                          name="wavoip"
-                          variant="outlined"
-                          margin="dense"
-                        />
-                      </div>
-                    )}
+
                     {showIntegrations && (
                       <FormControl
                         variant="outlined"

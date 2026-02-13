@@ -167,7 +167,7 @@ export default function Options(props) {
 
   // Sigla para inserir no copiar contatos
   const [copyContactPrefix, setCopyContactPrefix] = useState("");
-const [loadingCopyContactPrefix, setLoadingCopyContactPrefix] = useState(false);
+  const [loadingCopyContactPrefix, setLoadingCopyContactPrefix] = useState(false);
 
   //MENSAGENS CUSTOMIZADAS
   const [transferMessage, setTransferMessage] = useState("");
@@ -316,15 +316,15 @@ const [loadingCopyContactPrefix, setLoadingCopyContactPrefix] = useState(false);
     setLoadingEfiClientidType(false);
   }
 
-async function handleCopyContactPrefix(value) {
-  setCopyContactPrefix(value);
-  setLoadingCopyContactPrefix(true);
-  await update({
-    column: "copyContactPrefix",
-    data: value
-  });
-  setLoadingCopyContactPrefix(false);
-}
+  async function handleCopyContactPrefix(value) {
+    setCopyContactPrefix(value);
+    setLoadingCopyContactPrefix(true);
+    await update({
+      column: "copyContactPrefix",
+      data: value
+    });
+    setLoadingCopyContactPrefix(false);
+  }
 
   async function handleChangeEfiClientsecret(value) {
     setEfiClientsecretType(value);
@@ -865,31 +865,7 @@ async function handleCopyContactPrefix(value) {
           </FormControl>
         </Grid>
 
-        {/* AVISO SOBRE LIGAÇÃO DO WHATSAPP */}
-        <Grid xs={12} sm={6} md={4} item>
-          <FormControl className={classes.selectContainer}>
-            <InputLabel id="acceptCallWhatsapp-label">
-              {i18n.t("settings.settings.options.acceptCallWhatsapp")}
-            </InputLabel>
-            <Select
-              labelId="acceptCallWhatsapp-label"
-              value={AcceptCallWhatsapp}
-              onChange={async (e) => {
-                handleAcceptCallWhatsapp(e.target.value);
-              }}
-            >
-              <MenuItem value={"disabled"}>
-                {i18n.t("settings.settings.options.disabled")}
-              </MenuItem>
-              <MenuItem value={"enabled"}>
-                {i18n.t("settings.settings.options.enabled")}
-              </MenuItem>
-            </Select>
-            <FormHelperText>
-              {loadingAcceptCallWhatsapp && i18n.t("settings.settings.options.updating")}
-            </FormHelperText>
-          </FormControl>
-        </Grid>
+
 
         {/* HABILITAR PARA O ATENDENTE RETIRAR O ASSINATURA */}
         <Grid xs={12} sm={6} md={4} item>
@@ -1117,19 +1093,19 @@ async function handleCopyContactPrefix(value) {
 
       {/* CONFIGURAÇÃO SIGLA PARA CÓPIA DE CONTATOS */}
       <Grid spacing={3} container style={{ marginBottom: 10 }}>
-                  <Tabs
-            indicatorColor='primary'
-            textColor='primary'
-            scrollButtons='on'
-            variant='scrollable'
-            className={classes.tab}
-            style={{
-              marginBottom: 20,
-              marginTop: 20,
-            }}
-          >
-            <Tab label='Configuração de Sigla para Copia de Contato' />
-          </Tabs>
+        <Tabs
+          indicatorColor='primary'
+          textColor='primary'
+          scrollButtons='on'
+          variant='scrollable'
+          className={classes.tab}
+          style={{
+            marginBottom: 20,
+            marginTop: 20,
+          }}
+        >
+          <Tab label='Configuração de Sigla para Copia de Contato' />
+        </Tabs>
         <Grid xs={12} sm={6} md={6} item>
           <FormControl className={classes.selectContainer}>
             <TextField
@@ -1143,9 +1119,9 @@ async function handleCopyContactPrefix(value) {
               onChange={async (e) => {
                 handleCopyContactPrefix(e.target.value);
               }}
-                InputLabelProps={{
-    shrink: true,
-  }}
+              InputLabelProps={{
+                shrink: true,
+              }}
             />
             <FormHelperText>
               {loadingCopyContactPrefix && i18n.t("settings.settings.options.updating")}
@@ -1154,7 +1130,7 @@ async function handleCopyContactPrefix(value) {
         </Grid>
       </Grid>
 
-      
+
       {/*-----------------LGPD-----------------*/}
       {enableLGPD === "enabled" && (
         <>
@@ -1531,28 +1507,7 @@ async function handleCopyContactPrefix(value) {
           </FormControl>
         </Grid>
 
-        <Grid xs={12} sm={6} md={6} item>
-          <FormControl className={classes.selectContainer}>
-            <TextField
-              id="AcceptCallWhatsappMessage"
-              name="AcceptCallWhatsappMessage"
-              margin="dense"
-              multiline
-              rows={3}
-              label={i18n.t("settings.settings.customMessages.AcceptCallWhatsappMessage")}
-              variant="outlined"
-              required={AcceptCallWhatsapp === "disabled"}
-              value={AcceptCallWhatsappMessage}
-              onChange={async (e) => {
-                handleAcceptCallWhatsappMessage(e.target.value);
-              }}
-            >
-            </TextField>
-            <FormHelperText>
-              {loadingAcceptCallWhatsappMessage && i18n.t("settings.settings.options.updating")}
-            </FormHelperText>
-          </FormControl>
-        </Grid>
+
 
         <Grid xs={12} sm={6} md={6} item>
           <FormControl className={classes.selectContainer}>

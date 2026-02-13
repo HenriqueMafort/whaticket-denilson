@@ -798,13 +798,7 @@ const TicketActionButtonsCustom = ({
       )}
 
       <div className={classes.actionButtons}>
-        {showWavoipCall && (
-          <Hidden only={['xs', 'sm']}>
-            <IconButton color="secondary" onClick={handleOpenWavoipCall}>
-              <Phone />
-            </IconButton>
-          </Hidden>
-        )}
+
         {ticket.status === "closed" && (
           <ButtonWithSpinner
             loading={loading}

@@ -689,14 +689,7 @@ const MainListItems = ({ collapsed, drawerClose }) => {
         tooltip={collapsed}
       />
 
-      {showWavoipCall && (
-        <ListItemLink
-          to="/call-historicals"
-          primary={i18n.t("mainDrawer.listItems.callHistorical")}
-          icon={<HistoryToggleOffIcon />}
-          tooltip={collapsed}
-        />
-      )}
+
 
       <ListItemLink
         to="/quick-messages"
