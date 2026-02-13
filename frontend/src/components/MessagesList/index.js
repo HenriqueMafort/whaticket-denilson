@@ -265,14 +265,14 @@ const useStyles = makeStyles((theme) => ({
 
   textContentItem: {
     overflowWrap: "break-word",
-    padding: "3px 80px 6px 6px",
+    padding: "3px 8px 6px 6px",
   },
 
   textContentItemDeleted: {
     fontStyle: "italic",
     color: "rgba(0, 0, 0, 0.36)",
     overflowWrap: "break-word",
-    padding: "3px 80px 6px 6px",
+    padding: "3px 8px 6px 6px",
   },
 
   messageMedia: {
@@ -1337,7 +1337,7 @@ const MessagesList = ({
                   )}
 
                   <div className={classes.messageSignature}>
-                    {(message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : (ticket?.whatsapp?.name ? ticket.whatsapp.name : "")) || "Sem Conexão"} - {message.isGroup ? message.contact?.name : ((message.ticket?.user?.name ? message.ticket.user.name : (ticket?.user?.name ? ticket.user.name : "")) || "Sem Usuário")} &nbsp;
+                    {(message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : (ticket?.whatsapp?.name ? ticket.whatsapp.name : "")) || "Sem Conexão"} - {message.contact?.name || ((message.ticket?.user?.name ? message.ticket.user.name : (ticket?.user?.name ? ticket.user.name : "")) || "Sem Usuário")} &nbsp;
                     {message.isEdited ? "Editada " + format(parseISO(message.createdAt), "dd/MM/yy HH:mm") : format(parseISO(message.createdAt), "dd/MM/yy HH:mm")}
                   </div>
                 </div>
@@ -1425,7 +1425,7 @@ const MessagesList = ({
                   )}
 
                   <div className={classes.messageSignature}>
-                    {(message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : (ticket?.whatsapp?.name ? ticket.whatsapp.name : "")) || "Sem Conexão"} - {((message.ticket?.user?.name ? message.ticket.user.name : (ticket?.user?.name ? ticket.user.name : "")) || "Sem Usuário")} &nbsp;
+                    {(message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : (ticket?.whatsapp?.name ? ticket.whatsapp.name : "")) || "Sem Conexão"} - {(message.user?.name || message.ticket?.user?.name || ticket?.user?.name || "Sem Usuário")} &nbsp;
                     {message.isEdited ? "Editada " + format(parseISO(message.createdAt), "dd/MM/yy HH:mm") : format(parseISO(message.createdAt), "dd/MM/yy HH:mm")}
                     {renderMessageAck(message)}
                   </div>

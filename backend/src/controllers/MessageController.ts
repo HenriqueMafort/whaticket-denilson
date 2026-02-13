@@ -161,9 +161,9 @@ const isAudioFile = (media: Express.Multer.File): boolean => {
 
   // 4. Verificar padrões no nome do arquivo
   if (media.originalname &&
-      (media.originalname.includes('audio_') ||
-       media.originalname.includes('áudio') ||
-       media.originalname.includes('voice'))) {
+    (media.originalname.includes('audio_') ||
+      media.originalname.includes('áudio') ||
+      media.originalname.includes('voice'))) {
     console.log("✅ Detectado como áudio pelo padrão do nome");
     return true;
   }
@@ -210,7 +210,8 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
               ticket,
               body: Array.isArray(body) ? body[index] : body,
               isPrivate: isPrivate === "true",
-              isForwarded: false
+              isForwarded: false,
+              userId: +req.user.id
             });
           }
 
@@ -256,11 +257,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
           // }
         })
       );
-  } else {
-    // Tratamento para mensagens sem mídia (código existente)
-    if (ticket.channel === "whatsapp" && isPrivate === "false") {
-      await SendWhatsAppMessage({ body, ticket, quotedMsg, vCard });
-    } else if (ticket.channel == 'whatsapp_oficial' && isPrivate === "false") {
+    } else {
+      // Tratamento para mensagens sem mídia (código existente)
+      if (ticket.channel === "whatsapp" && isPrivate === "false") {
+        await SendWhatsAppMessage({ body, ticket, quotedMsg, vCard, userId: +req.user.id });
+      } else if (ticket.channel == 'whatsapp_oficial' && isPrivate === "false") {
         // Suporte a seleção manual de template via templateId/variables no envio padrão
         const { templateId, variables, bodyToSave } = (req.body || {}) as any;
 
@@ -386,43 +387,43 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
           await SendWhatsAppOficialMessage({ body, ticket, quotedMsg, type: 'contacts', media: null, vCard });
         } else if (within24h) {
           // dentro da janela de 24h: texto normal
-        // AUTO-DETECT: Se o body corresponde a uma QuickMessage oficial com botões, enviar como template
-        const matchedQuickMessage = await QuickMessage.findOne({
-          where: {
-            companyId,
-            isOficial: true,
-            status: 'APPROVED',
-            message: body
-          },
-          include: [{ model: QuickMessageComponent, as: 'components' }]
-        });
-        if (matchedQuickMessage) {
-          const hasButtons = matchedQuickMessage.components?.some((c: any) => (c.type || '').toUpperCase() === 'BUTTONS');
-          if (hasButtons) {
-            console.log("[WABA] Auto-detect: QuickMessage oficial com botões detectada, enviando como template");
-            const templateData: IMetaMessageTemplate = {
-              name: matchedQuickMessage.shortcode,
-              language: { code: matchedQuickMessage.language || 'pt_BR' }
-            };
-            let buttonsToSave: any[] = [];
-            for (const comp of (matchedQuickMessage.components || [])) {
-              if ((comp.type || '').toUpperCase() === 'BUTTONS') {
-                buttonsToSave.push(comp.buttons);
+          // AUTO-DETECT: Se o body corresponde a uma QuickMessage oficial com botões, enviar como template
+          const matchedQuickMessage = await QuickMessage.findOne({
+            where: {
+              companyId,
+              isOficial: true,
+              status: 'APPROVED',
+              message: body
+            },
+            include: [{ model: QuickMessageComponent, as: 'components' }]
+          });
+          if (matchedQuickMessage) {
+            const hasButtons = matchedQuickMessage.components?.some((c: any) => (c.type || '').toUpperCase() === 'BUTTONS');
+            if (hasButtons) {
+              console.log("[WABA] Auto-detect: QuickMessage oficial com botões detectada, enviando como template");
+              const templateData: IMetaMessageTemplate = {
+                name: matchedQuickMessage.shortcode,
+                language: { code: matchedQuickMessage.language || 'pt_BR' }
+              };
+              let buttonsToSave: any[] = [];
+              for (const comp of (matchedQuickMessage.components || [])) {
+                if ((comp.type || '').toUpperCase() === 'BUTTONS') {
+                  buttonsToSave.push(comp.buttons);
+                }
               }
+              const finalBody = body.concat('||||', JSON.stringify(buttonsToSave));
+              SetTicketMessagesAsRead(ticket);
+              await SendWhatsAppOficialMessage({
+                body: finalBody,
+                ticket,
+                quotedMsg,
+                type: 'template',
+                media: null,
+                template: templateData
+              });
+              return res.send();
             }
-            const finalBody = body.concat('||||', JSON.stringify(buttonsToSave));
-            SetTicketMessagesAsRead(ticket);
-            await SendWhatsAppOficialMessage({
-              body: finalBody,
-              ticket,
-              quotedMsg,
-              type: 'template',
-              media: null,
-              template: templateData
-            });
-            return res.send();
           }
-        }
           await SendWhatsAppOficialMessage({ body, ticket, quotedMsg, type: 'text', media: null });
         } else {
           // fora da janela / inicia conversa: tentar template de fallback com variável no BODY para enviar a mensagem do atendente
@@ -468,11 +469,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
                 let exampleObj: any = null;
                 let buttonsArr: any[] = [];
 
-              try { if (comp?.example) exampleObj = JSON.parse(comp.example); } catch {}
-              try { if (comp?.buttons) buttonsArr = JSON.parse(comp.buttons) || []; } catch {}
+                try { if (comp?.example) exampleObj = JSON.parse(comp.example); } catch { }
+                try { if (comp?.buttons) buttonsArr = JSON.parse(comp.buttons) || []; } catch { }
 
                 if (type === 'HEADER') {
-                  if (['IMAGE','VIDEO','DOCUMENT'].includes(format)) requiresHeaderMedia = true;
+                  if (['IMAGE', 'VIDEO', 'DOCUMENT'].includes(format)) requiresHeaderMedia = true;
                 }
 
                 if (type === 'BODY') {
@@ -531,7 +532,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
             const type = (comp?.type || '').toUpperCase();
             const text = comp?.text || '';
             let exampleObj: any = null;
-            try { if (comp?.example) exampleObj = JSON.parse(comp.example); } catch {}
+            try { if (comp?.example) exampleObj = JSON.parse(comp.example); } catch { }
             if (type === 'BODY') {
               if (text.includes('{{')) selectedBodyVarCount = Math.max(selectedBodyVarCount, (text.match(/{{/g) || []).length);
               const exBody = Array.isArray(exampleObj?.body_text?.[0]) ? exampleObj.body_text[0] : [];
@@ -559,7 +560,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
             try {
               const attendant = await User.findByPk(req.user.id);
               attendantName = attendant?.name || (req.user as any)?.username || '';
-            } catch {}
+            } catch { }
             templateData.components = [
               {
                 type: 'body',
@@ -596,7 +597,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
           participant: null,
           dataJson: null,
           ticketTrakingId: null,
-          isPrivate: isPrivate === "true"
+          participant: null,
+          dataJson: null,
+          ticketTrakingId: null,
+          isPrivate: isPrivate === "true",
+          userId: +req.user.id
         };
 
         await CreateMessageService({ messageData, companyId: ticket.companyId });
@@ -700,7 +705,7 @@ export const forwardMessage = async (
     || message.mediaType === 'contactMessage'
     || message.mediaType === 'interactive') {
     if (ticket.channel === "whatsapp") {
-      await SendWhatsAppMessage({ body, ticket: createTicket, quotedMsg, isForwarded: message.fromMe ? false : true });
+      await SendWhatsAppMessage({ body, ticket: createTicket, quotedMsg, isForwarded: message.fromMe ? false : true, userId: +requestUser.id });
     }
     if (ticket.channel === "whatsapp_oficial") {
       await SendWhatsAppOficialMessage({ body: `_Mensagem encaminhada_:\n ${body}`, ticket: createTicket, quotedMsg, type: 'text', media: null });
@@ -728,7 +733,7 @@ export const forwardMessage = async (
     } as Express.Multer.File
 
     if (ticket.channel === "whatsapp") {
-      await SendWhatsAppMedia({ media: mediaSrc, ticket: createTicket, body, isForwarded: message.fromMe ? false : true });
+      await SendWhatsAppMedia({ media: mediaSrc, ticket: createTicket, body, isForwarded: message.fromMe ? false : true, userId: +requestUser.id });
     }
     if (ticket.channel === "whatsapp_oficial") {
       await SendWhatsAppOficialMessage({ body: `_Mensagem encaminhada_:\n ${body}`, ticket: createTicket, quotedMsg, type: null, media: mediaSrc });

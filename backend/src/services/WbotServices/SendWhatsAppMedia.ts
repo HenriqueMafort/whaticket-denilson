@@ -123,6 +123,7 @@ interface Request {
   body?: string;
   isPrivate?: boolean;
   isForwarded?: boolean;
+  userId?: number;
 }
 
 const publicFolder = path.resolve(__dirname, "..", "..", "..", "public");
@@ -297,7 +298,8 @@ const SendWhatsAppMedia = async ({
   ticket,
   body = "",
   isPrivate = false,
-  isForwarded = false
+  isForwarded = false,
+  userId
 }: Request): Promise<WAMessage> => {
   try {
     const wbot = await getWbot(ticket.whatsappId);
@@ -523,6 +525,29 @@ const SendWhatsAppMedia = async ({
       lastMessage: body !== media.filename ? body : bodyMedia,
       imported: null
     });
+
+    if (userId) {
+      setTimeout(async () => {
+        try {
+          // Import Message model inside the timeout or at top if not circular dep
+          const Message = require("../../models/Message").default;
+
+          const msg = await Message.findOne({
+            where: {
+              wid: sentMessage.key.id,
+              companyId: ticket.companyId
+            }
+          });
+
+          if (msg) {
+            await msg.update({ userId });
+            console.log(`[SendWhatsAppMedia] Message ${msg.id} updated with userId ${userId}`);
+          }
+        } catch (error) {
+          console.error(`[SendWhatsAppMedia] Error updating userId for message ${sentMessage.key.id}:`, error);
+        }
+      }, 500);
+    }
 
     return sentMessage;
   } catch (err) {

@@ -23,6 +23,7 @@ export interface MessageData {
   isPrivate?: boolean;
   ticketImported?: any;
   isForwarded?: boolean;
+  userId?: number;
 }
 interface Request {
   messageData: MessageData;
@@ -33,7 +34,7 @@ const CreateMessageService = async ({
   messageData,
   companyId
 }: Request): Promise<Message> => {
-  
+
   const correctMediaType = (data: MessageData): MessageData => {
     // Se já tem mediaType definido como audio, manter
     if (data.mediaType === 'audio') {
@@ -49,7 +50,7 @@ const CreateMessageService = async ({
         if (audioExtensions.some(ext => url.includes(ext))) {
           return true;
         }
-        
+
         // Verificar se tem padrão de nome de áudio
         if (url.includes('audio_')) {
           return true;
@@ -80,7 +81,7 @@ const CreateMessageService = async ({
   };
 
   const correctedMessageData = correctMediaType(messageData);
-  
+
   await Message.upsert({ ...correctedMessageData, companyId });
 
   const message = await Message.findOne({

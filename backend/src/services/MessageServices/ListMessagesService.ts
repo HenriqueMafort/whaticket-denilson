@@ -112,6 +112,11 @@ const ListMessagesService = async ({
         attributes: ["id", "name"],
       },
       {
+        model: User,
+        as: "user",
+        attributes: ["id", "name"],
+      },
+      {
         model: Message,
         attributes: ["id", "wid", "fromMe", "mediaUrl", "body", "mediaType", "companyId"],
         as: "quotedMsg",
@@ -140,7 +145,7 @@ const ListMessagesService = async ({
     distinct: true,
     offset,
     subQuery: false,
-    order: [["createdAt", "DESC"]] 
+    order: [["createdAt", "DESC"]]
   });
 
   const hasMore = count > offset + messages.length;
