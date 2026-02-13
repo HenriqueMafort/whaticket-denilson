@@ -1109,7 +1109,17 @@ export const verifyMessage = async (
 
   let userId: string | number = null;
   if (msg.key.fromMe) {
-    userId = await cacheLayer.get(`message:wid:${msg.key.id}:userId`);
+    for (let i = 0; i < 5; i++) {
+      userId = await cacheLayer.get(`message:wid:${msg.key.id}:userId`);
+      if (userId) {
+        console.log(`[DEBUG-PM2] Listener Cache Hit attempt ${i + 1}: Found userId ${userId} for wid ${msg.key.id}`);
+        break;
+      }
+      if (i < 4) {
+        console.log(`[DEBUG-PM2] Listener Cache Miss attempt ${i + 1} for wid ${msg.key.id}. Waiting 200ms...`);
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+    }
   }
 
 
