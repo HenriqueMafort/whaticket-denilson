@@ -298,6 +298,17 @@ const useStyles = makeStyles((theme) => ({
     color: "#999",
   },
 
+  messageSignature: {
+    fontSize: 11,
+    color: "#999",
+    display: "block",
+    textAlign: "right",
+    marginTop: 5,
+    fontStyle: "italic",
+    width: "100%",
+    clear: "both"
+  },
+
   forwardMessage: {
     fontSize: 12,
     fontStyle: "italic",
@@ -1324,10 +1335,10 @@ const MessagesList = ({
                     </>
                   )}
 
-                  <span className={classes.timestamp}>
+                  <div className={classes.messageSignature}>
                     {message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : ""} - {message.isGroup ? message.contact?.name : (message.ticket?.user?.name ? message.ticket.user.name : "")} &nbsp;
                     {message.isEdited ? "Editada " + format(parseISO(message.createdAt), "HH:mm") : format(parseISO(message.createdAt), "HH:mm")}
-                  </span>
+                  </div>
                 </div>
               </div>
             </React.Fragment>
@@ -1412,11 +1423,11 @@ const MessagesList = ({
                     </>
                   )}
 
-                  <span className={classes.timestamp}>
+                  <div className={classes.messageSignature}>
                     {message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : ""} - {message.ticket?.user?.name ? message.ticket.user.name : ""} &nbsp;
-                    {message.isEdited ? "Editada " + format(parseISO(message.createdAt), "HH:mm") : format(parseISO(message.createdAt), "HH:mm")}
+                    {message.isEdited ? "Editada " + format(parseISO(message.createdAt), "dd/MM/yy HH:mm") : format(parseISO(message.createdAt), "dd/MM/yy HH:mm")}
                     {renderMessageAck(message)}
-                  </span>
+                  </div>
                 </div>
               </div>
             </React.Fragment>
