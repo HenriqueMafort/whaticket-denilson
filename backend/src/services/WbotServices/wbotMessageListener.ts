@@ -5275,6 +5275,7 @@ const wbotMessageListener = (wbot: Session, companyId: number): void => {
 
     // console.log("CIAAAAAAA WBOT " , companyId)
     messages.forEach(async (message: proto.IWebMessageInfo) => {
+      console.log(`[DEBUG-PM2] Listener processing message: ${message.key.id} | fromMe: ${message.key.fromMe}`);
       if (
         message?.messageStubParameters?.length &&
         message.messageStubParameters[0].includes("absent")
