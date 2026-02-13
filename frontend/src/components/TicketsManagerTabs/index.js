@@ -486,21 +486,42 @@ const TicketsManagerTabs = () => {
   const [selectedTags, setSelectedTags] = useState(() => {
     const saved = localStorage.getItem("ticketsSelectedTags");
     if (saved) {
-      return JSON.parse(saved);
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object') {
+          return parsed;
+        }
+      } catch (e) {
+        console.error("Error parsing ticketsSelectedTags", e);
+      }
     }
     return [];
   });
   const [selectedUsers, setSelectedUsers] = useState(() => {
     const saved = localStorage.getItem("ticketsSelectedUsers");
     if (saved) {
-      return JSON.parse(saved);
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object') {
+          return parsed;
+        }
+      } catch (e) {
+        console.error("Error parsing ticketsSelectedUsers", e);
+      }
     }
     return [];
   });
   const [selectedWhatsapp, setSelectedWhatsapp] = useState(() => {
     const saved = localStorage.getItem("ticketsSelectedWhatsapp");
     if (saved) {
-      return JSON.parse(saved);
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object') {
+          return parsed;
+        }
+      } catch (e) {
+        console.error("Error parsing ticketsSelectedWhatsapp", e);
+      }
     }
     return [];
   });
@@ -509,7 +530,14 @@ const TicketsManagerTabs = () => {
   const [selectedStatus, setSelectedStatus] = useState(() => {
     const saved = localStorage.getItem("ticketsSelectedStatus");
     if (saved) {
-      return JSON.parse(saved);
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object') {
+          return parsed;
+        }
+      } catch (e) {
+        console.error("Error parsing ticketsSelectedStatus", e);
+      }
     }
     return [];
   });
@@ -715,14 +743,14 @@ const TicketsManagerTabs = () => {
 
     clearTimeout(searchTimeout);
 
-    if (tags.length === 0) {
+    if (selecteds.length === 0) {
       setForceSearch(!forceSearch);
     } else if (tab !== "search") {
       setTab("search");
     }
 
     searchTimeout = setTimeout(() => {
-      setSelectedTags(tags);
+      setSelectedTags(selecteds);
       setForceSearch(!forceSearch);
     }, 500);
   };
@@ -732,13 +760,13 @@ const TicketsManagerTabs = () => {
 
     clearTimeout(searchTimeout);
 
-    if (users.length === 0) {
+    if (selecteds.length === 0) {
       setForceSearch(!forceSearch);
     } else if (tab !== "search") {
       setTab("search");
     }
     searchTimeout = setTimeout(() => {
-      setSelectedUsers(users);
+      setSelectedUsers(selecteds);
       setForceSearch(!forceSearch);
     }, 500);
   };
@@ -748,13 +776,13 @@ const TicketsManagerTabs = () => {
 
     clearTimeout(searchTimeout);
 
-    if (whatsapp.length === 0) {
+    if (selecteds.length === 0) {
       setForceSearch(!forceSearch);
     } else if (tab !== "search") {
       setTab("search");
     }
     searchTimeout = setTimeout(() => {
-      setSelectedWhatsapp(whatsapp);
+      setSelectedWhatsapp(selecteds);
       setForceSearch(!forceSearch);
     }, 500);
   };
@@ -764,14 +792,14 @@ const TicketsManagerTabs = () => {
 
     clearTimeout(searchTimeout);
 
-    if (statusFilter.length === 0) {
+    if (selecteds.length === 0) {
       setForceSearch(!forceSearch);
     } else if (tab !== "search") {
       setTab("search");
     }
 
     searchTimeout = setTimeout(() => {
-      setSelectedStatus(statusFilter);
+      setSelectedStatus(selecteds);
       setForceSearch(!forceSearch);
     }, 500);
   };
@@ -1366,28 +1394,31 @@ const TicketsManagerTabs = () => {
         {profile === "admin" && (
           <>
             <TicketsList
-              statusFilter={selectedStatus}
-              searchParam={searchParam}
+              tags={selectedTags.map(t => t.id)}
+              users={selectedUsers.map(u => u.id)}
               showAll={showAllTickets}
-              tags={selectedTags}
-              users={selectedUsers}
               selectedQueueIds={selectedQueueIds}
-              whatsappIds={selectedWhatsapp}
+              ticketOption={""}
+              closeTicket={(e) => {
+                handleCloseOrOpenTicket(e);
+              }}
+              status={tab}
+              whatsappIds={selectedWhatsapp.map(w => w.id)}
               forceSearch={forceSearch}
-              searchOnMessages={searchOnMessages}
-              status="search"
-            />
+              statusFilter={selectedStatus.map(s => s.status)}
+              userFilter={userFilter}
+              sortTickets={sortTickets} />
           </>
         )}
 
         {profile === "user" && (
           <TicketsList
-            statusFilter={selectedStatus}
+            statusFilter={selectedStatus.map(s => s.status)}
             searchParam={searchParam}
             showAll={false}
-            tags={selectedTags}
+            tags={selectedTags.map(t => t.id)}
             selectedQueueIds={selectedQueueIds}
-            whatsappIds={selectedWhatsapp}
+            whatsappIds={selectedWhatsapp.map(w => w.id)}
             forceSearch={forceSearch}
             searchOnMessages={searchOnMessages}
             status="search"
