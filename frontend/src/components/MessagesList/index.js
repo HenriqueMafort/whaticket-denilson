@@ -1325,6 +1325,7 @@ const MessagesList = ({
                   )}
 
                   <span className={classes.timestamp}>
+                    {message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : ""} - {message.isGroup ? message.contact?.name : (message.ticket?.user?.name ? message.ticket.user.name : "")} &nbsp;
                     {message.isEdited ? "Editada " + format(parseISO(message.createdAt), "HH:mm") : format(parseISO(message.createdAt), "HH:mm")}
                   </span>
                 </div>
@@ -1412,6 +1413,7 @@ const MessagesList = ({
                   )}
 
                   <span className={classes.timestamp}>
+                    {message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : ""} - {message.ticket?.user?.name ? message.ticket.user.name : ""} &nbsp;
                     {message.isEdited ? "Editada " + format(parseISO(message.createdAt), "HH:mm") : format(parseISO(message.createdAt), "HH:mm")}
                     {renderMessageAck(message)}
                   </span>
