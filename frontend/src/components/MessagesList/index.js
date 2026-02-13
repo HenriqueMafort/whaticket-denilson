@@ -451,7 +451,8 @@ const MessagesList = ({
   whatsappId,
   queueId,
   channel,
-  ticketStatus
+  ticketStatus,
+  ticket
 }) => {
   const classes = useStyles();
   const [messagesList, dispatch] = useReducer(reducer, []);
@@ -1336,8 +1337,8 @@ const MessagesList = ({
                   )}
 
                   <div className={classes.messageSignature}>
-                    {message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : ""} - {message.isGroup ? message.contact?.name : (message.ticket?.user?.name ? message.ticket.user.name : "")} &nbsp;
-                    {message.isEdited ? "Editada " + format(parseISO(message.createdAt), "HH:mm") : format(parseISO(message.createdAt), "HH:mm")}
+                    {(message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : (ticket?.whatsapp?.name ? ticket.whatsapp.name : "")) || "Sem Conexão"} - {message.isGroup ? message.contact?.name : ((message.ticket?.user?.name ? message.ticket.user.name : (ticket?.user?.name ? ticket.user.name : "")) || "Sem Usuário")} &nbsp;
+                    {message.isEdited ? "Editada " + format(parseISO(message.createdAt), "dd/MM/yy HH:mm") : format(parseISO(message.createdAt), "dd/MM/yy HH:mm")}
                   </div>
                 </div>
               </div>
@@ -1424,7 +1425,7 @@ const MessagesList = ({
                   )}
 
                   <div className={classes.messageSignature}>
-                    {message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : ""} - {message.ticket?.user?.name ? message.ticket.user.name : ""} &nbsp;
+                    {(message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : (ticket?.whatsapp?.name ? ticket.whatsapp.name : "")) || "Sem Conexão"} - {((message.ticket?.user?.name ? message.ticket.user.name : (ticket?.user?.name ? ticket.user.name : "")) || "Sem Usuário")} &nbsp;
                     {message.isEdited ? "Editada " + format(parseISO(message.createdAt), "dd/MM/yy HH:mm") : format(parseISO(message.createdAt), "dd/MM/yy HH:mm")}
                     {renderMessageAck(message)}
                   </div>

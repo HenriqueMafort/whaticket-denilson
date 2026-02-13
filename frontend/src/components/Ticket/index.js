@@ -206,6 +206,7 @@ const Ticket = () => {
     return (
       <>
         <MessagesList
+          ticket={ticket}
           isGroup={ticket.isGroup}
           onDrop={setDragDropFiles}
           whatsappId={ticket.whatsappId}
