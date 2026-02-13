@@ -1427,7 +1427,7 @@ const MessagesList = ({
                   )}
 
                   <div className={classes.messageSignature}>
-                    {(message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : (ticket?.whatsapp?.name ? ticket.whatsapp.name : "")) || "Sem Conexão"} - {message.user?.name ? message.user.name : (message.body?.startsWith("\u200e") || (message.wid && message.wid.startsWith("BAE")) ? "Bot" : "Dispositivo")} &nbsp;
+                    {(message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : (ticket?.whatsapp?.name ? ticket.whatsapp.name : "")) || "Sem Conexão"} - {message.user?.name ? message.user.name : (message.body?.startsWith("\u200e") || (message.wid && (message.wid.startsWith("BAE") || message.wid.startsWith("DENILSON"))) ? "Bot" : "Dispositivo")} &nbsp;
                     {message.isEdited ? "Editada " + format(parseISO(message.createdAt), "dd/MM/yy HH:mm") : format(parseISO(message.createdAt), "dd/MM/yy HH:mm")}
                     {renderMessageAck(message)}
                   </div>

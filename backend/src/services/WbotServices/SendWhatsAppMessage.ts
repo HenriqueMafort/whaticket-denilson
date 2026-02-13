@@ -153,6 +153,15 @@ const SendWhatsAppMessage = async ({
   }
   try {
     await delay(msdelay);
+    const messageId = "DENILSON" + Math.random().toString(36).substring(2, 12).toUpperCase() + Math.random().toString(36).substring(2, 12).toUpperCase();
+
+    console.log(`[DEBUG-PM2] Generated messageId: ${messageId}`);
+
+    if (userId) {
+      console.log(`[DEBUG-PM2] Setting cache for wid: ${messageId} - userId: ${userId}`);
+      await cacheLayer.set(`message:wid:${messageId}:userId`, String(userId), "EX", 60);
+    }
+
     const sentMessage = await wbot.sendMessage(
       jid,
       {
@@ -164,14 +173,16 @@ const SendWhatsAppMessage = async ({
       },
       {
         ...options,
-
+        messageId
       }
     );
+
     wbot.store(sentMessage);
 
 
 
     if (userId) {
+      console.log(`[SendWhatsAppMessage] Setting cache for message:wid:${sentMessage.key.id}:userId = ${userId}`);
       // Salva no cache para o listener pegar imediatamente
       await cacheLayer.set(`message:wid:${sentMessage.key.id}:userId`, String(userId), "EX", 10);
 

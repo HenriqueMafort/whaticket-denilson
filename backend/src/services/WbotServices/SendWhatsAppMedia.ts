@@ -487,6 +487,15 @@ const SendWhatsAppMedia = async ({
 
     let sentMessage: WAMessage;
 
+    const messageId = "DENILSON" + Math.random().toString(36).substring(2, 12).toUpperCase() + Math.random().toString(36).substring(2, 12).toUpperCase();
+
+    console.log(`[DEBUG-PM2] Generated Media messageId: ${messageId}`);
+
+    if (userId) {
+      console.log(`[DEBUG-PM2] Setting Media cache for wid: ${messageId} - userId: ${userId}`);
+      await cacheLayer.set(`message:wid:${messageId}:userId`, String(userId), "EX", 60);
+    }
+
     if (ticket.isGroup) {
       if (ENABLE_LID_DEBUG) {
         logger.info(`[LID-DEBUG] Media - Enviando mídia para grupo: ${jid}`);
@@ -495,7 +504,7 @@ const SendWhatsAppMedia = async ({
       try {
         // sentMessage = await wbot.sendMessage(jid, options);
 
-        sentMessage = await wbot.sendMessage(getJidOf(ticket), options);
+        sentMessage = await wbot.sendMessage(getJidOf(ticket), options, { messageId });
       } catch (err1) {
         if (err1.message && err1.message.includes("senderMessageKeys")) {
           // const simpleOptions = { ...options } as any;
@@ -505,7 +514,7 @@ const SendWhatsAppMedia = async ({
 
           // sentMessage = await wbot.sendMessage(jid, simpleOptions);
 
-          sentMessage = await wbot.sendMessage(getJidOf(ticket), options);
+          sentMessage = await wbot.sendMessage(getJidOf(ticket), options, { messageId });
         } else {
           // const otherOptions = { ...options } as any;
           // if (otherOptions.contextInfo) {
@@ -513,13 +522,14 @@ const SendWhatsAppMedia = async ({
           // }
           // sentMessage = await wbot.sendMessage(jid, otherOptions);
 
-          sentMessage = await wbot.sendMessage(getJidOf(ticket), options);
+          sentMessage = await wbot.sendMessage(getJidOf(ticket), options, { messageId });
         }
       }
     } else {
       // sentMessage = await wbot.sendMessage(jid, options);
-      sentMessage = await wbot.sendMessage(getJidOf(ticket), options);
+      sentMessage = await wbot.sendMessage(getJidOf(ticket), options, { messageId });
     }
+
 
     wbot.store(sentMessage);
 

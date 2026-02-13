@@ -1112,6 +1112,7 @@ export const verifyMessage = async (
     userId = await cacheLayer.get(`message:wid:${msg.key.id}:userId`);
   }
 
+
   const messageData = {
     wid: msg.key.id,
     ticketId: ticket.id,
