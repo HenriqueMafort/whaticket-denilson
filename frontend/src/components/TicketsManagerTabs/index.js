@@ -1394,8 +1394,8 @@ const TicketsManagerTabs = () => {
         {profile === "admin" && (
           <>
             <TicketsList
-              tags={selectedTags.map(t => t.id)}
-              users={selectedUsers.map(u => u.id)}
+              tags={selectedTags.filter(t => t?.id).map(t => t.id)}
+              users={selectedUsers.filter(u => u?.id).map(u => u.id)}
               showAll={showAllTickets}
               selectedQueueIds={selectedQueueIds}
               ticketOption={""}
@@ -1403,21 +1403,21 @@ const TicketsManagerTabs = () => {
                 handleCloseOrOpenTicket(e);
               }}
               status={tab}
-              whatsappIds={selectedWhatsapp.map(w => w.id)}
+              whatsappIds={selectedWhatsapp.filter(w => w?.id).map(w => w.id)}
               forceSearch={forceSearch}
-              statusFilter={selectedStatus.map(s => s.status)}
+              statusFilter={selectedStatus.filter(s => s?.status).map(s => s.status)}
               sortTickets={sortTickets} />
           </>
         )}
 
         {profile === "user" && (
           <TicketsList
-            statusFilter={selectedStatus.map(s => s.status)}
+            statusFilter={selectedStatus.filter(s => s?.status).map(s => s.status)}
             searchParam={searchParam}
             showAll={false}
-            tags={selectedTags.map(t => t.id)}
+            tags={selectedTags.filter(t => t?.id).map(t => t.id)}
             selectedQueueIds={selectedQueueIds}
-            whatsappIds={selectedWhatsapp.map(w => w.id)}
+            whatsappIds={selectedWhatsapp.filter(w => w?.id).map(w => w.id)}
             forceSearch={forceSearch}
             searchOnMessages={searchOnMessages}
             status="search"
