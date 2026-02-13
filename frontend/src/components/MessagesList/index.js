@@ -144,17 +144,18 @@ const useStyles = makeStyles((theme) => ({
   },
 
   quotedContainerLeft: {
-    margin: "-3px -80px 6px -6px",
+    margin: "0 0 6px 0",
     overflow: "hidden",
     backgroundColor: theme.mode === 'light' ? "#f0f0f0" : "#1d282f",
     borderRadius: "7.5px",
     display: "flex",
     position: "relative",
+    width: "100%",
   },
 
   quotedMsg: {
     padding: 10,
-    maxWidth: 300,
+    width: "100%",
     height: "auto",
     display: "block",
     whiteSpace: "pre-wrap",
@@ -226,17 +227,18 @@ const useStyles = makeStyles((theme) => ({
   },
 
   quotedContainerRight: {
-    margin: "-3px -80px 6px -6px",
+    margin: "0 0 6px 0",
     overflowY: "hidden",
     backgroundColor: theme.mode === 'light' ? "#cfe9ba" : "#025144",
     borderRadius: "7.5px",
     display: "flex",
     position: "relative",
+    width: "100%",
   },
 
   quotedMsgRight: {
     padding: 10,
-    maxWidth: 300,
+    width: "100%",
     height: "auto",
     whiteSpace: "pre-wrap",
   },
