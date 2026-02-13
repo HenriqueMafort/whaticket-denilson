@@ -502,37 +502,42 @@ const TicketListItem = ({ ticket }) => {
                         </span>
                     }
                     secondary={
-                        <span className={classes.contactNameWrapper}>
-                            {ticket.status === "closed"
-                                ? ticket?.userRating
-                                    ? getRatingIcon(ticket?.userRating?.rate)
-                                    : null
-                                : null}
-                            <Typography
-                                className={classes.contactLastMessage}
-                                noWrap
-                                component="span"
-                                variant="body2"
-                                color="textSecondary"
-                            >
-                                {ticket.lastMessage ? (
-                                    <MarkdownWrapper>
-                                        {ticket.lastMessage}
-                                    </MarkdownWrapper>
-                                ) : (
-                                    <br />
-                                )}
-                            </Typography>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                            <span className={classes.contactNameWrapper}>
+                                {ticket.status === "closed"
+                                    ? ticket?.userRating
+                                        ? getRatingIcon(ticket?.userRating?.rate)
+                                        : null
+                                    : null}
+                                <Typography
+                                    className={classes.contactLastMessage}
+                                    noWrap
+                                    component="span"
+                                    variant="body2"
+                                    color="textSecondary"
+                                >
+                                    {ticket.lastMessage ? (
+                                        <MarkdownWrapper>
+                                            {ticket.lastMessage}
+                                        </MarkdownWrapper>
+                                    ) : (
+                                        <br />
+                                    )}
+                                </Typography>
 
-                            <Badge
-                                overlap="rectangular"
-                                className={classes.newMessagesCount}
-                                badgeContent={ticket.unreadMessages}
-                                classes={{
-                                    badge: classes.badgeStyle,
-                                }}
-                            />
-                        </span>
+                                <Badge
+                                    overlap="rectangular"
+                                    className={classes.newMessagesCount}
+                                    badgeContent={ticket.unreadMessages}
+                                    classes={{
+                                        badge: classes.badgeStyle,
+                                    }}
+                                />
+                            </span>
+                            <span style={{ fontSize: 11, color: "#808080", marginTop: 2 }}>
+                                {ticket.whatsapp?.name || "Sem Conexão"} - {ticket.user?.name || "Sem Usuário"} - {format(parseISO(ticket.updatedAt), "dd/MM/yy HH:mm")}
+                            </span>
+                        </div>
                     }
                 />
                 {ticket.status === "pending" && (
@@ -689,8 +694,8 @@ const TicketListItem = ({ ticket }) => {
                 fullWidth
             >
                 <DialogContent className={classes.imageModalContent}>
-                    <img 
-                        src={ticket?.contact?.urlPicture} 
+                    <img
+                        src={ticket?.contact?.urlPicture}
                         alt={ticket?.contact?.name || "Foto do contato"}
                         className={classes.expandedImage}
                     />
