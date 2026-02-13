@@ -1,9 +1,9 @@
-'use strict';
+import { QueryInterface, DataTypes } from "sequelize";
 
 module.exports = {
-    up: (queryInterface, Sequelize) => {
+    up: (queryInterface: QueryInterface) => {
         return queryInterface.addColumn("Messages", "userId", {
-            type: Sequelize.INTEGER,
+            type: DataTypes.INTEGER,
             references: { model: "Users", key: "id" },
             onUpdate: "CASCADE",
             onDelete: "SET NULL",
@@ -11,7 +11,7 @@ module.exports = {
         });
     },
 
-    down: (queryInterface, Sequelize) => {
+    down: (queryInterface: QueryInterface) => {
         return queryInterface.removeColumn("Messages", "userId");
     }
 };
