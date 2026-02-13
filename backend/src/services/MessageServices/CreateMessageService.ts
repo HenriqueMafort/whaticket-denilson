@@ -110,6 +110,7 @@ const CreateMessageService = async ({
           },
           {
             model: User,
+            as: "user",
             attributes: ["id", "name"]
           },
           {
@@ -128,6 +129,11 @@ const CreateMessageService = async ({
         model: Message,
         as: "quotedMsg",
         include: ["contact"]
+      },
+      {
+        model: User,
+        as: "user",
+        attributes: ["id", "name"]
       }
     ]
   });
