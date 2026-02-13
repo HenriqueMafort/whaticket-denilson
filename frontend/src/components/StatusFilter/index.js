@@ -12,14 +12,10 @@ export function StatusFilter({ onFiltered, initialStatus }) {
   }, []);
 
   useEffect(() => {
-    setSelecteds([]);
-    if (
-      Array.isArray(initialStatus) &&
-      initialStatus.length > 0
-    ) {
-      onChange(initialStatus);
+    if (Array.isArray(initialStatus)) {
+      const cleaned = initialStatus.filter(s => s !== null);
+      setSelecteds(cleaned);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialStatus]);
 
   const onChange = async (value) => {

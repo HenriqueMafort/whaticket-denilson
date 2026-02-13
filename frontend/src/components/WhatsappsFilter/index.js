@@ -17,16 +17,11 @@ export function WhatsappsFilter({ onFiltered, initialWhatsapps }) {
   }, []);
 
   useEffect(() => {
-    setSelecteds([]);
-    if (
-      Array.isArray(initialWhatsapps) &&
-      Array.isArray(whatsapps) &&
-      whatsapps.length > 0
-    ) {
-      onChange(initialWhatsapps);
+    if (Array.isArray(initialWhatsapps)) {
+      const cleaned = initialWhatsapps.filter(w => w !== null);
+      setSelecteds(cleaned);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialWhatsapps, whatsapps]);
+  }, [initialWhatsapps]);
 
   const loadWhatsapps = async () => {
     try {

@@ -17,16 +17,11 @@ export function UsersFilter({ onFiltered, initialUsers }) {
   }, []);
 
   useEffect(() => {
-    setSelecteds([]);
-    if (
-      Array.isArray(initialUsers) &&
-      Array.isArray(users) &&
-      users.length > 0
-    ) {
-      onChange(initialUsers);
+    if (Array.isArray(initialUsers)) {
+      const cleaned = initialUsers.filter(u => u !== null);
+      setSelecteds(cleaned);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialUsers, users]);
+  }, [initialUsers]);
 
   const loadUsers = async () => {
     try {

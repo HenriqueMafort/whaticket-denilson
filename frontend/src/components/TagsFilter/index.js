@@ -16,16 +16,11 @@ export function TagsFilter({ onFiltered, initialTags }) {
   }, []);
 
   useEffect(() => {
-    setSelecteds([]);
-    if (
-      Array.isArray(initialTags) &&
-      Array.isArray(tags) &&
-      tags.length > 0
-    ) {
-      onChange(initialTags);
+    if (Array.isArray(initialTags)) {
+      const cleaned = initialTags.filter(t => t !== null);
+      setSelecteds(cleaned);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialTags, tags]);
+  }, [initialTags]);
 
   const loadTags = async () => {
     try {
