@@ -173,147 +173,144 @@ const SendWhatsAppMessage = async ({
       },
       {
         ...options,
-        messageId
       }
     );
-  }
-    );
 
-console.log(`[DEBUG-PM2] Sent Message Check - Generated: ${messageId} | Actual: ${sentMessage.key.id} | Match: ${messageId === sentMessage.key.id}`);
+    console.log(`[DEBUG-PM2] Sent Message Check - Generated: ${messageId} | Actual: ${sentMessage.key.id} | Match: ${messageId === sentMessage.key.id}`);
 
-wbot.store(sentMessage);
+    wbot.store(sentMessage);
 
 
 
-if (userId) {
-  console.log(`[SendWhatsAppMessage] Setting cache for message:wid:${sentMessage.key.id}:userId = ${userId}`);
-  // Salva no cache para o listener pegar imediatamente
-  await cacheLayer.set(`message:wid:${sentMessage.key.id}:userId`, String(userId), "EX", 10);
+    if (userId) {
+      console.log(`[SendWhatsAppMessage] Setting cache for message:wid:${sentMessage.key.id}:userId = ${userId}`);
+      // Salva no cache para o listener pegar imediatamente
+      await cacheLayer.set(`message:wid:${sentMessage.key.id}:userId`, String(userId), "EX", 10);
 
-  setTimeout(async () => {
-    try {
-      const msg = await Message.findOne({
-        where: {
-          wid: sentMessage.key.id,
-          companyId: ticket.companyId
-        }
-      });
-
-      if (msg) {
-        await msg.update({ userId });
-        console.log(`[SendWhatsAppMessage] Message ${msg.id} updated with userId ${userId}`);
-
-        // Avisa o front para atualizar a assinatura
-        const io = getIO();
-        io.of(String(ticket.companyId))
-          .emit(`company-${ticket.companyId}-appMessage`, {
-            action: "update",
-            message: msg
+      setTimeout(async () => {
+        try {
+          const msg = await Message.findOne({
+            where: {
+              wid: sentMessage.key.id,
+              companyId: ticket.companyId
+            }
           });
-      }
-    } catch (error) {
-      console.error(`[SendWhatsAppMessage] Error updating userId for message ${sentMessage.key.id}:`, error);
+
+          if (msg) {
+            await msg.update({ userId });
+            console.log(`[SendWhatsAppMessage] Message ${msg.id} updated with userId ${userId}`);
+
+            // Avisa o front para atualizar a assinatura
+            const io = getIO();
+            io.of(String(ticket.companyId))
+              .emit(`company-${ticket.companyId}-appMessage`, {
+                action: "update",
+                message: msg
+              });
+          }
+        } catch (error) {
+          console.error(`[SendWhatsAppMessage] Error updating userId for message ${sentMessage.key.id}:`, error);
+        }
+      }, 500); // Aguarda um pouco para o listener processar e salvar a mensagem
     }
-  }, 500); // Aguarda um pouco para o listener processar e salvar a mensagem
-}
 
-// Log detalhado de mensagem enviada com sucesso
-logger.info(
-  `[RDS-BAILEYS] Mensagem enviada com sucesso para contato ID=${contactNumber.id}, number=${contactNumber.number}, jid=${jid}`
-);
+    // Log detalhado de mensagem enviada com sucesso
+    logger.info(
+      `[RDS-BAILEYS] Mensagem enviada com sucesso para contato ID=${contactNumber.id}, number=${contactNumber.number}, jid=${jid}`
+    );
 
-return sentMessage;
+    return sentMessage;
   } catch (err) {
-  // Log detalhado do erro de envio para facilitar diagnóstico
-  logger.error(
-    `[RDS-BAILEYS] ERRO ao enviar mensagem para contato ID=${contactNumber.id}, number=${contactNumber.number}, jid=${jid}: ${err.message}`
-  );
+    // Log detalhado do erro de envio para facilitar diagnóstico
+    logger.error(
+      `[RDS-BAILEYS] ERRO ao enviar mensagem para contato ID=${contactNumber.id}, number=${contactNumber.number}, jid=${jid}: ${err.message}`
+    );
 
-  console.log(
-    `erro ao enviar mensagem na company ${ticket.companyId} - `,
-    body,
-    ticket,
-    quotedMsg,
-    msdelay,
-    vCard,
-    isForwarded
-  );
+    console.log(
+      `erro ao enviar mensagem na company ${ticket.companyId} - `,
+      body,
+      ticket,
+      quotedMsg,
+      msdelay,
+      vCard,
+      isForwarded
+    );
 
-  if (ENABLE_LID_DEBUG) {
-    logger.error(`[RDS-LID] Erro ao enviar mensagem para ${jid}: ${err.message}`);
-
-    if (contactNumber.number?.includes("@lid")) {
-      logger.error(`[RDS-LID] Contato com formato @lid detectado: ${contactNumber.number}`);
-
-      try {
-        const parts = contactNumber.number.split('@');
-        if (parts.length > 0 && /^\d+$/.test(parts[0])) {
-          const correctNumber = parts[0];
-          logger.info(`[RDS-LID] Tentando corrigir número: ${contactNumber.number} -> ${correctNumber}`);
-
-          await contactNumber.update({
-            number: correctNumber,
-            remoteJid: `${correctNumber}@s.whatsapp.net`
-          });
-
-          logger.info(`[RDS-LID] Contato atualizado com sucesso: ${correctNumber}`);
-        }
-      } catch (updateError) {
-        logger.error(`[RDS-LID] Erro ao atualizar contato: ${updateError.message}`);
-      }
-    }
-  }
-
-  if (err.message && err.message.includes("senderMessageKeys")) {
     if (ENABLE_LID_DEBUG) {
-      logger.error(
-        `[RDS-LID] SendMessage - Erro de criptografia de grupo detectado: ${err.message}`
-      );
+      logger.error(`[RDS-LID] Erro ao enviar mensagem para ${jid}: ${err.message}`);
+
+      if (contactNumber.number?.includes("@lid")) {
+        logger.error(`[RDS-LID] Contato com formato @lid detectado: ${contactNumber.number}`);
+
+        try {
+          const parts = contactNumber.number.split('@');
+          if (parts.length > 0 && /^\d+$/.test(parts[0])) {
+            const correctNumber = parts[0];
+            logger.info(`[RDS-LID] Tentando corrigir número: ${contactNumber.number} -> ${correctNumber}`);
+
+            await contactNumber.update({
+              number: correctNumber,
+              remoteJid: `${correctNumber}@s.whatsapp.net`
+            });
+
+            logger.info(`[RDS-LID] Contato atualizado com sucesso: ${correctNumber}`);
+          }
+        } catch (updateError) {
+          logger.error(`[RDS-LID] Erro ao atualizar contato: ${updateError.message}`);
+        }
+      }
     }
 
-    try {
-      if (ENABLE_LID_DEBUG) {
-        logger.info(
-          `[RDS-LID] SendMessage - Tentando envio sem criptografia para grupo ${jid}`
-        );
-      }
-
-      const sentMessage = await wbot.sendMessage(jid, {
-        text: formatBody(body, ticket)
-      });
-
-      if (ENABLE_LID_DEBUG) {
-        logger.info(
-          `[RDS-LID] SendMessage - Sucesso no envio sem criptografia para grupo ${jid}`
-        );
-      }
-      wbot.store(sentMessage);
-      await ticket.update({
-        lastMessage: formatBody(body, ticket),
-        imported: null
-      });
-
-      // Log detalhado de mensagem enviada com sucesso após retry (problema de criptografia)
-      logger.info(
-        `[RDS-BAILEYS] Mensagem enviada com sucesso após retry para contato ID=${contactNumber.id}, number=${contactNumber.number}, jid=${jid} (problema de criptografia resolvido)`
-      );
-
-      return sentMessage;
-    } catch (finalErr) {
+    if (err.message && err.message.includes("senderMessageKeys")) {
       if (ENABLE_LID_DEBUG) {
         logger.error(
-          `[RDS-LID] SendMessage - Falha no envio sem criptografia: ${finalErr.message}`
+          `[RDS-LID] SendMessage - Erro de criptografia de grupo detectado: ${err.message}`
         );
       }
-      Sentry.captureException(finalErr);
-      throw new AppError("ERR_SENDING_WAPP_MSG_GROUP_CRYPTO");
-    }
-  }
 
-  Sentry.captureException(err);
-  console.log(err);
-  throw new AppError("ERR_SENDING_WAPP_MSG");
-}
+      try {
+        if (ENABLE_LID_DEBUG) {
+          logger.info(
+            `[RDS-LID] SendMessage - Tentando envio sem criptografia para grupo ${jid}`
+          );
+        }
+
+        const sentMessage = await wbot.sendMessage(jid, {
+          text: formatBody(body, ticket)
+        });
+
+        if (ENABLE_LID_DEBUG) {
+          logger.info(
+            `[RDS-LID] SendMessage - Sucesso no envio sem criptografia para grupo ${jid}`
+          );
+        }
+        wbot.store(sentMessage);
+        await ticket.update({
+          lastMessage: formatBody(body, ticket),
+          imported: null
+        });
+
+        // Log detalhado de mensagem enviada com sucesso após retry (problema de criptografia)
+        logger.info(
+          `[RDS-BAILEYS] Mensagem enviada com sucesso após retry para contato ID=${contactNumber.id}, number=${contactNumber.number}, jid=${jid} (problema de criptografia resolvido)`
+        );
+
+        return sentMessage;
+      } catch (finalErr) {
+        if (ENABLE_LID_DEBUG) {
+          logger.error(
+            `[RDS-LID] SendMessage - Falha no envio sem criptografia: ${finalErr.message}`
+          );
+        }
+        Sentry.captureException(finalErr);
+        throw new AppError("ERR_SENDING_WAPP_MSG_GROUP_CRYPTO");
+      }
+    }
+
+    Sentry.captureException(err);
+    console.log(err);
+    throw new AppError("ERR_SENDING_WAPP_MSG");
+  }
 };
 
 export default SendWhatsAppMessage;
