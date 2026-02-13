@@ -302,7 +302,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 11,
     color: "#999",
     display: "block",
-    textAlign: "right",
+    textAlign: "left",
     marginTop: 5,
     fontStyle: "italic",
     width: "100%",
@@ -1337,7 +1337,7 @@ const MessagesList = ({
                   )}
 
                   <div className={classes.messageSignature}>
-                    {(message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : (ticket?.whatsapp?.name ? ticket.whatsapp.name : "")) || "Sem Conexão"} - {message.contact?.name || ((message.ticket?.user?.name ? message.ticket.user.name : (ticket?.user?.name ? ticket.user.name : "")) || "Sem Usuário")} &nbsp;
+                    {(message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : (ticket?.whatsapp?.name ? ticket.whatsapp.name : "")) || "Sem Conexão"} &nbsp;
                     {message.isEdited ? "Editada " + format(parseISO(message.createdAt), "dd/MM/yy HH:mm") : format(parseISO(message.createdAt), "dd/MM/yy HH:mm")}
                   </div>
                 </div>
