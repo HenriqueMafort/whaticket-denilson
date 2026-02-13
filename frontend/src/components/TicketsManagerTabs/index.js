@@ -1406,7 +1406,6 @@ const TicketsManagerTabs = () => {
               whatsappIds={selectedWhatsapp.map(w => w.id)}
               forceSearch={forceSearch}
               statusFilter={selectedStatus.map(s => s.status)}
-              userFilter={userFilter}
               sortTickets={sortTickets} />
           </>
         )}
