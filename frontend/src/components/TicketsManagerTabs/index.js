@@ -925,35 +925,33 @@ const TicketsManagerTabs = () => {
               role={user.allUserChat === 'enabled' && user.profile === 'user' ? 'admin' : user.profile}
               perform="tickets-manager:showall"
               yes={() => (
-                <Tooltip title={showAllTickets ? "Ocultar todos" : "Mostrar todos"}>
-                  <Badge
-                    color="primary"
-                    invisible={
-                      !isHoveredAll ||
-                      isHoveredNew ||
-                      isHoveredResolve ||
-                      isHoveredOpen ||
-                      isHoveredClosed
-                    }
-                    badgeContent={"Todos"}
-                    classes={{ badge: classes.tabsBadge }}
+                <Badge
+                  color="primary"
+                  invisible={
+                    !isHoveredAll ||
+                    isHoveredNew ||
+                    isHoveredResolve ||
+                    isHoveredOpen ||
+                    isHoveredClosed
+                  }
+                  badgeContent={"Todos"}
+                  classes={{ badge: classes.tabsBadge }}
+                >
+                  <ToggleButton
+                    onMouseEnter={() => setIsHoveredAll(true)}
+                    onMouseLeave={() => setIsHoveredAll(false)}
+                    className={`${classes.standardButton} ${showAllTickets ? classes.activeButton : ''}`}
+                    value="uncheck"
+                    selected={showAllTickets}
+                    onChange={() => setShowAllTickets((prevState) => !prevState)}
                   >
-                    <ToggleButton
-                      onMouseEnter={() => setIsHoveredAll(true)}
-                      onMouseLeave={() => setIsHoveredAll(false)}
-                      className={`${classes.standardButton} ${showAllTickets ? classes.activeButton : ''}`}
-                      value="uncheck"
-                      selected={showAllTickets}
-                      onChange={() => setShowAllTickets((prevState) => !prevState)}
-                    >
-                      {showAllTickets ? (
-                        <VisibilityIcon className={`${classes.standardIcon} ${classes.activeIcon}`} />
-                      ) : (
-                        <VisibilityOffIcon className={classes.standardIcon} />
-                      )}
-                    </ToggleButton>
-                  </Badge>
-                </Tooltip>
+                    {showAllTickets ? (
+                      <VisibilityIcon className={`${classes.standardIcon} ${classes.activeIcon}`} />
+                    ) : (
+                      <VisibilityOffIcon className={classes.standardIcon} />
+                    )}
+                  </ToggleButton>
+                </Badge>
               )}
             />
             <Snackbar
@@ -982,230 +980,216 @@ const TicketsManagerTabs = () => {
                 </>
               }
             />
-            <Tooltip title={i18n.t("tickets.inbox.newTicket")}>
+            <Badge
+              color="primary"
+              invisible={
+                isHoveredAll ||
+                !isHoveredNew ||
+                isHoveredResolve ||
+                isHoveredOpen ||
+                isHoveredClosed
+              }
+              badgeContent={i18n.t("tickets.inbox.newTicket")}
+              classes={{ badge: classes.tabsBadge }}
+            >
+              <IconButton
+                onMouseEnter={() => setIsHoveredNew(true)}
+                onMouseLeave={() => setIsHoveredNew(false)}
+                className={classes.standardButton}
+                onClick={() => {
+                  setNewTicketModalOpen(true);
+                }}
+              >
+                <AddIcon className={classes.standardIcon} />
+              </IconButton>
+            </Badge>
+            {user.profile === "admin" && (
               <Badge
                 color="primary"
                 invisible={
                   isHoveredAll ||
-                  !isHoveredNew ||
+                  isHoveredNew ||
+                  !isHoveredResolve ||
+                  isHoveredOpen ||
+                  isHoveredClosed
+                }
+                badgeContent={i18n.t("tickets.inbox.closedAll")}
+                classes={{ badge: classes.tabsBadge }}
+              >
+                <IconButton
+                  onMouseEnter={() => setIsHoveredResolve(true)}
+                  onMouseLeave={() => setIsHoveredResolve(false)}
+                  className={classes.standardButton}
+                  onClick={handleSnackbarOpen}
+                >
+                  <PlaylistAddCheckOutlined className={classes.standardIcon} />
+                </IconButton>
+              </Badge>
+            )}
+            {/* Botão "Abertos" */}
+            <Badge
+              invisible={
+                !(
+                  tab === "open" &&
+                  !isHoveredAll &&
+                  !isHoveredNew &&
+                  !isHoveredResolve &&
+                  !isHoveredClosed &&
+                  !isHoveredSort
+                ) && !isHoveredOpen
+              }
+              badgeContent={i18n.t("tickets.inbox.open")}
+              classes={{ badge: classes.tabsBadge }}
+            >
+              <IconButton
+                onMouseEnter={() => {
+                  setIsHoveredOpen(true);
+                  setHoveredButton("open");
+                }}
+                onMouseLeave={() => {
+                  setIsHoveredOpen(false);
+                  setHoveredButton(null);
+                }}
+                className={`${classes.standardButton} ${(tab === "open" || isHoveredOpen) ? classes.activeButton : ''
+                  }`}
+                onClick={() => handleChangeTab(null, "open")}
+              >
+                <MoveToInboxIcon
+                  className={`${classes.standardIcon} ${(tab === "open" || isHoveredOpen) ? classes.activeIcon : ''
+                    }`}
+                />
+              </IconButton>
+            </Badge>
+
+            {/* Botão "Resolvidos" */}
+            <Badge
+              color="primary"
+              invisible={
+                !(
+                  tab === "closed" &&
+                  !isHoveredAll &&
+                  !isHoveredNew &&
+                  !isHoveredResolve &&
+                  !isHoveredOpen &&
+                  !isHoveredSort
+                ) && !isHoveredClosed
+              }
+              badgeContent={i18n.t("tickets.inbox.resolverd")}
+              classes={{ badge: classes.tabsBadge }}
+            >
+              <IconButton
+                onMouseEnter={() => {
+                  setIsHoveredClosed(true);
+                  setHoveredButton("closed");
+                }}
+                onMouseLeave={() => {
+                  setIsHoveredClosed(false);
+                  setHoveredButton(null);
+                }}
+                className={`${classes.standardButton} ${(tab === "closed" || isHoveredClosed) ? classes.activeButton : ''
+                  }`}
+                onClick={() => handleChangeTab(null, "closed")}
+              >
+                <CheckBoxIcon
+                  className={`${classes.standardIcon} ${(tab === "closed" || isHoveredClosed) ? classes.activeIcon : ''
+                    }`}
+                />
+              </IconButton>
+            </Badge>
+
+            {tab !== "closed" && tab !== "search" && (
+              <Badge
+                color="primary"
+                invisible={
+                  !isHoveredSort ||
+                  isHoveredAll ||
+                  isHoveredNew ||
                   isHoveredResolve ||
                   isHoveredOpen ||
                   isHoveredClosed
                 }
-                badgeContent={i18n.t("tickets.inbox.newTicket")}
+                badgeContent={!sortTickets ? "Crescente" : "Decrescente"}
                 classes={{ badge: classes.tabsBadge }}
               >
-                <IconButton
-                  onMouseEnter={() => setIsHoveredNew(true)}
-                  onMouseLeave={() => setIsHoveredNew(false)}
-                  className={classes.standardButton}
-                  onClick={() => {
-                    setNewTicketModalOpen(true);
-                  }}
+                <ToggleButton
+                  onMouseEnter={() => setIsHoveredSort(true)}
+                  onMouseLeave={() => setIsHoveredSort(false)}
+                  className={`${classes.standardButton} ${sortTickets ? classes.activeButton : ''}`}
+                  value="uncheck"
+                  selected={sortTickets}
+                  onChange={() => setSortTickets((prevState) => !prevState)}
                 >
-                  <AddIcon className={classes.standardIcon} />
-                </IconButton>
+                  {!sortTickets ? (
+                    <TextRotateUp className={`${classes.standardIcon} ${sortTickets ? classes.activeIcon : ''}`} />
+                  ) : (
+                    <TextRotationDown className={`${classes.standardIcon} ${classes.activeIcon}`} />
+                  )}
+                </ToggleButton>
               </Badge>
-            </Tooltip>
-            {user.profile === "admin" && (
-              <Tooltip title={i18n.t("tickets.inbox.closedAll")}>
-                <Badge
-                  color="primary"
-                  invisible={
-                    isHoveredAll ||
-                    isHoveredNew ||
-                    !isHoveredResolve ||
-                    isHoveredOpen ||
-                    isHoveredClosed
-                  }
-                  badgeContent={i18n.t("tickets.inbox.closedAll")}
-                  classes={{ badge: classes.tabsBadge }}
-                >
-                  <IconButton
-                    onMouseEnter={() => setIsHoveredResolve(true)}
-                    onMouseLeave={() => setIsHoveredResolve(false)}
-                    className={classes.standardButton}
-                    onClick={handleSnackbarOpen}
-                  >
-                    <PlaylistAddCheckOutlined className={classes.standardIcon} />
-                  </IconButton>
-                </Badge>
-              </Tooltip>
             )}
-            {/* Botão "Abertos" */}
-            <Tooltip title={i18n.t("tickets.inbox.open")}>
-              <Badge
-                invisible={
-                  !(
-                    tab === "open" &&
-                    !isHoveredAll &&
-                    !isHoveredNew &&
-                    !isHoveredResolve &&
-                    !isHoveredClosed &&
-                    !isHoveredSort
-                  ) && !isHoveredOpen
-                }
-                badgeContent={i18n.t("tickets.inbox.open")}
-                classes={{ badge: classes.tabsBadge }}
-              >
-                <IconButton
-                  onMouseEnter={() => {
-                    setIsHoveredOpen(true);
-                    setHoveredButton("open");
-                  }}
-                  onMouseLeave={() => {
-                    setIsHoveredOpen(false);
-                    setHoveredButton(null);
-                  }}
-                  className={`${classes.standardButton} ${(tab === "open" || isHoveredOpen) ? classes.activeButton : ''
-                    }`}
-                  onClick={() => handleChangeTab(null, "open")}
-                >
-                  <MoveToInboxIcon
-                    className={`${classes.standardIcon} ${(tab === "open" || isHoveredOpen) ? classes.activeIcon : ''
-                      }`}
-                  />
-                </IconButton>
-              </Badge>
-            </Tooltip>
 
-            {/* Botão "Resolvidos" */}
-            <Tooltip title={i18n.t("tickets.inbox.resolverd")}>
-              <Badge
-                color="primary"
-                invisible={
-                  !(
-                    tab === "closed" &&
+            <Badge
+              color="primary"
+              invisible={
+                !(
+                  (awaitingFilter === "agent" &&
                     !isHoveredAll &&
                     !isHoveredNew &&
                     !isHoveredResolve &&
                     !isHoveredOpen &&
-                    !isHoveredSort
-                  ) && !isHoveredClosed
-                }
-                badgeContent={i18n.t("tickets.inbox.resolverd")}
-                classes={{ badge: classes.tabsBadge }}
+                    !isHoveredClosed &&
+                    !isHoveredSort &&
+                    !isHoveredAwaitingCustomer
+                  ) || isHoveredAwaitingAgent
+                )
+              }
+              badgeContent={"Ag. Cliente"}
+              classes={{ badge: classes.tabsBadgeAwaiting }}
+            >
+              <IconButton
+                onMouseEnter={() => setIsHoveredAwaitingAgent(true)}
+                onMouseLeave={() => setIsHoveredAwaitingAgent(false)}
+                className={`${classes.awaitingSmallButton} ${awaitingFilter === "agent" ? classes.activeButton : ''
+                  }`}
+                onClick={() => setAwaitingFilter((prev) => (prev === "agent" ? null : "agent"))}
               >
-                <IconButton
-                  onMouseEnter={() => {
-                    setIsHoveredClosed(true);
-                    setHoveredButton("closed");
-                  }}
-                  onMouseLeave={() => {
-                    setIsHoveredClosed(false);
-                    setHoveredButton(null);
-                  }}
-                  className={`${classes.standardButton} ${(tab === "closed" || isHoveredClosed) ? classes.activeButton : ''
+                <ClockIcon
+                  className={`${classes.awaitingSmallIcon} ${awaitingFilter === "agent" ? classes.activeIcon : ''
                     }`}
-                  onClick={() => handleChangeTab(null, "closed")}
-                >
-                  <CheckBoxIcon
-                    className={`${classes.standardIcon} ${(tab === "closed" || isHoveredClosed) ? classes.activeIcon : ''
-                      }`}
-                  />
-                </IconButton>
-              </Badge>
-            </Tooltip>
-
-            {tab !== "closed" && tab !== "search" && (
-              <Tooltip title={!sortTickets ? "Ordenação crescente" : "Ordenação decrescente"}>
-                <Badge
-                  color="primary"
-                  invisible={
-                    !isHoveredSort ||
-                    isHoveredAll ||
-                    isHoveredNew ||
-                    isHoveredResolve ||
-                    isHoveredOpen ||
-                    isHoveredClosed
-                  }
-                  badgeContent={!sortTickets ? "Crescente" : "Decrescente"}
-                  classes={{ badge: classes.tabsBadge }}
-                >
-                  <ToggleButton
-                    onMouseEnter={() => setIsHoveredSort(true)}
-                    onMouseLeave={() => setIsHoveredSort(false)}
-                    className={`${classes.standardButton} ${sortTickets ? classes.activeButton : ''}`}
-                    value="uncheck"
-                    selected={sortTickets}
-                    onChange={() => setSortTickets((prevState) => !prevState)}
-                  >
-                    {!sortTickets ? (
-                      <TextRotateUp className={`${classes.standardIcon} ${sortTickets ? classes.activeIcon : ''}`} />
-                    ) : (
-                      <TextRotationDown className={`${classes.standardIcon} ${classes.activeIcon}`} />
-                    )}
-                  </ToggleButton>
-                </Badge>
-              </Tooltip>
-            )}
-
-            <Tooltip title="Cliente aguardando">
-              <Badge
-                color="primary"
-                invisible={
-                  !(
-                    (awaitingFilter === "agent" &&
-                      !isHoveredAll &&
-                      !isHoveredNew &&
-                      !isHoveredResolve &&
-                      !isHoveredOpen &&
-                      !isHoveredClosed &&
-                      !isHoveredSort &&
-                      !isHoveredAwaitingCustomer
-                    ) || isHoveredAwaitingAgent
-                  )
-                }
-                badgeContent={"Ag. Cliente"}
-                classes={{ badge: classes.tabsBadgeAwaiting }}
+                />
+              </IconButton>
+            </Badge>
+            <Badge
+              color="primary"
+              invisible={
+                !(
+                  (awaitingFilter === "customer" &&
+                    !isHoveredAll &&
+                    !isHoveredNew &&
+                    !isHoveredResolve &&
+                    !isHoveredOpen &&
+                    !isHoveredClosed &&
+                    !isHoveredSort &&
+                    !isHoveredAwaitingAgent
+                  ) || isHoveredAwaitingCustomer
+                )
+              }
+              badgeContent={"Ag. Atend."}
+              classes={{ badge: classes.tabsBadgeAwaiting }}
+            >
+              <IconButton
+                onMouseEnter={() => setIsHoveredAwaitingCustomer(true)}
+                onMouseLeave={() => setIsHoveredAwaitingCustomer(false)}
+                className={`${classes.awaitingSmallButton} ${awaitingFilter === "customer" ? classes.activeButton : ''
+                  }`}
+                onClick={() => setAwaitingFilter((prev) => (prev === "customer" ? null : "customer"))}
               >
-                <IconButton
-                  onMouseEnter={() => setIsHoveredAwaitingAgent(true)}
-                  onMouseLeave={() => setIsHoveredAwaitingAgent(false)}
-                  className={`${classes.awaitingSmallButton} ${awaitingFilter === "agent" ? classes.activeButton : ''
+                <MessageSharpIcon
+                  className={`${classes.awaitingSmallIcon} ${awaitingFilter === "customer" ? classes.activeIcon : ''
                     }`}
-                  onClick={() => setAwaitingFilter((prev) => (prev === "agent" ? null : "agent"))}
-                >
-                  <ClockIcon
-                    className={`${classes.awaitingSmallIcon} ${awaitingFilter === "agent" ? classes.activeIcon : ''
-                      }`}
-                  />
-                </IconButton>
-              </Badge>
-            </Tooltip>
-            <Tooltip title="Atendente aguardando">
-              <Badge
-                color="primary"
-                invisible={
-                  !(
-                    (awaitingFilter === "customer" &&
-                      !isHoveredAll &&
-                      !isHoveredNew &&
-                      !isHoveredResolve &&
-                      !isHoveredOpen &&
-                      !isHoveredClosed &&
-                      !isHoveredSort &&
-                      !isHoveredAwaitingAgent
-                    ) || isHoveredAwaitingCustomer
-                  )
-                }
-                badgeContent={"Ag. Atend."}
-                classes={{ badge: classes.tabsBadgeAwaiting }}
-              >
-                <IconButton
-                  onMouseEnter={() => setIsHoveredAwaitingCustomer(true)}
-                  onMouseLeave={() => setIsHoveredAwaitingCustomer(false)}
-                  className={`${classes.awaitingSmallButton} ${awaitingFilter === "customer" ? classes.activeButton : ''
-                    }`}
-                  onClick={() => setAwaitingFilter((prev) => (prev === "customer" ? null : "customer"))}
-                >
-                  <MessageSharpIcon
-                    className={`${classes.awaitingSmallIcon} ${awaitingFilter === "customer" ? classes.activeIcon : ''
-                      }`}
-                  />
-                </IconButton>
-              </Badge>
-            </Tooltip>
+                />
+              </IconButton>
+            </Badge>
 
             {/* Movido o seletor de filas para a mesma linha dos botões */}
             <span className="MuiBadge-root">
