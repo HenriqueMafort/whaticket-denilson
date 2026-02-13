@@ -17,6 +17,8 @@ import logger from "../../utils/logger";
 import { ENABLE_LID_DEBUG } from "../../config/debug";
 import { normalizeJid } from "../../utils";
 import { getJidOf } from "./getJidOf";
+import cacheLayer from "../../libs/cache";
+import { getIO } from "../../libs/socket";
 
 ffmpeg.setFfmpegPath(ffmpegStatic!);
 
@@ -527,6 +529,9 @@ const SendWhatsAppMedia = async ({
     });
 
     if (userId) {
+      // Salva no cache para o listener pegar imediatamente
+      await cacheLayer.set(`message:wid:${sentMessage.key.id}:userId`, String(userId), "EX", 10);
+
       setTimeout(async () => {
         try {
           // Import Message model inside the timeout or at top if not circular dep
@@ -542,6 +547,14 @@ const SendWhatsAppMedia = async ({
           if (msg) {
             await msg.update({ userId });
             console.log(`[SendWhatsAppMedia] Message ${msg.id} updated with userId ${userId}`);
+
+            // Avisa o front para atualizar a assinatura
+            const io = getIO();
+            io.of(String(ticket.companyId))
+              .emit(`company-${ticket.companyId}-appMessage`, {
+                action: "update",
+                message: msg
+              });
           }
         } catch (error) {
           console.error(`[SendWhatsAppMedia] Error updating userId for message ${sentMessage.key.id}:`, error);

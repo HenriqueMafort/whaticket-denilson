@@ -7,6 +7,8 @@ import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
 import Contact from "../../models/Contact";
 import { isNil } from "lodash";
+import cacheLayer from "../../libs/cache";
+import { getIO } from "../../libs/socket";
 
 import formatBody from "../../helpers/Mustache";
 import logger from "../../utils/logger";
@@ -170,6 +172,9 @@ const SendWhatsAppMessage = async ({
 
 
     if (userId) {
+      // Salva no cache para o listener pegar imediatamente
+      await cacheLayer.set(`message:wid:${sentMessage.key.id}:userId`, String(userId), "EX", 10);
+
       setTimeout(async () => {
         try {
           const msg = await Message.findOne({
@@ -182,6 +187,14 @@ const SendWhatsAppMessage = async ({
           if (msg) {
             await msg.update({ userId });
             console.log(`[SendWhatsAppMessage] Message ${msg.id} updated with userId ${userId}`);
+
+            // Avisa o front para atualizar a assinatura
+            const io = getIO();
+            io.of(String(ticket.companyId))
+              .emit(`company-${ticket.companyId}-appMessage`, {
+                action: "update",
+                message: msg
+              });
           }
         } catch (error) {
           console.error(`[SendWhatsAppMessage] Error updating userId for message ${sentMessage.key.id}:`, error);

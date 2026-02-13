@@ -832,6 +832,11 @@ export const verifyMediaMessage = async (
   wbot: Session
 ): Promise<Message> => {
   const io = getIO();
+  let userId: string | number = null;
+  if (msg.key.fromMe) {
+    userId = await cacheLayer.get(`message:wid:${msg.key.id}:userId`);
+  }
+
   const quotedMsg = await verifyQuotedMessage(msg);
   const companyId = ticket.companyId;
 
@@ -863,7 +868,8 @@ export const verifyMediaMessage = async (
         dataJson: JSON.stringify(msg),
         ticketImported: ticket.imported,
         isForwarded,
-        isPrivate
+        isPrivate,
+        userId: userId ? parseInt(String(userId)) : undefined
       };
 
       await ticket.update({
@@ -1015,7 +1021,8 @@ export const verifyMediaMessage = async (
       ).toISOString(),
       ticketImported: ticket.imported,
       isForwarded,
-      isPrivate
+      isPrivate,
+      userId: userId ? parseInt(String(userId)) : undefined
     };
 
     await ticket.update({
@@ -1100,6 +1107,11 @@ export const verifyMessage = async (
   const body = getBodyMessage(msg);
   const companyId = ticket.companyId;
 
+  let userId: string | number = null;
+  if (msg.key.fromMe) {
+    userId = await cacheLayer.get(`message:wid:${msg.key.id}:userId`);
+  }
+
   const messageData = {
     wid: msg.key.id,
     ticketId: ticket.id,
@@ -1121,7 +1133,8 @@ export const verifyMessage = async (
       Math.floor(getTimestampMessage(msg.messageTimestamp) * 1000)
     ).toISOString(),
     ticketImported: ticket.imported,
-    isForwarded
+    isForwarded,
+    userId: userId ? parseInt(String(userId)) : undefined
   };
 
   await ticket.update({
@@ -3275,84 +3288,84 @@ export const handleMessageIntegration = async (
       }
     } catch { /* ignora parse e segue */ }
 
-  if (queueIntegration.type === "n8n" || queueIntegration.type === "webhook") {
-    if (queueIntegration?.urlN8N) {
-      const options = {
-        method: "POST",
-        url: queueIntegration?.urlN8N,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        json: msg
-      };
-      try {
-        request(options, function (error, response) {
-          if (error) {
-            throw new Error(error);
-          } else {
-            console.log(response.body);
-          }
-        });
-      } catch (error) {
-        throw new Error(error);
-      }
-    }
-  } else if (queueIntegration.type === "dialogflow") {
-    let inputAudio: string | undefined;
-
-    if (msgType === "audioMessage") {
-      let filename = `${msg.messageTimestamp}.ogg`;
-      readFile(
-        join(
-          __dirname,
-          "..",
-          "..",
-          "..",
-          "public",
-          `company${companyId}`,
-          filename
-        ),
-        "base64",
-        (err, data) => {
-          inputAudio = data;
-          if (err) {
-            logger.error(err);
-          }
+    if (queueIntegration.type === "n8n" || queueIntegration.type === "webhook") {
+      if (queueIntegration?.urlN8N) {
+        const options = {
+          method: "POST",
+          url: queueIntegration?.urlN8N,
+          headers: {
+            "Content-Type": "application/json"
+          },
+          json: msg
+        };
+        try {
+          request(options, function (error, response) {
+            if (error) {
+              throw new Error(error);
+            } else {
+              console.log(response.body);
+            }
+          });
+        } catch (error) {
+          throw new Error(error);
         }
-      );
-    } else {
-      inputAudio = undefined;
-    }
+      }
+    } else if (queueIntegration.type === "dialogflow") {
+      let inputAudio: string | undefined;
 
-    const debouncedSentMessage = debounce(
-      async () => {
-        await sendDialogflowAwswer(
-          wbot,
-          ticket,
-          msg,
-          ticket.contact,
-          inputAudio,
-          companyId,
-          queueIntegration
+      if (msgType === "audioMessage") {
+        let filename = `${msg.messageTimestamp}.ogg`;
+        readFile(
+          join(
+            __dirname,
+            "..",
+            "..",
+            "..",
+            "public",
+            `company${companyId}`,
+            filename
+          ),
+          "base64",
+          (err, data) => {
+            inputAudio = data;
+            if (err) {
+              logger.error(err);
+            }
+          }
         );
-      },
-      500,
-      ticket.id
-    );
-    debouncedSentMessage();
-  } else if (queueIntegration.type === "typebot") {
-    console.log("[TYPEBOT 3010] Enviando mensagem para Typebot");
-    // await typebots(ticket, msg, wbot, queueIntegration);
-    await typebotListener({ ticket, msg, wbot, typebot: queueIntegration });
-  } else if (queueIntegration.type === "flowbuilder") {
-    const contact = await ShowContactService(
-      ticket.contactId,
-      ticket.companyId
-    );
-    await flowbuilderIntegration(msg, wbot, companyId, queueIntegration, ticket, contact, null, null);
-  } else if (queueIntegration.type === "SGP") {
-    console.error(`SGP: Chamando integração SGP pelo handler antigo`);
-  }
+      } else {
+        inputAudio = undefined;
+      }
+
+      const debouncedSentMessage = debounce(
+        async () => {
+          await sendDialogflowAwswer(
+            wbot,
+            ticket,
+            msg,
+            ticket.contact,
+            inputAudio,
+            companyId,
+            queueIntegration
+          );
+        },
+        500,
+        ticket.id
+      );
+      debouncedSentMessage();
+    } else if (queueIntegration.type === "typebot") {
+      console.log("[TYPEBOT 3010] Enviando mensagem para Typebot");
+      // await typebots(ticket, msg, wbot, queueIntegration);
+      await typebotListener({ ticket, msg, wbot, typebot: queueIntegration });
+    } else if (queueIntegration.type === "flowbuilder") {
+      const contact = await ShowContactService(
+        ticket.contactId,
+        ticket.companyId
+      );
+      await flowbuilderIntegration(msg, wbot, companyId, queueIntegration, ticket, contact, null, null);
+    } else if (queueIntegration.type === "SGP") {
+      console.error(`SGP: Chamando integração SGP pelo handler antigo`);
+    }
   } catch (error) {
     logger.error(`[INTEGRATION ERROR] Erro ao processar integração ${queueIntegration?.type} no ticket ${ticket.id}:`, error);
     await notifyIntegrationErrorAndReset(ticket, companyId);
