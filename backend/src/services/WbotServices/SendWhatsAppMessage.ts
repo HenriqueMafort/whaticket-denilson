@@ -6,6 +6,7 @@ import GetTicketWbot from "../../helpers/GetTicketWbot";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
 import Contact from "../../models/Contact";
+import User from "../../models/User";
 import { isNil } from "lodash";
 import cacheLayer from "../../libs/cache";
 import { getIO } from "../../libs/socket";
@@ -151,9 +152,13 @@ const SendWhatsAppMessage = async ({
       throw new AppError("ERR_SENDING_WAPP_MSG");
     }
   }
+  const messageId =
+    "DENILSON" +
+    Math.random().toString(36).substring(2, 12).toUpperCase() +
+    Math.random().toString(36).substring(2, 12).toUpperCase();
+
   try {
     await delay(msdelay);
-    const messageId = "DENILSON" + Math.random().toString(36).substring(2, 12).toUpperCase() + Math.random().toString(36).substring(2, 12).toUpperCase();
 
     console.log(`[DEBUG-PM2] Generated messageId: ${messageId}`);
 
@@ -173,6 +178,7 @@ const SendWhatsAppMessage = async ({
       },
       {
         ...options,
+        messageId
       }
     );
 
@@ -198,7 +204,19 @@ const SendWhatsAppMessage = async ({
             where: {
               wid: sentMessage.key.id,
               companyId: ticket.companyId
-            }
+            },
+            include: [
+              {
+                model: Ticket,
+                as: "ticket",
+                attributes: ["id", "uuid"]
+              },
+              {
+                model: User,
+                as: "user",
+                attributes: ["id", "name"]
+              }
+            ]
           });
 
           if (msg) {

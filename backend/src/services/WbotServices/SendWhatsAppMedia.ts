@@ -12,11 +12,13 @@ import mime from "mime-types";
 import Contact from "../../models/Contact";
 import { getWbot } from "../../libs/wbot";
 import CreateMessageService from "../MessageServices/CreateMessageService";
+import Message from "../../models/Message";
 import formatBody from "../../helpers/Mustache";
 import logger from "../../utils/logger";
 import { ENABLE_LID_DEBUG } from "../../config/debug";
 import { normalizeJid } from "../../utils";
 import { getJidOf } from "./getJidOf";
+import User from "../../models/User";
 import cacheLayer from "../../libs/cache";
 import { getIO } from "../../libs/socket";
 
@@ -540,18 +542,27 @@ const SendWhatsAppMedia = async ({
 
     if (userId) {
       // Salva no cache para o listener pegar imediatamente
-      await cacheLayer.set(`message:wid:${sentMessage.key.id}:userId`, String(userId), "EX", 10);
+      await cacheLayer.set(`message:wid:${sentMessage.key.id}:userId`, String(userId), "EX", 60);
 
       setTimeout(async () => {
         try {
-          // Import Message model inside the timeout or at top if not circular dep
-          const Message = require("../../models/Message").default;
-
           const msg = await Message.findOne({
             where: {
               wid: sentMessage.key.id,
               companyId: ticket.companyId
-            }
+            },
+            include: [
+              {
+                model: Ticket,
+                as: "ticket",
+                attributes: ["id", "uuid"]
+              },
+              {
+                model: User,
+                as: "user",
+                attributes: ["id", "name"]
+              }
+            ]
           });
 
           if (msg) {
