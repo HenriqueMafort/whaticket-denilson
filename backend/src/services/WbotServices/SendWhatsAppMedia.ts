@@ -555,7 +555,7 @@ const SendWhatsAppMedia = async ({
               {
                 model: Ticket,
                 as: "ticket",
-                attributes: ["id", "uuid"]
+                attributes: ["id", "uuid", "status", "isBot"]
               },
               {
                 model: User,

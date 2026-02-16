@@ -499,6 +499,27 @@ const MessagesList = ({
   const { showSelectMessageCheckbox } = useContext(ForwardMessageContext);
   const { user, socket } = useContext(AuthContext);
   const companyId = user.companyId;
+  const getSignatureLabel = (message) => {
+    if (message?.user?.name) {
+      return message.user.name;
+    }
+
+    const ticketIsBot =
+      message?.ticket?.isBot !== undefined
+        ? message.ticket.isBot
+        : ticket?.isBot;
+    const ticketStatus =
+      message?.ticket?.status !== undefined
+        ? message.ticket.status
+        : ticket?.status;
+
+    const isChatbotByTicket = ticketIsBot === true || ticketStatus === "chatbot";
+    const hasChatbotMarker =
+      message?.body?.startsWith("\u200e") ||
+      (message?.wid && message.wid.startsWith("BAE"));
+
+    return isChatbotByTicket || hasChatbotMarker ? "Chatbot" : "Dispositivo";
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -1434,7 +1455,7 @@ const MessagesList = ({
                   )}
 
                   <div className={classes.messageSignature}>
-                    {(message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : (ticket?.whatsapp?.name ? ticket.whatsapp.name : "")) || "Sem Conexão"} - {message.user?.name ? message.user.name : (message.body?.startsWith("\u200e") || (message.wid && message.wid.startsWith("BAE")) ? "Chatbot" : "Dispositivo")} &nbsp;
+                    {(message.ticket?.whatsapp?.name ? message.ticket.whatsapp.name : (ticket?.whatsapp?.name ? ticket.whatsapp.name : "")) || "Sem Conexão"} - {getSignatureLabel(message)} &nbsp;
                     {message.isEdited ? "Editada " + format(parseISO(message.createdAt), "dd/MM/yy HH:mm") : format(parseISO(message.createdAt), "dd/MM/yy HH:mm")}
                     {renderMessageAck(message)}
                   </div>
@@ -1512,3 +1533,5 @@ const MessagesList = ({
 };
 
 export default MessagesList;
+
+
