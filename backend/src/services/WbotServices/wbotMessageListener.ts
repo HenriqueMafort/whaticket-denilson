@@ -3808,8 +3808,6 @@ const handleMessage = async (
     // if (isPrivate) return;
 
     if (msg.key.fromMe) {
-      if (/\u200e/.test(bodyMessage)) return;
-
       if (
         !hasMedia &&
         msgType !== "conversation" &&
