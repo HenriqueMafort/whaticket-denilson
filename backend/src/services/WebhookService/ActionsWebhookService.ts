@@ -120,6 +120,11 @@ const processVariableValue = (text: string, dataWebhook: any, ticketId?: number)
   return text;
 };
 
+const ensureChatbotMarker = (text: string): string => {
+  if (!text) return "\u200e";
+  return text.startsWith("\u200e") ? text : `\u200e${text}`;
+};
+
 const compareValues = (value1: string, value2: string, operator: string): boolean => {
   if (!value1 && operator !== "isEmpty" && operator !== "isNotEmpty") {
     value1 = "";
@@ -571,6 +576,8 @@ export const ActionsWebhookService = async (
           };
         }
 
+        msg.body = ensureChatbotMarker(msg.body);
+
         console.log("msg", msg);
 
         if (whatsapp.channel === "whatsapp") {
@@ -712,15 +719,16 @@ export const ActionsWebhookService = async (
                 ? `Olá! Sou ${name}. Como posso ajudá-lo? (Digite "${continueKeywords[0]}" quando quiser prosseguir)`
                 : `Olá! Sou ${name}. Como posso ajudá-lo?`;
 
+            const markedWelcomeMessage = ensureChatbotMarker(welcomeMessage);
             console.log(`[${provider.toUpperCase()} NODE] Enviando boas-vindas para ticket ${ticket.id}`);
 
             if (whatsapp.channel === "whatsapp") {
-              await SendWhatsAppMessage({ body: welcomeMessage, ticket, quotedMsg: null });
+              await SendWhatsAppMessage({ body: markedWelcomeMessage, ticket, quotedMsg: null });
             }
 
             if (whatsapp.channel === "whatsapp_oficial") {
               await SendWhatsAppOficialMessage({
-                body: welcomeMessage,
+                body: markedWelcomeMessage,
                 ticket: ticket,
                 quotedMsg: null,
                 type: 'text',
@@ -825,7 +833,7 @@ export const ActionsWebhookService = async (
 
             if (whatsapp.channel === "whatsapp_oficial") {
               await SendWhatsAppOficialMessage({
-                body: question,
+                body: ensureChatbotMarker(question),
                 ticket: ticket,
                 quotedMsg: null,
                 type: 'text',
@@ -836,14 +844,14 @@ export const ActionsWebhookService = async (
 
             if (whatsapp.channel === "whatsapp") {
               await SendWhatsAppMessage({
-                body: question,
+                body: ensureChatbotMarker(question),
                 ticket: ticket,
                 quotedMsg: null
               });
             } else {
               await SendMessage(whatsapp, {
                 number: numberClient,
-                body: question
+                body: ensureChatbotMarker(question)
               });
             }
 
@@ -1216,13 +1224,13 @@ export const ActionsWebhookService = async (
 
             if (whatsapp.channel === "whatsapp") {
               await SendWhatsAppMessage({
-                body: greeting,
+                body: ensureChatbotMarker(greeting),
                 ticket: ticketDetails,
                 quotedMsg: null
               });
             } else if (whatsapp.channel === "whatsapp_oficial") {
               await SendWhatsAppOficialMessage({
-                body: greeting,
+                body: ensureChatbotMarker(greeting),
                 ticket: ticketDetails,
                 quotedMsg: null,
                 type: 'text',
@@ -1259,14 +1267,14 @@ export const ActionsWebhookService = async (
             const ticketDetails = await ShowTicketService(ticket.id, companyId);
 
             if (dataWebhook === "") {
-              msg = bodyFor;
+              msg = ensureChatbotMarker(bodyFor);
             } else {
               const dataLocal = {
                 nome: createFieldJsonName,
                 numero: numberClient,
                 email: createFieldJsonEmail
               };
-              msg = replaceMessages(bodyFor, details, dataWebhook, dataLocal, idTicket);
+              msg = ensureChatbotMarker(replaceMessages(bodyFor, details, dataWebhook, dataLocal, idTicket));
             }
 
             if (whatsapp.channel === "whatsapp") {
@@ -1583,7 +1591,7 @@ export const ActionsWebhookService = async (
 
             const ticketDetails = await ShowTicketService(ticket.id, companyId);
 
-            const exitMessage = "Atendimento pelo chatbot finalizado. Em breve um atendente entrará em contato.";
+            const exitMessage = ensureChatbotMarker("Atendimento pelo chatbot finalizado. Em breve um atendente entrará em contato.");
 
             if (whatsapp.channel === "whatsapp") {
               await SendWhatsAppMessage({
@@ -1610,7 +1618,9 @@ export const ActionsWebhookService = async (
               read: true
             };
 
-            await CreateMessageService({ messageData, companyId });
+            if (whatsapp.channel !== "whatsapp") {
+              await CreateMessageService({ messageData, companyId });
+            }
 
             await ticketDetails.update({
               flowWebhook: false,
@@ -1652,7 +1662,7 @@ export const ActionsWebhookService = async (
               optionsText += `[${item.number}] ${item.value}\n`;
             });
 
-            const fallbackMessage = `Opção inválida. Por favor, escolha uma das opções abaixo ou digite *Sair* para finalizar o atendimento:\n\n${optionsText}`;
+            const fallbackMessage = ensureChatbotMarker(`Opção inválida. Por favor, escolha uma das opções abaixo ou digite *Sair* para finalizar o atendimento:\n\n${optionsText}`);
 
             const ticketDetails = await ShowTicketService(ticket.id, companyId);
 
@@ -1681,7 +1691,9 @@ export const ActionsWebhookService = async (
               read: true
             };
 
-            await CreateMessageService({ messageData, companyId });
+            if (whatsapp.channel !== "whatsapp") {
+              await CreateMessageService({ messageData, companyId });
+            }
 
             return "fallback_sent";
           }
@@ -1716,7 +1728,7 @@ export const ActionsWebhookService = async (
           let msg;
           if (dataWebhook === "") {
             msg = {
-              body: menuCreate,
+              body: ensureChatbotMarker(menuCreate),
               number: numberClient,
               companyId: companyId
             };
@@ -1727,7 +1739,7 @@ export const ActionsWebhookService = async (
               email: createFieldJsonEmail
             };
             msg = {
-              body: replaceMessages(menuCreate, details, dataWebhook, dataLocal, idTicket),
+              body: ensureChatbotMarker(replaceMessages(menuCreate, details, dataWebhook, dataLocal, idTicket)),
               number: numberClient,
               companyId: companyId
             };
@@ -2676,3 +2688,6 @@ const replaceMessages = (
 };
 
 export { finalizeTriggeredFlow };
+
+
+
