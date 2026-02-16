@@ -854,6 +854,12 @@ const TicketsManagerTabs = () => {
     fontSize: "10px",
   };
 
+  const normalizedSortTickets = sortTickets ? "ASC" : "DESC";
+  const selectedTagIds = selectedTags.filter(t => t?.id).map(t => t.id);
+  const selectedUserIds = selectedUsers.filter(u => u?.id).map(u => u.id);
+  const selectedWhatsappIds = selectedWhatsapp.filter(w => w?.id).map(w => w.id);
+  const selectedStatusFilters = selectedStatus.filter(s => s?.status).map(s => s.status);
+
   return (
     <Paper elevation={0} variant="outlined" className={classes.ticketsWrapper}>
       <NewTicketModal
@@ -1343,7 +1349,7 @@ const TicketsManagerTabs = () => {
           <TicketsList
             status="open"
             showAll={showAllTickets}
-            sortTickets={sortTickets ? "ASC" : "DESC"}
+            sortTickets={normalizedSortTickets}
             selectedQueueIds={selectedQueueIds}
             updateCount={(val) => setOpenCount(val)}
             style={applyPanelStyle("open")}
@@ -1354,7 +1360,7 @@ const TicketsManagerTabs = () => {
           <TicketsList
             status="pending"
             selectedQueueIds={selectedQueueIds}
-            sortTickets={sortTickets ? "ASC" : "DESC"}
+            sortTickets={normalizedSortTickets}
             showAll={user.profile === "admin" || user.allUserChat === 'enabled' ? showAllTickets : false}
             updateCount={(val) => setPendingCount(val)}
             style={applyPanelStyle("pending")}
@@ -1366,7 +1372,7 @@ const TicketsManagerTabs = () => {
             <TicketsList
               status="group"
               showAll={showAllTickets}
-              sortTickets={sortTickets ? "ASC" : "DESC"}
+              sortTickets={normalizedSortTickets}
               selectedQueueIds={selectedQueueIds}
               updateCount={(val) => setGroupingCount(val)}
               style={applyPanelStyle("group")}
@@ -1390,8 +1396,10 @@ const TicketsManagerTabs = () => {
         {profile === "admin" && (
           <>
             <TicketsList
-              tags={selectedTags.filter(t => t?.id).map(t => t.id)}
-              users={selectedUsers.filter(u => u?.id).map(u => u.id)}
+              tags={selectedTagIds}
+              users={selectedUserIds}
+              searchParam={searchParam}
+              searchOnMessages={searchOnMessages}
               showAll={showAllTickets}
               selectedQueueIds={selectedQueueIds}
               ticketOption={""}
@@ -1399,23 +1407,25 @@ const TicketsManagerTabs = () => {
                 handleCloseOrOpenTicket(e);
               }}
               status={tab}
-              whatsappIds={selectedWhatsapp.filter(w => w?.id).map(w => w.id)}
+              whatsappIds={selectedWhatsappIds}
               forceSearch={forceSearch}
-              statusFilter={selectedStatus.filter(s => s?.status).map(s => s.status)}
-              sortTickets={sortTickets} />
+              statusFilter={selectedStatusFilters}
+              sortTickets={normalizedSortTickets}
+            />
           </>
         )}
 
         {profile === "user" && (
           <TicketsList
-            statusFilter={selectedStatus.filter(s => s?.status).map(s => s.status)}
+            statusFilter={selectedStatusFilters}
             searchParam={searchParam}
-            showAll={false}
-            tags={selectedTags.filter(t => t?.id).map(t => t.id)}
-            selectedQueueIds={selectedQueueIds}
-            whatsappIds={selectedWhatsapp.filter(w => w?.id).map(w => w.id)}
-            forceSearch={forceSearch}
             searchOnMessages={searchOnMessages}
+            showAll={false}
+            tags={selectedTagIds}
+            selectedQueueIds={selectedQueueIds}
+            whatsappIds={selectedWhatsappIds}
+            forceSearch={forceSearch}
+            sortTickets={normalizedSortTickets}
             status="search"
           />
         )}
