@@ -4025,7 +4025,19 @@ const handleMessage = async (
             wid: msgKeyIdEdited,
             companyId,
             ticketId: ticket.id
-          }
+          },
+          include: [
+            {
+              model: Ticket,
+              as: "ticket",
+              attributes: ["id", "uuid"]
+            },
+            {
+              model: User,
+              as: "user",
+              attributes: ["id", "name"]
+            }
+          ]
         });
 
         if (!messageToUpdate) return;
@@ -5098,6 +5110,11 @@ const handleMsgAck = async (
       },
       include: [
         "contact",
+        {
+          model: User,
+          as: "user",
+          attributes: ["id", "name"]
+        },
         {
           model: Ticket,
           as: "ticket",

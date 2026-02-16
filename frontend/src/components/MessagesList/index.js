@@ -436,7 +436,14 @@ const reducer = (state, action) => {
     const messageIndex = state.findIndex((m) => m.id === messageToUpdate.id);
 
     if (messageIndex !== -1) {
-      state[messageIndex] = messageToUpdate;
+      const currentMessage = state[messageIndex];
+      state[messageIndex] = {
+        ...currentMessage,
+        ...messageToUpdate,
+        user: messageToUpdate.user || currentMessage.user,
+        ticket: messageToUpdate.ticket || currentMessage.ticket,
+        quotedMsg: messageToUpdate.quotedMsg || currentMessage.quotedMsg
+      };
     }
 
     return [...state];
