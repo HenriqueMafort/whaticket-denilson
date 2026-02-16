@@ -534,6 +534,8 @@ const ListTicketsService = async ({
 
   const limit = 40;
   const offset = limit * (+pageNumber - 1);
+  const normalizedSortTickets =
+    String(sortTickets || "").toUpperCase() === "ASC" ? "ASC" : "DESC";
 
   const { count, rows: tickets } = await Ticket.findAndCountAll({
     where: whereCondition,
@@ -542,7 +544,7 @@ const ListTicketsService = async ({
     distinct: true,
     limit,
     offset,
-    order: [["updatedAt", sortTickets]],
+    order: [["updatedAt", normalizedSortTickets]],
     subQuery: false
   });
 
