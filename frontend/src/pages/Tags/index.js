@@ -234,6 +234,7 @@ const Tags = () => {
         open={promoteModalOpen}
         onClose={() => setPromoteModalOpen(false)}
         onConfirm={() => handlePromoteTag(promotingTag.id)}
+        colorConfirm="primary"
       >
         {i18n.t("tags.confirmationModal.promoteMessage")}
       </ConfirmationModal>

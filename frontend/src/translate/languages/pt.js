@@ -803,11 +803,6 @@ const messages = {
           okAdd: "Adicionar",
           okEdit: "Salvar",
           cancel: "Cancelar",
-          promote: "Promover ao Kanban",
-        },
-        confirmationModal: {
-          promoteTitle: "Promover ao Kanban",
-          promoteMessage: "Tem certeza que deseja promover esta tag ao Kanban? Ela se tornará uma coluna no quadro Kanban.",
         },
         success: "Tag salva com sucesso.",
         successKanban: "Lane salva com sucesso.",
@@ -1629,6 +1624,8 @@ const messages = {
         confirmationModal: {
           deleteTitle: "Você tem certeza que quer excluir esta Tag?",
           deleteMessage: "Esta ação não pode ser revertida.",
+          promoteTitle: "Promover ao Kanban",
+          promoteMessage: "Tem certeza que deseja promover esta tag ao Kanban? Ela se tornará uma coluna no quadro Kanban.",
         },
         table: {
           id: "ID",
@@ -1641,6 +1638,7 @@ const messages = {
         },
         buttons: {
           add: "Nova Tag",
+          promote: "Promover ao Kanban",
         },
         toasts: {
           deleted: "Tag excluído com sucesso.",
