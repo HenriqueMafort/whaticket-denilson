@@ -1627,6 +1627,8 @@ const messages = {
         },
         promoteTitle: "Promover ao Kanban",
         promoteMessage: "Tem certeza que deseja promover esta tag ao Kanban? Ela se tornará uma coluna no quadro Kanban.",
+        demoteTitle: "Remover do Kanban",
+        demoteMessage: "Tem certeza que deseja remover esta tag do Kanban? Ela deixará de ser uma coluna no quadro.",
         table: {
           id: "ID",
           name: "Nome",
@@ -1641,6 +1643,7 @@ const messages = {
           promote: "Promover ao Kanban",
         },
         toasts: {
+          success: "Tag atualizada com sucesso.",
           deleted: "Tag excluído com sucesso.",
         },
       },

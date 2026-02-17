@@ -100,7 +100,7 @@ const Tags = () => {
       const fetchMoreTags = async () => {
         try {
           const { data } = await api.get("/tags/", {
-            params: { searchParam, pageNumber, kanban: 0, limit: pageSize },
+            params: { searchParam, pageNumber, limit: pageSize },
           });
           dispatch({ type: "LOAD_TAGS", payload: data.tags });
           setHasMore(data.hasMore);
@@ -188,10 +188,11 @@ const Tags = () => {
     setPageNumber(1);
   };
 
-  const handlePromoteTag = async (tagId) => {
+  const handleToggleKanban = async (tagId, currentStatus) => {
     try {
-      await api.put(`/tags/${tagId}`, { kanban: 1 });
-      toast.success(i18n.t("tags.toasts.updated"));
+      const newStatus = currentStatus === 1 ? 0 : 1;
+      await api.put(`/tags/${tagId}`, { kanban: newStatus });
+      toast.success(i18n.t("tags.toasts.success"));
     } catch (err) {
       toastError(err);
     }
@@ -230,13 +231,21 @@ const Tags = () => {
         {i18n.t("tags.confirmationModal.deleteMessage")}
       </ConfirmationModal>
       <ConfirmationModal
-        title={promotingTag && `${i18n.t("tags.promoteTitle")}`}
+        title={
+          promotingTag &&
+          (promotingTag.kanban === 1
+            ? i18n.t("tags.demoteTitle")
+            : i18n.t("tags.promoteTitle"))
+        }
         open={promoteModalOpen}
         onClose={() => setPromoteModalOpen(false)}
-        onConfirm={() => handlePromoteTag(promotingTag.id)}
+        onConfirm={() => handleToggleKanban(promotingTag.id, promotingTag.kanban)}
         colorConfirm="primary"
       >
-        {i18n.t("tags.promoteMessage")}
+        {promotingTag &&
+          (promotingTag.kanban === 1
+            ? i18n.t("tags.demoteMessage")
+            : i18n.t("tags.promoteMessage"))}
       </ConfirmationModal>
       <TagModal
         open={tagModalOpen}
@@ -337,7 +346,11 @@ const Tags = () => {
                         setPromotingTag(tag);
                       }}
                     >
-                      <DashboardIcon />
+                      <DashboardIcon
+                        style={{
+                          color: tag.kanban === 1 ? tag.color : "inherit",
+                        }}
+                      />
                     </IconButton>
 
                     <IconButton size="small" onClick={() => handleEditTag(tag)}>
