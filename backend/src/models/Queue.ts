@@ -115,7 +115,7 @@ class Queue extends Model<Queue> {
 
   @Default(false)
   @Column
-  closeTicket: boolean;
+  maskContact: boolean;
 
   @Default(false)
   @Column

@@ -13,7 +13,7 @@ import TicketTag from "../../models/TicketTag";
 import ContactWallet from "../../models/ContactWallet";
 import { intersection } from "lodash";
 import Whatsapp from "../../models/Whatsapp";
- 
+
 interface Request {
   searchParam?: string;
   pageNumber?: string;
@@ -56,13 +56,13 @@ const ListTicketsServiceKanban = async ({
   // Verificar se o usuário é admin
   const user = await ShowUserService(userId, companyId);
   const isAdmin = user.profile === 'admin';
-  
-  let whereCondition: Filterable["where"] = isAdmin 
+
+  let whereCondition: Filterable["where"] = isAdmin
     ? { queueId: { [Op.or]: [queueIds, null] } }
     : {
-        [Op.or]: [{ userId }, { status: "pending" }],
-        queueId: { [Op.or]: [queueIds, null] }
-      };
+      [Op.or]: [{ userId }, { status: "pending" }],
+      queueId: { [Op.or]: [queueIds, null] }
+    };
   let includeCondition: Includeable[];
 
   includeCondition = [
@@ -93,7 +93,7 @@ const ListTicketsServiceKanban = async ({
     {
       model: Queue,
       as: "queue",
-      attributes: ["id", "name", "color"]
+      attributes: ["id", "name", "color", "maskContact"]
     },
     {
       model: User,
@@ -188,14 +188,14 @@ const ListTicketsServiceKanban = async ({
 
     whereCondition = isAdmin
       ? {
-          queueId: { [Op.or]: [userQueueIds, null] },
-          unreadMessages: { [Op.gt]: 0 }
-        }
+        queueId: { [Op.or]: [userQueueIds, null] },
+        unreadMessages: { [Op.gt]: 0 }
+      }
       : {
-          [Op.or]: [{ userId }, { status: "pending" }],
-          queueId: { [Op.or]: [userQueueIds, null] },
-          unreadMessages: { [Op.gt]: 0 }
-        };
+        [Op.or]: [{ userId }, { status: "pending" }],
+        queueId: { [Op.or]: [userQueueIds, null] },
+        unreadMessages: { [Op.gt]: 0 }
+      };
   }
 
   if (Array.isArray(tags) && tags.length > 0) {
@@ -258,6 +258,14 @@ const ListTicketsServiceKanban = async ({
     subQuery: false
   });
   const hasMore = count > offset + tickets.length;
+
+  if (!isAdmin) {
+    tickets.forEach(ticket => {
+      if (ticket.queue?.maskContact && ticket.contact) {
+        ticket.contact.number = ticket.contact.number.slice(0, -4) + "****";
+      }
+    });
+  }
 
   return {
     tickets,

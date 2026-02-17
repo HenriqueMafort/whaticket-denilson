@@ -18,7 +18,7 @@ interface QueueData {
   tempoRoteador: number;
   integrationId?: number | null;
   fileListId?: number | null;
-  closeTicket?: boolean;
+  maskContact?: boolean;
   typeRandomMode?: string;
   randomizeImmediate?: boolean;
   tipoIntegracao?: string;

@@ -132,6 +132,7 @@ const QueueModal = ({ open, onClose, queueId, onEdit }) => {
     integrationId: "",
     fileListId: "",
     closeTicket: false,
+    maskContact: false,
     typeRandomMode: "RANDOM",
     randomizeImmediate: false
   };
@@ -366,7 +367,7 @@ const QueueModal = ({ open, onClose, queueId, onEdit }) => {
           let baseJson = {};
           try {
             baseJson = integrationData?.jsonContent ? JSON.parse(integrationData.jsonContent) : {};
-          } catch {}
+          } catch { }
           const jsonContent = {
             ...baseJson,
             tipoIntegracao: values.tipoIntegracao,
@@ -571,6 +572,17 @@ const QueueModal = ({ open, onClose, queueId, onEdit }) => {
                       />
                     }
                     label={i18n.t("queueModal.form.closeTicket")}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Field
+                        as={Switch}
+                        color="primary"
+                        name="maskContact"
+                        checked={values.maskContact}
+                      />
+                    }
+                    label={i18n.t("queueModal.form.maskContact")}
                   />
                   <div>
                     <FormControlLabel

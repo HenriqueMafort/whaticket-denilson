@@ -13,7 +13,8 @@ import ContactWallet from "../../models/ContactWallet";
 
 const ShowTicketService = async (
   id: string | number,
-  companyId: number
+  companyId: number,
+  userProfile?: string
 ): Promise<Ticket> => {
   const ticket = await Ticket.findOne({
     where: {
@@ -48,19 +49,13 @@ const ShowTicketService = async (
       "lgpdSendMessageAt",
       "isBot",
       "typebotSessionId",
-      "typebotStatus",
-      "sendInactiveMessage",
-      "fromMe",
-      "isOutOfHour",
-      "isActiveDemand",
-      "typebotSessionTime",
-      "hashFlowId"
+      "typebotStatus"
     ],
     include: [
       {
         model: Contact,
         as: "contact",
-        attributes: ["id", "companyId", "name", "number", "email", "profilePicUrl", "acceptAudioMessage", "active", "disableBot", "isGroup", "remoteJid", "urlPicture", "lgpdAcceptedAt"],
+        attributes: ["id", "companyId", "name", "number", "email", "profilePicUrl", "acceptAudioMessage", "active", "disableBot", "isGroup", "remoteJid", "urlPicture", "lid"],
         include: ["extraInfo", "tags",
           {
             association: "wallets",
@@ -83,7 +78,7 @@ const ShowTicketService = async (
       {
         model: Queue,
         as: "queue",
-        attributes: ["id", "name", "color"],
+        attributes: ["id", "name", "color", "maskContact"],
         include: ["chatbots"]
       },
       {
@@ -99,7 +94,7 @@ const ShowTicketService = async (
       {
         model: Whatsapp,
         as: "whatsapp",
-        attributes: ["id", "name", "groupAsTicket", "greetingMediaAttachment", "facebookUserToken", "facebookUserId", "status", "token", "channel", "color"]
+        attributes: ["id", "name", "expiresTicket", "groupAsTicket", "color"]
 
       },
       {
@@ -131,6 +126,10 @@ const ShowTicketService = async (
 
   if (!ticket) {
     throw new AppError("ERR_NO_TICKET_FOUND", 404);
+  }
+
+  if (userProfile !== "admin" && ticket.queue?.maskContact && ticket.contact) {
+    ticket.contact.number = ticket.contact.number.slice(0, -4) + "****";
   }
 
   return ticket;

@@ -115,7 +115,7 @@ const ListTicketsService = async ({
     {
       model: Queue,
       as: "queue",
-      attributes: ["id", "name", "color"]
+      attributes: ["id", "name", "color", "maskContact"]
     },
     {
       model: User,
@@ -547,6 +547,14 @@ const ListTicketsService = async ({
     order: [["updatedAt", normalizedSortTickets]],
     subQuery: false
   });
+
+  if (user.profile !== "admin") {
+    tickets.forEach(ticket => {
+      if (ticket.queue?.maskContact && ticket.contact) {
+        ticket.contact.number = ticket.contact.number.slice(0, -4) + "****";
+      }
+    });
+  }
 
   const hasMore = count > offset + tickets.length;
 

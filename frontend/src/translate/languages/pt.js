@@ -588,6 +588,7 @@ const messages = {
           integrationId: "Integração",
           fileListId: "Lista de arquivos",
           closeTicket: "Fechar ticket",
+          maskContact: "Mascarar contato",
           randomizeImmediate: "Randomizar Automaticamente (Imediato)",
           queueType: "Tipo de menu",
           message: "Mensagem de retorno",

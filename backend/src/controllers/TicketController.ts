@@ -304,7 +304,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     // Se for erro 409 (ticket já existe)
     if (err.statusCode === 409) {
       const existingTicket = JSON.parse(err.message);
-      
+
       // Verificar se o usuário que está tentando criar é o dono do ticket existente
       if (existingTicket.userId === userId) {
         // É o mesmo usuário, retornar o ticket existente
@@ -325,9 +325,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
-  const { id: userId, companyId } = req.user;
+  const { id: userId, companyId, profile } = req.user;
 
-  const contact = await ShowTicketService(ticketId, companyId);
+  const contact = await ShowTicketService(ticketId, companyId, profile);
 
   await CreateLogTicketService({
     userId,
@@ -355,9 +355,9 @@ export const showFromUUID = async (
   res: Response
 ): Promise<Response> => {
   const { uuid } = req.params;
-  const { id: userId, companyId } = req.user;
+  const { id: userId, companyId, profile } = req.user;
 
-  const ticket: Ticket = await ShowTicketUUIDService(uuid, companyId);
+  const ticket: Ticket = await ShowTicketUUIDService(uuid, companyId, profile);
 
   if (
     ["whatsapp", "whatsapp_oficial"].includes(ticket.channel) &&

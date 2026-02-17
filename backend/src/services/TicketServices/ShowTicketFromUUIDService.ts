@@ -9,8 +9,11 @@ import Company from "../../models/Company";
 import QueueIntegrations from "../../models/QueueIntegrations";
 import ContactWallet from "../../models/ContactWallet";
 
-const ShowTicketUUIDService = async (uuid: string,
-  companyId: number): Promise<Ticket> => {
+const ShowTicketUUIDService = async (
+  uuid: string,
+  companyId: number,
+  userProfile?: string
+): Promise<Ticket> => {
   const ticket = await Ticket.findOne({
     where: {
       uuid,
@@ -44,7 +47,7 @@ const ShowTicketUUIDService = async (uuid: string,
       {
         model: Contact,
         as: "contact",
-        attributes: ["id", "name", "number", "email", "profilePicUrl", "acceptAudioMessage", "active", "disableBot", "urlPicture", "companyId", "isGroup", "remoteJid", "lid"],
+        attributes: ["id", "companyId", "name", "number", "email", "profilePicUrl", "acceptAudioMessage", "active", "disableBot", "urlPicture", "companyId", "isGroup", "remoteJid", "lid"],
         include: ["extraInfo", "tags",
           {
             association: "wallets",
@@ -67,7 +70,7 @@ const ShowTicketUUIDService = async (uuid: string,
       {
         model: Queue,
         as: "queue",
-        attributes: ["id", "name", "color"]
+        attributes: ["id", "name", "color", "maskContact"]
       },
       {
         model: User,
@@ -99,6 +102,10 @@ const ShowTicketUUIDService = async (uuid: string,
 
   if (!ticket) {
     throw new AppError("ERR_NO_TICKET_FOUND", 404);
+  }
+
+  if (userProfile !== "admin" && ticket.queue?.maskContact && ticket.contact) {
+    ticket.contact.number = ticket.contact.number.slice(0, -4) + "****";
   }
 
   return ticket;
