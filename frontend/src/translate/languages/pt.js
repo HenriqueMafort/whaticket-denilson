@@ -1624,9 +1624,9 @@ const messages = {
         confirmationModal: {
           deleteTitle: "Você tem certeza que quer excluir esta Tag?",
           deleteMessage: "Esta ação não pode ser revertida.",
-          promoteTitle: "Promover ao Kanban",
-          promoteMessage: "Tem certeza que deseja promover esta tag ao Kanban? Ela se tornará uma coluna no quadro Kanban.",
         },
+        promoteTitle: "Promover ao Kanban",
+        promoteMessage: "Tem certeza que deseja promover esta tag ao Kanban? Ela se tornará uma coluna no quadro Kanban.",
         table: {
           id: "ID",
           name: "Nome",

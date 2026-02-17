@@ -230,13 +230,13 @@ const Tags = () => {
         {i18n.t("tags.confirmationModal.deleteMessage")}
       </ConfirmationModal>
       <ConfirmationModal
-        title={promotingTag && `${i18n.t("tags.confirmationModal.promoteTitle")}`}
+        title={promotingTag && `${i18n.t("tags.promoteTitle")}`}
         open={promoteModalOpen}
         onClose={() => setPromoteModalOpen(false)}
         onConfirm={() => handlePromoteTag(promotingTag.id)}
         colorConfirm="primary"
       >
-        {i18n.t("tags.confirmationModal.promoteMessage")}
+        {i18n.t("tags.promoteMessage")}
       </ConfirmationModal>
       <TagModal
         open={tagModalOpen}
