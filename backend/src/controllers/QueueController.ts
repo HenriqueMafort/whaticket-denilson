@@ -39,6 +39,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     integrationId,
     fileListId,
     closeTicket,
+    maskContact,
     typeRandomMode,
     randomizeImmediate,
     tipoIntegracao
@@ -51,7 +52,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     greetingMessage,
     companyId,
     outOfHoursMessage,
-    tempoRoteador: tempoRoteador ===""? 0 : tempoRoteador,
+    tempoRoteador: tempoRoteador === "" ? 0 : tempoRoteador,
     ativarRoteador,
     schedules,
     chatbots,
@@ -59,6 +60,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     integrationId: integrationId === "" ? null : integrationId,
     fileListId: fileListId === "" ? null : fileListId,
     closeTicket,
+    maskContact,
     typeRandomMode,
     randomizeImmediate,
     tipoIntegracao
@@ -66,10 +68,10 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   const io = getIO();
   io.of(String(companyId))
-  .emit(`company-${companyId}-queue`, {
-    action: "update",
-    queue
-  });
+    .emit(`company-${companyId}-queue`, {
+      action: "update",
+      queue
+    });
 
   return res.status(200).json(queue);
 };
@@ -103,36 +105,39 @@ export const update = async (
     integrationId,
     fileListId,
     closeTicket,
+    maskContact,
     typeRandomMode,
     randomizeImmediate,
     tipoIntegracao
   } = req.body;
 
   const queue = await UpdateQueueService(queueId,
-    {name,
-    color,
-    greetingMessage,
-    outOfHoursMessage,
-    tempoRoteador: tempoRoteador ===""? 0 : tempoRoteador,
-    ativarRoteador,
-    schedules,
-    chatbots,
-    orderQueue: orderQueue === "" ? null : orderQueue,
-    integrationId: integrationId === "" ? null : integrationId,
-    fileListId: fileListId === "" ? null : fileListId,
-    closeTicket,
-    typeRandomMode,
-    randomizeImmediate,
-    tipoIntegracao
-  },
+    {
+      name,
+      color,
+      greetingMessage,
+      outOfHoursMessage,
+      tempoRoteador: tempoRoteador === "" ? 0 : tempoRoteador,
+      ativarRoteador,
+      schedules,
+      chatbots,
+      orderQueue: orderQueue === "" ? null : orderQueue,
+      integrationId: integrationId === "" ? null : integrationId,
+      fileListId: fileListId === "" ? null : fileListId,
+      closeTicket,
+      maskContact,
+      typeRandomMode,
+      randomizeImmediate,
+      tipoIntegracao
+    },
     companyId);
 
   const io = getIO();
   io.of(String(companyId))
-  .emit(`company-${companyId}-queue`, {
-    action: "update",
-    queue
-  });
+    .emit(`company-${companyId}-queue`, {
+      action: "update",
+      queue
+    });
 
   return res.status(201).json(queue);
 };
@@ -148,10 +153,10 @@ export const remove = async (
 
   const io = getIO();
   io.of(String(companyId))
-  .emit(`company-${companyId}-queue`, {
-    action: "delete",
-    queueId: +queueId
-  });
+    .emit(`company-${companyId}-queue`, {
+      action: "delete",
+      queueId: +queueId
+    });
 
   return res.status(200).send();
 };
