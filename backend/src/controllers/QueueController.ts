@@ -89,6 +89,7 @@ export const update = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  console.log("UPDATE QUEUE BODY:", req.body);
   const { queueId } = req.params;
   const { companyId } = req.user;
 

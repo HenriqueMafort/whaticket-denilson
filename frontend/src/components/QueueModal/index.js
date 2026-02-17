@@ -253,6 +253,7 @@ const QueueModal = ({ open, onClose, queueId, onEdit }) => {
         integrationId: "",
         fileListId: "",
         closeTicket: false,
+        maskContact: false,
         typeRandomMode: "RANDOM",
         randomizeImmediate: false
       });
