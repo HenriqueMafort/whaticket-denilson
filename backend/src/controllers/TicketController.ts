@@ -382,14 +382,15 @@ export const update = async (
 ): Promise<Response> => {
   const { ticketId } = req.params;
   const ticketData: TicketData = req.body;
-  const { companyId } = req.user;
+  const { companyId, profile: userProfile } = req.user;
 
   const mutex = new Mutex();
   const { ticket } = await mutex.runExclusive(async () => {
     const result = await UpdateTicketService({
       ticketData,
       ticketId,
-      companyId
+      companyId,
+      userProfile
     });
     return result;
   });

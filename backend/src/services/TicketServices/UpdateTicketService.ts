@@ -58,6 +58,7 @@ interface Request {
   ticketData: TicketData;
   ticketId: string | number;
   companyId: number;
+  userProfile?: string;
 }
 
 interface Response {
@@ -69,7 +70,8 @@ interface Response {
 const UpdateTicketService = async ({
   ticketData,
   ticketId,
-  companyId
+  companyId,
+  userProfile
 }: Request): Promise<Response> => {
   try {
     let {
@@ -109,6 +111,16 @@ const UpdateTicketService = async ({
     const oldStatus = ticket?.status;
     const oldUserId = ticket.user?.id;
     const oldQueueId = ticket?.queueId;
+
+    if (
+      !isNil(queueId) &&
+      !isNil(oldQueueId) &&
+      queueId !== oldQueueId &&
+      userProfile !== "admin" &&
+      ticket.queue?.maskContact
+    ) {
+      throw new AppError("Apenas administradores podem transferir tickets de uma fila com mascaramento de contato.", 403);
+    }
 
     if (isNil(ticket.whatsappId) && status === "closed") {
       await CreateLogTicketService({
@@ -328,7 +340,7 @@ const UpdateTicketService = async ({
               vCard: null
             });
           }
-          
+
         }
       }
 
