@@ -23,6 +23,7 @@ import { FormControl, InputLabel, Select, MenuItem } from "@material-ui/core";
 
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import EditIcon from "@material-ui/icons/Edit";
+import DashboardIcon from "@material-ui/icons/Dashboard";
 
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
@@ -90,6 +91,8 @@ const Tags = () => {
   const [searchParam, setSearchParam] = useState("");
   const [tags, dispatch] = useReducer(reducer, []);
   const [tagModalOpen, setTagModalOpen] = useState(false);
+  const [promotingTag, setPromotingTag] = useState(null);
+  const [promoteModalOpen, setPromoteModalOpen] = useState(false);
   const pageNumberRef = useRef(1);
 
   useEffect(() => {
@@ -185,6 +188,18 @@ const Tags = () => {
     setPageNumber(1);
   };
 
+  const handlePromoteTag = async (tagId) => {
+    try {
+      await api.put(`/tags/${tagId}`, { kanban: 1 });
+      toast.success(i18n.t("tags.toasts.updated"));
+    } catch (err) {
+      toastError(err);
+    }
+    setPromotingTag(null);
+    setSearchParam("");
+    setPageNumber(1);
+  };
+
   const loadMore = () => {
     setPageNumber((prevPageNumber) => prevPageNumber + 1);
   };
@@ -214,6 +229,14 @@ const Tags = () => {
       >
         {i18n.t("tags.confirmationModal.deleteMessage")}
       </ConfirmationModal>
+      <ConfirmationModal
+        title={promotingTag && `${i18n.t("tags.confirmationModal.promoteTitle")}`}
+        open={promoteModalOpen}
+        onClose={() => setPromoteModalOpen(false)}
+        onConfirm={() => handlePromoteTag(promotingTag.id)}
+      >
+        {i18n.t("tags.confirmationModal.promoteMessage")}
+      </ConfirmationModal>
       <TagModal
         open={tagModalOpen}
         onClose={handleCloseTagModal}
@@ -224,19 +247,19 @@ const Tags = () => {
       <MainHeader>
         <Title>{i18n.t("tags.title")} ({tags.length})</Title>
         <MainHeaderButtonsWrapper>
-            <FormControl variant="outlined" size="small" style={{ minWidth: 140 }}>
-              <InputLabel id="page-size-label">Itens/página</InputLabel>
-              <Select
-                labelId="page-size-label"
-                value={pageSize}
-                onChange={handlePageSizeChange}
-                label="Itens/página"
-              >
-                <MenuItem value={20}>20</MenuItem>
-                <MenuItem value={50}>50</MenuItem>
-                <MenuItem value={100}>100</MenuItem>
-              </Select>
-            </FormControl>
+          <FormControl variant="outlined" size="small" style={{ minWidth: 140 }}>
+            <InputLabel id="page-size-label">Itens/página</InputLabel>
+            <Select
+              labelId="page-size-label"
+              value={pageSize}
+              onChange={handlePageSizeChange}
+              label="Itens/página"
+            >
+              <MenuItem value={20}>20</MenuItem>
+              <MenuItem value={50}>50</MenuItem>
+              <MenuItem value={100}>100</MenuItem>
+            </Select>
+          </FormControl>
           <TextField
             placeholder={i18n.t("contacts.searchPlaceholder")}
             type="search"
@@ -306,6 +329,16 @@ const Tags = () => {
                   </TableCell>
 
                   <TableCell align="center">
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        setPromoteModalOpen(true);
+                        setPromotingTag(tag);
+                      }}
+                    >
+                      <DashboardIcon />
+                    </IconButton>
+
                     <IconButton size="small" onClick={() => handleEditTag(tag)}>
                       <EditIcon />
                     </IconButton>
