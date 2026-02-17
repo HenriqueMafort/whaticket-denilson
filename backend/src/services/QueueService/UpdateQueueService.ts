@@ -19,6 +19,7 @@ interface QueueData {
   integrationId?: number | null;
   fileListId?: number | null;
   maskContact?: boolean;
+  closeTicket?: boolean;
   typeRandomMode?: string;
   randomizeImmediate?: boolean;
   tipoIntegracao?: string;

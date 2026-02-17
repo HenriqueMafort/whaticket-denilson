@@ -121,6 +121,10 @@ class Queue extends Model<Queue> {
   @Column
   randomizeImmediate: boolean;
 
+  @Default(false)
+  @Column
+  closeTicket: boolean;
+
   @Default("")
   @Column
   tipoIntegracao: string;
