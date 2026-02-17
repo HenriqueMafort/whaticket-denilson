@@ -1,6 +1,6 @@
 class FormatMask {
   setPhoneFormatMask(phoneToFormat) {
-    if(!phoneToFormat || phoneToFormat.length < 12){
+    if (!phoneToFormat || phoneToFormat.length < 12) {
       return phoneToFormat;
     }
 
@@ -8,6 +8,9 @@ class FormatMask {
 
     if (number.length <= 12) {
       const phoneNumberFormatted = number.match(/^(\d{2})(\d{2})(\d{4})(\d{4})$/);
+      if (!phoneNumberFormatted) {
+        return phoneToFormat;
+      }
       return (
         "+" +
         phoneNumberFormatted[1] +
@@ -18,8 +21,11 @@ class FormatMask {
         "-" +
         phoneNumberFormatted[4]
       );
-    }else if(number.length === 13){
+    } else if (number.length === 13) {
       const phoneNumberFormatted = number.match(/^(\d{2})(\d{2})(\d{5})(\d{4})$/);
+      if (!phoneNumberFormatted) {
+        return phoneToFormat;
+      }
       return (
         "+" +
         phoneNumberFormatted[1] +
@@ -42,10 +48,10 @@ class FormatMask {
     return filterNumber;
   }
 
-  maskPhonePattern(phoneNumber){
-    if(phoneNumber.length < 13){
+  maskPhonePattern(phoneNumber) {
+    if (phoneNumber.length < 13) {
       return '🇧🇷 (99) 9999 9999';
-    }else{
+    } else {
       return '🇧🇷 (99) 99999 9999';
     }
   }
