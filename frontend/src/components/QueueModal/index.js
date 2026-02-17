@@ -564,22 +564,22 @@ const QueueModal = ({ open, onClose, queueId, onEdit }) => {
                   />
                   <FormControlLabel
                     control={
-                      <Field
-                        as={Switch}
+                      <Switch
                         color="primary"
                         name="closeTicket"
                         checked={values.closeTicket}
+                        onChange={(e) => setFieldValue("closeTicket", e.target.checked)}
                       />
                     }
                     label={i18n.t("queueModal.form.closeTicket")}
                   />
                   <FormControlLabel
                     control={
-                      <Field
-                        as={Switch}
+                      <Switch
                         color="primary"
                         name="maskContact"
                         checked={values.maskContact}
+                        onChange={(e) => setFieldValue("maskContact", e.target.checked)}
                       />
                     }
                     label={i18n.t("queueModal.form.maskContact")}
@@ -587,11 +587,11 @@ const QueueModal = ({ open, onClose, queueId, onEdit }) => {
                   <div>
                     <FormControlLabel
                       control={
-                        <Field
-                          as={Switch}
+                        <Switch
                           color="primary"
                           name="ativarRoteador"
                           checked={values.ativarRoteador}
+                          onChange={(e) => setFieldValue("ativarRoteador", e.target.checked)}
                         />
                       }
                       label={i18n.t("queueModal.form.rotate")}
@@ -635,11 +635,11 @@ const QueueModal = ({ open, onClose, queueId, onEdit }) => {
                     </Field>
                     <FormControlLabel
                       control={
-                        <Field
-                          as={Checkbox}
+                        <Checkbox
                           color="primary"
                           name="randomizeImmediate"
                           checked={values.randomizeImmediate}
+                          onChange={(e) => setFieldValue("randomizeImmediate", e.target.checked)}
                           disabled={!values.ativarRoteador}
                         />
                       }
