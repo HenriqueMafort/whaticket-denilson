@@ -1,6 +1,7 @@
 import moment from "moment";
 import * as Sentry from "@sentry/node";
 import { Op } from "sequelize";
+import AppError from "../../errors/AppError";
 import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
 import { getIO } from "../../libs/socket";
 import Ticket from "../../models/Ticket";
