@@ -601,7 +601,8 @@ const MessagesList = ({
     }
 
     const onAppMessageMessagesList = (data) => {
-      if (data.action === "create" && data.ticket.uuid === ticketId) {`n        if (searchTerm && data.message.body && !data.message.body.toLowerCase().includes(searchTerm.toLowerCase())) return;
+      if (data.action === "create" && data.ticket.uuid === ticketId) {
+        if (searchTerm && data.message.body && !data.message.body.toLowerCase().includes(searchTerm.toLowerCase())) return;
         dispatch({ type: "ADD_MESSAGE", payload: data.message });
         scrollToBottom();
       }
@@ -1533,6 +1534,7 @@ const MessagesList = ({
 };
 
 export default MessagesList;
+
 
 
 
