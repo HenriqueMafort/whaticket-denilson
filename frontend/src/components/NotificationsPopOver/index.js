@@ -64,7 +64,7 @@ const NotificationsPopOver = (volume) => {
 	const [notifications, setNotifications] = useState([]);
 	const queueIds = queues.map((q) => q.id);
 	const { get: getSetting } = useCompanySettings();
-    const { setCurrentTicket, setTabOpen } = useContext(TicketsContext);
+	const { setCurrentTicket, setTabOpen } = useContext(TicketsContext);
 
 	const [showTicketWithoutQueue, setShowTicketWithoutQueue] = useState(false);
 	const [showNotificationPending, setShowNotificationPending] = useState(false);
@@ -174,60 +174,60 @@ const NotificationsPopOver = (volume) => {
 				}
 			};
 
-// Adicione esta lógica no componente NotificationsPopOver
-const onCompanyAppMessageNotificationsPopover = (data) => {
-    if (
-        data.action === "create" && !data.message.fromMe &&
-        !data.message.read &&
-        (data.ticket?.userId === user?.id || !data.ticket?.userId) &&
-        (user?.queues?.some(queue => (queue.id === data.ticket.queueId)) ||
-            !data.ticket.queueId && showTicketWithoutQueue === true) &&
-        (!["pending", "lgpd", "nps", "group"].includes(data.ticket?.status) ||
-            (data.ticket?.status === "pending" && showNotificationPending === true) ||
-            (data.ticket?.status === "group" && data.ticket?.whatsapp?.groupAsTicket === "enabled" && showGroupNotification === true))
-    ) {
-        // Aplicar lógica de permissão para mensagens pending
-        const shouldBlurMessages = data.ticket.status === "pending" && user.allowSeeMessagesInPendingTickets === "disabled";
-        
-        // Se deve ocultar a mensagem, modifique o ticket antes de adicioná-lo às notificações
-        const ticketToAdd = shouldBlurMessages 
-            ? {
-                ...data.ticket,
-                lastMessage: i18n.t("notifications.messageHidden") // ou "Mensagem oculta"
-              }
-            : data.ticket;
+			// Adicione esta lógica no componente NotificationsPopOver
+			const onCompanyAppMessageNotificationsPopover = (data) => {
+				if (
+					data.action === "create" && !data.message.fromMe &&
+					!data.message.read &&
+					(data.ticket?.userId === user?.id || !data.ticket?.userId) &&
+					(user?.queues?.some(queue => (queue.id === data.ticket.queueId)) ||
+						!data.ticket.queueId && showTicketWithoutQueue === true) &&
+					(!["pending", "lgpd", "nps", "group"].includes(data.ticket?.status) ||
+						(data.ticket?.status === "pending" && showNotificationPending === true) ||
+						(data.ticket?.status === "group" && data.ticket?.whatsapp?.groupAsTicket === "enabled" && showGroupNotification === true))
+				) {
+					// Aplicar lógica de permissão para mensagens pending
+					const shouldBlurMessages = data.ticket.status === "pending" && user.allowSeeMessagesInPendingTickets === "disabled";
 
-        setNotifications(prevState => {
-            const ticketIndex = prevState.findIndex(t => t.id === ticketToAdd.id);
-            if (ticketIndex !== -1) {
-                prevState[ticketIndex] = ticketToAdd;
-                return [...prevState];
-            }
-            return [ticketToAdd, ...prevState];
-        });
+					// Se deve ocultar a mensagem, modifique o ticket antes de adicioná-lo às notificações
+					const ticketToAdd = shouldBlurMessages
+						? {
+							...data.ticket,
+							lastMessage: i18n.t("notifications.messageHidden") // ou "Mensagem oculta"
+						}
+						: data.ticket;
 
-        const shouldNotNotificate =
-            (data.message.ticketId === ticketIdRef.current &&
-                document.visibilityState === "visible") ||
-            (data.ticket.userId && data.ticket.userId !== user?.id) ||
-            (data.ticket.isGroup && data.ticket?.whatsapp?.groupAsTicket === "disabled" && showGroupNotification === false);
+					setNotifications(prevState => {
+						const ticketIndex = prevState.findIndex(t => t.id === ticketToAdd.id);
+						if (ticketIndex !== -1) {
+							prevState[ticketIndex] = ticketToAdd;
+							return [...prevState];
+						}
+						return [ticketToAdd, ...prevState];
+					});
 
-        if (shouldNotNotificate === true) return;
+					const shouldNotNotificate =
+						(data.message.ticketId === ticketIdRef.current &&
+							document.visibilityState === "visible") ||
+						(data.ticket.userId && data.ticket.userId !== user?.id) ||
+						(data.ticket.isGroup && data.ticket?.whatsapp?.groupAsTicket === "disabled" && showGroupNotification === false);
 
-        // Para notificações desktop, também aplicar a lógica de ocultação
-        const messageBody = shouldBlurMessages 
-            ? i18n.t("notifications.messageHidden")
-            : data.message.body;
+					if (shouldNotNotificate === true) return;
 
-        handleNotifications({
-            ...data,
-            message: {
-                ...data.message,
-                body: messageBody
-            }
-        });
-    }
-}
+					// Para notificações desktop, também aplicar a lógica de ocultação
+					const messageBody = shouldBlurMessages
+						? i18n.t("notifications.messageHidden")
+						: data.message.body;
+
+					handleNotifications({
+						...data,
+						message: {
+							...data.message,
+							body: messageBody
+						}
+					});
+				}
+			}
 
 			socket.on("connect", onConnectNotificationsPopover);
 			socket.on(`company-${companyId}-ticket`, onCompanyTicketNotificationsPopover);
@@ -290,22 +290,15 @@ const onCompanyAppMessageNotificationsPopover = (data) => {
 	};
 
 	const browserNotification = () => {
-		const numbers = "⓿➊➋➌➍➎➏➐➑➒➓⓫⓬⓭⓮⓯⓰⓱⓲⓳⓴";
-		if (notifications.length > 0) {
-			if (notifications.length < 21) {
-				document.title = numbers.substring(notifications.length, notifications.length + 1) + " - " + (theme.appName || "...");
-			} else {
-				document.title = "(" + notifications.length + ")" + (theme.appName || "...");
-			}
-		} else {
-			document.title = theme.appName || "...";
-		}
+		// ⚠️ REMOÇÃO DE NOTIFICAÇÕES: Mantendo o título e favicon estáticos conforme solicitado
+		document.title = theme.appName || "...";
+
 		return (
 			<>
 				<Favicon
-					animated={true}
+					animated={false}
 					url={(theme?.appLogoFavicon) ? theme.appLogoFavicon : defaultLogoFavicon}
-					alertCount={notifications.length}
+					// alertCount={notifications.length} // Removido o badge vermelho
 					iconSize={195}
 				/>
 			</>
