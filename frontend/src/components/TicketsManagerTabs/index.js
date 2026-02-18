@@ -450,12 +450,28 @@ const TicketsManagerTabs = () => {
   const classes = useStyles();
   const history = useHistory();
 
+  const { user } = useContext(AuthContext);
+
+  const showAllStorageKey = `ticketsShowAll-${user?.companyId}-${user?.id}`;
+  const tabOpenStorageKey = `ticketsTabOpen-${user?.companyId}-${user?.id}`;
+  const awaitingFilterStorageKey = `ticketsAwaitingFilter-${user?.companyId}-${user?.id}`;
+
+  // ⚠️ SEGURANÇA: Chaves de localStorage específicas por usuário para evitar vazamento entre sessões
+  const searchParamKey = `ticketsSearchParam-${user?.id}`;
+  const tabKey = `ticketsTab-${user?.id}`;
+  const selectedQueueIdsKey = `ticketsSelectedQueueIds-${user?.id}`;
+  const selectedTagsKey = `ticketsSelectedTags-${user?.id}`;
+  const selectedUsersKey = `ticketsSelectedUsers-${user?.id}`;
+  const selectedWhatsappKey = `ticketsSelectedWhatsapp-${user?.id}`;
+  const selectedStatusKey = `ticketsSelectedStatus-${user?.id}`;
+  const filterOpenKey = `ticketsFilterOpen-${user?.id}`;
+
   const [searchParam, setSearchParam] = useState(() => {
-    const saved = localStorage.getItem("ticketsSearchParam");
+    const saved = localStorage.getItem(searchParamKey);
     return saved || "";
   });
   const [tab, setTab] = useState(() => {
-    const saved = localStorage.getItem("ticketsTab");
+    const saved = localStorage.getItem(tabKey);
     return saved || "open";
   });
   const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
@@ -465,7 +481,6 @@ const TicketsManagerTabs = () => {
   const searchInputRef = useRef();
   const [searchOnMessages, setSearchOnMessages] = useState(false);
 
-  const { user } = useContext(AuthContext);
   const { profile } = user;
   const { setSelectedQueuesMessage } = useContext(QueueSelectedContext);
   const { tabOpen, setTabOpen } = useContext(TicketsContext);
@@ -477,14 +492,14 @@ const TicketsManagerTabs = () => {
 
   const userQueueIds = user.queues.map((q) => q.id);
   const [selectedQueueIds, setSelectedQueueIds] = useState(() => {
-    const saved = localStorage.getItem("ticketsSelectedQueueIds");
+    const saved = localStorage.getItem(selectedQueueIdsKey);
     if (saved) {
       return JSON.parse(saved);
     }
     return userQueueIds || [];
   });
   const [selectedTags, setSelectedTags] = useState(() => {
-    const saved = localStorage.getItem("ticketsSelectedTags");
+    const saved = localStorage.getItem(selectedTagsKey);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -501,7 +516,7 @@ const TicketsManagerTabs = () => {
     return [];
   });
   const [selectedUsers, setSelectedUsers] = useState(() => {
-    const saved = localStorage.getItem("ticketsSelectedUsers");
+    const saved = localStorage.getItem(selectedUsersKey);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -518,7 +533,7 @@ const TicketsManagerTabs = () => {
     return [];
   });
   const [selectedWhatsapp, setSelectedWhatsapp] = useState(() => {
-    const saved = localStorage.getItem("ticketsSelectedWhatsapp");
+    const saved = localStorage.getItem(selectedWhatsappKey);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -537,7 +552,7 @@ const TicketsManagerTabs = () => {
   const [forceSearch, setForceSearch] = useState(false);
   const [listRefreshKey, setListRefreshKey] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState(() => {
-    const saved = localStorage.getItem("ticketsSelectedStatus");
+    const saved = localStorage.getItem(selectedStatusKey);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -554,7 +569,7 @@ const TicketsManagerTabs = () => {
     return [];
   });
   const [filter, setFilter] = useState(() => {
-    const saved = localStorage.getItem("ticketsFilterOpen");
+    const saved = localStorage.getItem(filterOpenKey);
     if (saved === "true") {
       return true;
     }
@@ -572,16 +587,19 @@ const TicketsManagerTabs = () => {
   const [isHoveredAwaitingCustomer, setIsHoveredAwaitingCustomer] = useState(false);
 
   const [isFilterActive, setIsFilterActive] = useState(() => {
-    const saved = localStorage.getItem("ticketsFilterOpen");
+    const saved = localStorage.getItem(filterOpenKey);
     if (saved === "true") {
       return true;
     }
     return false;
   });
 
-  const showAllStorageKey = `ticketsShowAll-${user?.companyId}-${user?.id}`;
-  const tabOpenStorageKey = `ticketsTabOpen-${user?.companyId}-${user?.id}`;
-  const awaitingFilterStorageKey = `ticketsAwaitingFilter-${user?.companyId}-${user?.id}`;
+  const normalizedSortTickets = sortTickets ? "ASC" : "DESC";
+
+  const selectedTagIds = selectedTags.filter(t => t?.id).map(t => t.id);
+  const selectedUserIds = selectedUsers.filter(u => u?.id).map(u => u.id);
+  const selectedWhatsappIds = selectedWhatsapp.filter(w => w?.id).map(w => w.id);
+  const selectedStatusFilters = selectedStatus.filter(s => s?.status).map(s => s.status);
 
   useEffect(() => {
     const stored = localStorage.getItem(showAllStorageKey);
@@ -629,49 +647,40 @@ const TicketsManagerTabs = () => {
   }, [showAllTickets, showAllStorageKey]);
 
   useEffect(() => {
-    localStorage.setItem("ticketsSearchParam", searchParam);
-  }, [searchParam]);
+    localStorage.setItem(searchParamKey, searchParam);
+  }, [searchParam, searchParamKey]);
 
   useEffect(() => {
-    localStorage.setItem("ticketsTab", tab);
-  }, [tab]);
+    localStorage.setItem(tabKey, tab);
+  }, [tab, tabKey]);
 
   useEffect(() => {
-    localStorage.setItem("ticketsSelectedQueueIds", JSON.stringify(selectedQueueIds));
-  }, [selectedQueueIds]);
+    localStorage.setItem(selectedQueueIdsKey, JSON.stringify(selectedQueueIds));
+  }, [selectedQueueIds, selectedQueueIdsKey]);
 
   useEffect(() => {
-    localStorage.setItem("ticketsSelectedTags", JSON.stringify(selectedTags));
-  }, [selectedTags]);
+    localStorage.setItem(selectedTagsKey, JSON.stringify(selectedTags));
+  }, [selectedTags, selectedTagsKey]);
 
   useEffect(() => {
-    localStorage.setItem("ticketsSelectedUsers", JSON.stringify(selectedUsers));
-  }, [selectedUsers]);
+    localStorage.setItem(selectedUsersKey, JSON.stringify(selectedUsers));
+  }, [selectedUsers, selectedUsersKey]);
 
   useEffect(() => {
-    localStorage.setItem("ticketsSelectedWhatsapp", JSON.stringify(selectedWhatsapp));
-  }, [selectedWhatsapp]);
+    localStorage.setItem(selectedWhatsappKey, JSON.stringify(selectedWhatsapp));
+  }, [selectedWhatsapp, selectedWhatsappKey]);
 
   useEffect(() => {
-    localStorage.setItem("ticketsSelectedStatus", JSON.stringify(selectedStatus));
-  }, [selectedStatus]);
+    localStorage.setItem(selectedStatusKey, JSON.stringify(selectedStatus));
+  }, [selectedStatus, selectedStatusKey]);
 
   useEffect(() => {
-    localStorage.setItem("ticketsFilterOpen", filter);
-  }, [filter]);
+    localStorage.setItem(filterOpenKey, filter);
+  }, [filter, filterOpenKey]);
 
   useEffect(() => {
     setSelectedQueuesMessage(selectedQueueIds);
-  }, [selectedQueueIds]);
-
-  useEffect(() => {
-    const canShowAll =
-      user.profile.toUpperCase() === "ADMIN" ||
-      user.allUserChat.toUpperCase() === "ENABLED";
-    if (!canShowAll) {
-      setShowAllTickets(false);
-    }
-  }, [user.profile, user.allUserChat]);
+  }, [selectedQueueIds, setSelectedQueuesMessage]);
 
   useEffect(() => {
     if (tab === "search") {
@@ -854,11 +863,6 @@ const TicketsManagerTabs = () => {
     fontSize: "10px",
   };
 
-  const normalizedSortTickets = sortTickets ? "ASC" : "DESC";
-  const selectedTagIds = selectedTags.filter(t => t?.id).map(t => t.id);
-  const selectedUserIds = selectedUsers.filter(u => u?.id).map(u => u.id);
-  const selectedWhatsappIds = selectedWhatsapp.filter(w => w?.id).map(w => w.id);
-  const selectedStatusFilters = selectedStatus.filter(s => s?.status).map(s => s.status);
 
   return (
     <Paper elevation={0} variant="outlined" className={classes.ticketsWrapper}>
