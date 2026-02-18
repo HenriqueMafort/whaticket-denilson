@@ -472,6 +472,7 @@ const MessagesList = ({
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [totalMatches, setTotalMatches] = useState(0);
   const history = useHistory();
   const lastMessageRef = useRef();
 
@@ -565,11 +566,12 @@ const MessagesList = ({
           if (currentTicketId.current === ticketId) {
             dispatch({ type: "LOAD_MESSAGES", payload: data.messages });
             setHasMore(data.hasMore);
+            setTotalMatches(data.count);
             setLoading(false);
             setLoadingMore(false);
           }
 
-          if (pageNumber === 1 && data.messages.length > 0) { if (searchTerm) { scrollToTop(); } else { scrollToBottom(); } }
+          if (pageNumber === 1 && data.messages.length > 0) { if (!searchTerm) { scrollToBottom(); } }
         } catch (err) {
           setLoading(false);
           toastError(err);
@@ -584,7 +586,7 @@ const MessagesList = ({
     };
   }, [pageNumber, ticketId, selectedQueuesMessage, searchTerm]);
 
-  useEffect(() => { if (searchTerm) { onMatchCountUpdate(messagesList.length); } else { onMatchCountUpdate(0); } }, [messagesList.length, searchTerm, onMatchCountUpdate]);
+  useEffect(() => { if (searchTerm) { onMatchCountUpdate(totalMatches); } else { onMatchCountUpdate(0); } }, [totalMatches, searchTerm, onMatchCountUpdate]);
 
   useEffect(() => { if (searchTerm && messagesList.length > 0 && currentMatchIndex >= 0) { const targetMessage = messagesList[currentMatchIndex]; if (targetMessage) { const element = document.getElementById(`m-` + targetMessage.id); if (element) { element.scrollIntoView({ behavior: 'smooth', block: 'center' }); } } } }, [currentMatchIndex, searchTerm, messagesList]);
 
@@ -1276,7 +1278,7 @@ const MessagesList = ({
               {renderTicketsSeparator(message, index)}
               {renderMessageDivider(message, index)}
               <div
-                className={classes.messageLeft}
+                id={"m-" + message.id} className={classes.messageLeft}
                 title={message.queueId && message.queue?.name}
                 onDoubleClick={(e) => hanldeReplyMessage(e, message)}
               >
@@ -1532,6 +1534,9 @@ const MessagesList = ({
 };
 
 export default MessagesList;
+
+
+
 
 
 

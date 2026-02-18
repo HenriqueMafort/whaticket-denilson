@@ -88,6 +88,14 @@ const Ticket = () => {
   const { companyId } = user;
 
   useEffect(() => {
+    if (searchTerm && searchMatchCount > 0) {
+      setCurrentMatchIndex(searchMatchCount - 1);
+    } else {
+      setCurrentMatchIndex(0);
+    }
+  }, [searchTerm, searchMatchCount]);
+
+  useEffect(() => {
     setLoading(true);
     const delayDebounceFn = setTimeout(() => {
       const fetchTicket = async () => {
