@@ -551,7 +551,7 @@ const ListTicketsService = async ({
   if (user.profile !== "admin") {
     tickets.forEach(ticket => {
       if (ticket.queue?.maskContact && ticket.contact) {
-        ticket.contact.number = ticket.contact.number.slice(0, -4) + "****";
+        ticket.contact.number = "********" + ticket.contact.number.slice(-4);
       }
     });
   }

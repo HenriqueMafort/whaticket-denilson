@@ -129,7 +129,7 @@ const ShowTicketService = async (
   }
 
   if (userProfile !== "admin" && ticket.queue?.maskContact && ticket.contact) {
-    ticket.contact.number = ticket.contact.number.slice(0, -4) + "****";
+    ticket.contact.number = "********" + ticket.contact.number.slice(-4);
   }
 
   return ticket;

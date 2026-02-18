@@ -67,7 +67,7 @@ const buildWhereCondition = async ({
     });
 
     const contactTagsIntersection = intersection(contactTags.map(t => t.contactId));
-    
+
     whereCondition = {
       ...whereCondition,
       id: {
@@ -167,6 +167,20 @@ const ListContactsService = async ({
   });
 
   const hasMore = count > offset + contacts.length;
+
+  const user = await User.findOne({
+    where: { id: userId },
+    include: [{ model: Queue, as: "queues" }]
+  });
+
+  if (user && user.profile !== "admin") {
+    const hasMaskedQueue = user.queues?.some(q => q.maskContact);
+    if (hasMaskedQueue) {
+      contacts.forEach(contact => {
+        contact.number = "********" + contact.number.slice(-4);
+      });
+    }
+  }
 
   return {
     contacts,
