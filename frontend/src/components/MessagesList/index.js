@@ -544,8 +544,7 @@ const MessagesList = ({
   }, [])
 
   useEffect(() => {
-    dispatch({ type: "RESET" });
-    setPageNumber(1);
+    dispatch({ type: "RESET" }); setPageNumber(1); setTotalMatches(0); onMatchCountUpdate(0);
     currentTicketId.current = ticketId;
   }, [ticketId, selectedQueuesMessage, searchTerm]);
 
@@ -602,7 +601,7 @@ const MessagesList = ({
     }
 
     const onAppMessageMessagesList = (data) => {
-      if (data.action === "create" && data.ticket.uuid === ticketId) {
+      if (data.action === "create" && data.ticket.uuid === ticketId) {`n        if (searchTerm && data.message.body && !data.message.body.toLowerCase().includes(searchTerm.toLowerCase())) return;
         dispatch({ type: "ADD_MESSAGE", payload: data.message });
         scrollToBottom();
       }
@@ -1534,6 +1533,8 @@ const MessagesList = ({
 };
 
 export default MessagesList;
+
+
 
 
 

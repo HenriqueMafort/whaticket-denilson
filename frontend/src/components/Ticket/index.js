@@ -88,10 +88,13 @@ const Ticket = () => {
   const { companyId } = user;
 
   useEffect(() => {
-    if (searchTerm && searchMatchCount > 0) {
-      setCurrentMatchIndex(searchMatchCount - 1);
+    if (searchTerm) {
+      if (searchMatchCount > 0 && currentMatchIndex === 0) {
+        setCurrentMatchIndex(searchMatchCount - 1);
+      }
     } else {
       setCurrentMatchIndex(0);
+      setSearchMatchCount(0);
     }
   }, [searchTerm, searchMatchCount]);
 

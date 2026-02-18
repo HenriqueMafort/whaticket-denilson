@@ -103,11 +103,18 @@ const ListMessagesService = async ({
   const limit = 20;
   const offset = limit * (+pageNumber - 1);
 
-  let whereCondition: any = { ticketId: tickets, companyId };
+  let whereCondition: any = { ticketId: { [Op.in]: tickets }, companyId };
 
-  if (searchParam) {
-    whereCondition.body = {
-      [Op.like]: `%${searchParam}%`
+  if (searchParam && searchParam.trim() !== "") {
+    whereCondition = {
+      [Op.and]: [
+        { ticketId: { [Op.in]: tickets }, companyId },
+        {
+          body: {
+            [Op.like]: `%${searchParam.trim()}%`
+          }
+        }
+      ]
     };
   }
 
