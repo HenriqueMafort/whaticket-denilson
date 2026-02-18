@@ -16,6 +16,8 @@ import {
   Add,
   Search,
   Clear,
+  KeyboardArrowUp,
+  KeyboardArrowDown,
 } from "@material-ui/icons";
 import { v4 as uuidv4 } from "uuid";
 
@@ -106,6 +108,12 @@ const useStyles = makeStyles((theme) => ({
   searchIcon: {
     color: theme.mode === "light" ? theme.palette.primary.main : "#FFF",
   },
+  searchMatchCount: {
+    margin: "0 10px",
+    fontSize: "0.8rem",
+    color: theme.mode === "light" ? "rgba(0, 0, 0, 0.6)" : "rgba(255, 255, 255, 0.6)",
+    whiteSpace: "nowrap"
+  },
 }));
 
 const SessionSchema = Yup.object().shape({
@@ -118,6 +126,9 @@ const TicketActionButtonsCustom = ({
   onQuickMessageSelect,
   searchTerm,
   onSearch,
+  searchMatchCount,
+  currentMatchIndex,
+  onNavigateMatch,
 }) => {
   const classes = useStyles();
   const theme = useTheme();
@@ -877,6 +888,27 @@ const TicketActionButtonsCustom = ({
                   onChange={(e) => setLocalSearchTerm(e.target.value)}
                   autoFocus
                 />
+                {searchMatchCount > 0 && (
+                  <>
+                    <span className={classes.searchMatchCount}>
+                      {currentMatchIndex + 1} / {searchMatchCount}
+                    </span>
+                    <IconButton
+                      size="small"
+                      onClick={() => onNavigateMatch(Math.max(0, currentMatchIndex - 1))}
+                      disabled={currentMatchIndex === 0}
+                    >
+                      <KeyboardArrowUp fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={() => onNavigateMatch(Math.min(searchMatchCount - 1, currentMatchIndex + 1))}
+                      disabled={currentMatchIndex === searchMatchCount - 1}
+                    >
+                      <KeyboardArrowDown fontSize="small" />
+                    </IconButton>
+                  </>
+                )}
                 <IconButton size="small" onClick={handleToggleSearch}>
                   <Clear fontSize="small" />
                 </IconButton>

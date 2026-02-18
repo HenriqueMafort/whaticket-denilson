@@ -83,6 +83,8 @@ const Ticket = () => {
   const [ticket, setTicket] = useState({});
   const [dragDropFiles, setDragDropFiles] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchMatchCount, setSearchMatchCount] = useState(0);
+  const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const { companyId } = user;
 
   useEffect(() => {
@@ -215,6 +217,8 @@ const Ticket = () => {
           channel={ticket.channel}
           ticketStatus={ticket.status}
           searchTerm={searchTerm}
+          currentMatchIndex={currentMatchIndex}
+          onMatchCountUpdate={setSearchMatchCount}
         >
         </MessagesList>
         <MessageInput
@@ -256,6 +260,9 @@ const Ticket = () => {
             onQuickMessageSelect={handleQuickMessageSelect}
             searchTerm={searchTerm}
             onSearch={setSearchTerm}
+            searchMatchCount={searchMatchCount}
+            currentMatchIndex={currentMatchIndex}
+            onNavigateMatch={setCurrentMatchIndex}
           />
         </TicketHeader>
         {/* </div> */}

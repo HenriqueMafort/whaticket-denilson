@@ -462,7 +462,9 @@ const MessagesList = ({
   channel,
   ticketStatus,
   ticket,
-  searchTerm
+  searchTerm,
+  currentMatchIndex,
+  onMatchCountUpdate
 }) => {
   const classes = useStyles();
   const [messagesList, dispatch] = useReducer(reducer, []);
@@ -581,6 +583,10 @@ const MessagesList = ({
       clearTimeout(delayDebounceFn);
     };
   }, [pageNumber, ticketId, selectedQueuesMessage, searchTerm]);
+
+  useEffect(() => { if (searchTerm) { onMatchCountUpdate(messagesList.length); } else { onMatchCountUpdate(0); } }, [messagesList.length, searchTerm, onMatchCountUpdate]);
+
+  useEffect(() => { if (searchTerm && messagesList.length > 0 && currentMatchIndex >= 0) { const targetMessage = messagesList[currentMatchIndex]; if (targetMessage) { const element = document.getElementById(`m-` + targetMessage.id); if (element) { element.scrollIntoView({ behavior: 'smooth', block: 'center' }); } } } }, [currentMatchIndex, searchTerm, messagesList]);
 
   useEffect(() => {
     if (ticketId === "undefined") {
@@ -1374,7 +1380,7 @@ const MessagesList = ({
               {renderTicketsSeparator(message, index)}
               {renderMessageDivider(message, index)}
               <div
-                className={message.isPrivate ? classes.messageRightPrivate : classes.messageRight}
+                id={"m-" + message.id} className={message.isPrivate ? classes.messageRightPrivate : classes.messageRight}
                 title={message.queueId && message.queue?.name}
                 onDoubleClick={(e) => hanldeReplyMessage(e, message)}
               >
@@ -1526,6 +1532,7 @@ const MessagesList = ({
 };
 
 export default MessagesList;
+
 
 
 
