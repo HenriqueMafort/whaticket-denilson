@@ -585,7 +585,7 @@ const MessagesList = ({
     };
   }, [pageNumber, ticketId, selectedQueuesMessage, searchTerm]);
 
-  useEffect(() => { if (searchTerm) { onMatchCountUpdate(totalMatches); } else { onMatchCountUpdate(0); } }, [totalMatches, searchTerm, onMatchCountUpdate]);
+  useEffect(() => { if (searchTerm && totalMatches > 0) { onMatchCountUpdate(totalMatches); } else { onMatchCountUpdate(0); } }, [totalMatches, searchTerm, onMatchCountUpdate]);
 
   useEffect(() => { if (searchTerm && messagesList.length > 0 && currentMatchIndex >= 0) { const targetMessage = messagesList[currentMatchIndex]; if (targetMessage) { const element = document.getElementById(`m-` + targetMessage.id); if (element) { element.scrollIntoView({ behavior: 'smooth', block: 'center' }); } } } }, [currentMatchIndex, searchTerm, messagesList]);
 
@@ -1534,6 +1534,7 @@ const MessagesList = ({
 };
 
 export default MessagesList;
+
 
 
 
