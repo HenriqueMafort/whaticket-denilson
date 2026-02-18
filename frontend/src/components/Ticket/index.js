@@ -82,6 +82,7 @@ const Ticket = () => {
   const [contact, setContact] = useState({});
   const [ticket, setTicket] = useState({});
   const [dragDropFiles, setDragDropFiles] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const { companyId } = user;
 
   useEffect(() => {
@@ -213,6 +214,7 @@ const Ticket = () => {
           queueId={ticket.queueId}
           channel={ticket.channel}
           ticketStatus={ticket.status}
+          searchTerm={searchTerm}
         >
         </MessagesList>
         <MessageInput
@@ -252,6 +254,8 @@ const Ticket = () => {
             ticket={ticket}
             contact={contact}
             onQuickMessageSelect={handleQuickMessageSelect}
+            searchTerm={searchTerm}
+            onSearch={setSearchTerm}
           />
         </TicketHeader>
         {/* </div> */}

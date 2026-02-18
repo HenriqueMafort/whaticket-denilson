@@ -461,7 +461,8 @@ const MessagesList = ({
   queueId,
   channel,
   ticketStatus,
-  ticket
+  ticket,
+  searchTerm
 }) => {
   const classes = useStyles();
   const [messagesList, dispatch] = useReducer(reducer, []);
@@ -543,7 +544,7 @@ const MessagesList = ({
     dispatch({ type: "RESET" });
     setPageNumber(1);
     currentTicketId.current = ticketId;
-  }, [ticketId, selectedQueuesMessage]);
+  }, [ticketId, selectedQueuesMessage, searchTerm]);
 
   useEffect(() => {
     setLoading(true);
@@ -556,7 +557,7 @@ const MessagesList = ({
         if (isNil(ticketId)) return;
         try {
           const { data } = await api.get("/messages/" + ticketId, {
-            params: { pageNumber, selectedQueues: JSON.stringify(selectedQueuesMessage) },
+            params: { pageNumber, selectedQueues: JSON.stringify(selectedQueuesMessage), searchParam: searchTerm },
           });
 
           if (currentTicketId.current === ticketId) {
@@ -581,7 +582,7 @@ const MessagesList = ({
     return () => {
       clearTimeout(delayDebounceFn);
     };
-  }, [pageNumber, ticketId, selectedQueuesMessage]);
+  }, [pageNumber, ticketId, selectedQueuesMessage, searchTerm]);
 
   useEffect(() => {
     if (ticketId === "undefined") {
@@ -1533,5 +1534,6 @@ const MessagesList = ({
 };
 
 export default MessagesList;
+
 
 

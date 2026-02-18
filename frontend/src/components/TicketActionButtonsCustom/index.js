@@ -14,6 +14,8 @@ import {
   FileCopy as FileCopyIcon,
   FlashOn,
   Add,
+  Search,
+  Clear,
 } from "@material-ui/icons";
 import { v4 as uuidv4 } from "uuid";
 
@@ -80,6 +82,30 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: "100%",
     // alignItems: "center"
   },
+  searchInputWrapper: {
+    display: "flex",
+    alignItems: "center",
+    backgroundColor: theme.mode === "light" ? "rgba(0, 0, 0, 0.05)" : "rgba(255, 255, 255, 0.05)",
+    borderRadius: 20,
+    padding: "0 10px",
+    marginRight: 10,
+    flex: 1,
+    transition: "all 0.3s ease",
+  },
+  searchInput: {
+    border: "none",
+    outline: "none",
+    backgroundColor: "transparent",
+    padding: "8px 5px",
+    flex: 1,
+    color: theme.mode === "light" ? "inherit" : "#FFF",
+    "&::placeholder": {
+      color: theme.mode === "light" ? "rgba(0, 0, 0, 0.4)" : "rgba(255, 255, 255, 0.4)",
+    },
+  },
+  searchIcon: {
+    color: theme.mode === "light" ? theme.palette.primary.main : "#FFF",
+  },
 }));
 
 const SessionSchema = Yup.object().shape({
@@ -90,10 +116,8 @@ const TicketActionButtonsCustom = ({
   ticket,
   contact,
   onQuickMessageSelect,
-  // , showSelectMessageCheckbox,
-  // selectedMessages,
-  // forwardMessageModalOpen,
-  // setForwardMessageModalOpen
+  searchTerm,
+  onSearch,
 }) => {
   const classes = useStyles();
   const theme = useTheme();
@@ -147,6 +171,29 @@ const TicketActionButtonsCustom = ({
 
   // Estados para copiar telefone e respostas rápidas
   const [quickMessageModalOpen, setQuickMessageModalOpen] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [localSearchTerm, setLocalSearchTerm] = useState("");
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      onSearch(localSearchTerm);
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [localSearchTerm, onSearch]);
+
+  useEffect(() => {
+    if (searchTerm === "") {
+      setLocalSearchTerm("");
+    }
+  }, [searchTerm]);
+
+  const handleToggleSearch = () => {
+    setShowSearch(!showSearch);
+    if (showSearch) {
+      setLocalSearchTerm("");
+    }
+  };
 
   console.log("DEBUG user:", user);
   console.log(
@@ -820,9 +867,31 @@ const TicketActionButtonsCustom = ({
                 </IconButton> */}
         {(ticket.status === "open" || ticket.status === "group") && (
           <>
-            {/* {!showSelectMessageCheckbox ? ( */}
-            <>
-              {/* <IconButton
+            {showSearch ? (
+              <div className={classes.searchInputWrapper}>
+                <Search className={classes.searchIcon} fontSize="small" />
+                <input
+                  className={classes.searchInput}
+                  placeholder="Pesquisar..."
+                  value={localSearchTerm}
+                  onChange={(e) => setLocalSearchTerm(e.target.value)}
+                  autoFocus
+                />
+                <IconButton size="small" onClick={handleToggleSearch}>
+                  <Clear fontSize="small" />
+                </IconButton>
+              </div>
+            ) : (
+              <IconButton
+                className={classes.bottomButtonVisibilityIcon}
+                onClick={handleToggleSearch}
+              >
+                <Tooltip title="Pesquisar mensagens">
+                  <Search />
+                </Tooltip>
+              </IconButton>
+            )}
+            {/* <IconButton
                                 className={classes.bottomButtonVisibilityIcon}
                                 onClick={handleEnableIntegration}
                             >
@@ -832,84 +901,83 @@ const TicketActionButtonsCustom = ({
                                 </Tooltip>
                             </IconButton> */}
 
+            {/* Ícone para copiar telefone */}
+            <Hidden only={['xs', 'sm']}>
               {/* Ícone para copiar telefone */}
-              <Hidden only={['xs', 'sm']}>
-                {/* Ícone para copiar telefone */}
-                <IconButton
-                  className={classes.bottomButtonVisibilityIcon}
-                  onClick={handleCopyPhone}
-                  disabled={!contact?.number}
-                >
-                  <Tooltip title={getCopyPhoneTooltip()}>
-                    <FileCopyIcon />
-                  </Tooltip>
-                </IconButton>
+              <IconButton
+                className={classes.bottomButtonVisibilityIcon}
+                onClick={handleCopyPhone}
+                disabled={!contact?.number}
+              >
+                <Tooltip title={getCopyPhoneTooltip()}>
+                  <FileCopyIcon />
+                </Tooltip>
+              </IconButton>
 
-                {/* Ícone para respostas rápidas */}
-                <IconButton
-                  className={classes.bottomButtonVisibilityIcon}
-                  onClick={handleOpenQuickMessageModal}
-                >
-                  <Tooltip title={i18n.t("ticketInfo.quickMessages")}>
-                    <FlashOn />
-                  </Tooltip>
-                </IconButton>
-              </Hidden>
+              {/* Ícone para respostas rápidas */}
+              <IconButton
+                className={classes.bottomButtonVisibilityIcon}
+                onClick={handleOpenQuickMessageModal}
+              >
+                <Tooltip title={i18n.t("ticketInfo.quickMessages")}>
+                  <FlashOn />
+                </Tooltip>
+              </IconButton>
+            </Hidden>
 
-              <Hidden only={['xs', 'sm']}>
-                <IconButton className={classes.bottomButtonVisibilityIcon}>
-                  <Tooltip title={i18n.t("messagesList.header.buttons.resolve")}>
-                    <HighlightOffIcon onClick={handleClickResolver} />
-                  </Tooltip>
-                </IconButton>
-              </Hidden>
+            <Hidden only={['xs', 'sm']}>
+              <IconButton className={classes.bottomButtonVisibilityIcon}>
+                <Tooltip title={i18n.t("messagesList.header.buttons.resolve")}>
+                  <HighlightOffIcon onClick={handleClickResolver} />
+                </Tooltip>
+              </IconButton>
+            </Hidden>
 
-              <Hidden only={['xs', 'sm']}>
-                <IconButton className={classes.bottomButtonVisibilityIcon}>
-                  <Tooltip title={i18n.t("tickets.buttons.returnQueue")}>
-                    <UndoIcon
-                      // color="primary"
-                      onClick={(e) =>
-                        handleUpdateTicketStatus(e, "pending", null)
-                      }
-                    />
-                  </Tooltip>
-                </IconButton>
-              </Hidden>
+            <Hidden only={['xs', 'sm']}>
+              <IconButton className={classes.bottomButtonVisibilityIcon}>
+                <Tooltip title={i18n.t("tickets.buttons.returnQueue")}>
+                  <UndoIcon
+                    // color="primary"
+                    onClick={(e) =>
+                      handleUpdateTicketStatus(e, "pending", null)
+                    }
+                  />
+                </Tooltip>
+              </IconButton>
+            </Hidden>
 
-              <Hidden only={['xs', 'sm']}>
-                <IconButton className={classes.bottomButtonVisibilityIcon}>
-                  <Tooltip title="Transferir Ticket">
-                    <SwapHorizOutlined
-                      // color="primary"
-                      onClick={handleOpenTransferModal}
-                    />
-                  </Tooltip>
-                </IconButton>
-              </Hidden>
+            <Hidden only={['xs', 'sm']}>
+              <IconButton className={classes.bottomButtonVisibilityIcon}>
+                <Tooltip title="Transferir Ticket">
+                  <SwapHorizOutlined
+                    // color="primary"
+                    onClick={handleOpenTransferModal}
+                  />
+                </Tooltip>
+              </IconButton>
+            </Hidden>
 
-              {/* Botão de vincular à carteira só aparece se NÃO houver carteira vinculada E se a configuração DirectTicketsToWallets estiver ativa */}
-              <Hidden only={['xs', 'sm']}>
-                {directTicketsToWallets && !(
-                  ticket.contact?.contactWallets &&
-                  ticket.contact.contactWallets.length > 0
-                ) && (
-                    <IconButton
-                      className={classes.bottomButtonVisibilityIcon}
-                      onClick={handleLinkToWallet}
-                      disabled={linkingWallet}
-                    >
-                      <Tooltip title="Vincular à minha carteira">
-                        {linkingWallet ? (
-                          <CircularProgress size={20} />
-                        ) : (
-                          <AccountBalanceWallet />
-                        )}
-                      </Tooltip>
-                    </IconButton>
-                  )}
-              </Hidden>
-            </>
+            {/* Botão de vincular à carteira só aparece se NÃO houver carteira vinculada E se a configuração DirectTicketsToWallets estiver ativa */}
+            <Hidden only={['xs', 'sm']}>
+              {directTicketsToWallets && !(
+                ticket.contact?.contactWallets &&
+                ticket.contact.contactWallets.length > 0
+              ) && (
+                  <IconButton
+                    className={classes.bottomButtonVisibilityIcon}
+                    onClick={handleLinkToWallet}
+                    disabled={linkingWallet}
+                  >
+                    <Tooltip title="Vincular à minha carteira">
+                      {linkingWallet ? (
+                        <CircularProgress size={20} />
+                      ) : (
+                        <AccountBalanceWallet />
+                      )}
+                    </Tooltip>
+                  </IconButton>
+                )}
+            </Hidden>
 
             {/* {showSchedules && (
                             <>
@@ -1043,7 +1111,7 @@ const TicketActionButtonsCustom = ({
             {i18n.t("ticketsList.buttons.exportAsPDF")}
           </MenuItem>
         </Menu>
-      </div>
+      </div >
       <>
         {(!user.finalizacaoComValorVendaAtiva ||
           user.finalizacaoComValorVendaAtiva === false ||
@@ -1117,7 +1185,8 @@ const TicketActionButtonsCustom = ({
             </Formik>
           )}
       </>
-      {openFinalizacaoVenda &&
+      {
+        openFinalizacaoVenda &&
         (console.log("DEBUG JSX: Renderizando FinalizacaoVendaModal"),
           (
             <FinalizacaoVendaModal
@@ -1130,46 +1199,49 @@ const TicketActionButtonsCustom = ({
                 setShowFinalizacaoOptions(true);
               }}
             />
-          ))}
-      {showFinalizacaoOptions && (
-        <Dialog
-          open={showFinalizacaoOptions}
-          onClose={() => setShowFinalizacaoOptions(false)}
-          aria-labelledby="finalizacao-options-title"
-        >
-          <DialogTitle id="finalizacao-options-title">
-            Como deseja finalizar?
-          </DialogTitle>
-          <DialogActions className={classes.botoes}>
-            <Button
-              onClick={async () => {
-                setShowFinalizacaoOptions(false);
-                await handleUpdateTicketStatusWithData(
-                  ticketDataToFinalize,
-                  false,
-                  null
-                );
-              }}
-              style={{ background: theme.palette.primary.main, color: "white" }}
-            >
-              {i18n.t("messagesList.header.dialogRatingWithoutFarewellMsg")}
-            </Button>
-            <Button
-              onClick={async () => {
-                setShowFinalizacaoOptions(false);
-                await handleUpdateTicketStatusWithData(
-                  ticketDataToFinalize,
-                  true,
-                  null
-                );
-              }}
-              style={{ background: theme.palette.primary.main, color: "white" }}
-            >
-              {i18n.t("messagesList.header.dialogRatingCancel")}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
+          ))
+      }
+      {
+        showFinalizacaoOptions && (
+          <Dialog
+            open={showFinalizacaoOptions}
+            onClose={() => setShowFinalizacaoOptions(false)}
+            aria-labelledby="finalizacao-options-title"
+          >
+            <DialogTitle id="finalizacao-options-title">
+              Como deseja finalizar?
+            </DialogTitle>
+            <DialogActions className={classes.botoes}>
+              <Button
+                onClick={async () => {
+                  setShowFinalizacaoOptions(false);
+                  await handleUpdateTicketStatusWithData(
+                    ticketDataToFinalize,
+                    false,
+                    null
+                  );
+                }}
+                style={{ background: theme.palette.primary.main, color: "white" }}
+              >
+                {i18n.t("messagesList.header.dialogRatingWithoutFarewellMsg")}
+              </Button>
+              <Button
+                onClick={async () => {
+                  setShowFinalizacaoOptions(false);
+                  await handleUpdateTicketStatusWithData(
+                    ticketDataToFinalize,
+                    true,
+                    null
+                  );
+                }}
+                style={{ background: theme.palette.primary.main, color: "white" }}
+              >
+                {i18n.t("messagesList.header.dialogRatingCancel")}
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )
+      }
     </>
   );
 };

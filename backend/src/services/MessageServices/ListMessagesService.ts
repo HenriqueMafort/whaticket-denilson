@@ -16,6 +16,7 @@ interface Request {
   pageNumber?: string;
   queues?: number[];
   user?: User;
+  searchParam?: string;
 }
 
 interface Response {
@@ -30,7 +31,8 @@ const ListMessagesService = async ({
   ticketId,
   companyId,
   queues = [],
-  user
+  user,
+  searchParam
 }: Request): Promise<Response> => {
 
   if (!isNaN(Number(ticketId))) {
@@ -101,8 +103,16 @@ const ListMessagesService = async ({
   const limit = 20;
   const offset = limit * (+pageNumber - 1);
 
+  let whereCondition: any = { ticketId: tickets, companyId };
+
+  if (searchParam) {
+    whereCondition.body = {
+      [Op.like]: `%${searchParam}%`
+    };
+  }
+
   const { count, rows: messages } = await Message.findAndCountAll({
-    where: { ticketId: tickets, companyId },
+    where: whereCondition,
     attributes: ["id", "wid", "fromMe", "mediaUrl", "body", "mediaType", "ack", "createdAt", "ticketId", "isDeleted", "queueId", "isForwarded", "isEdited", "isPrivate", "companyId", "userId"],
     limit,
     include: [
