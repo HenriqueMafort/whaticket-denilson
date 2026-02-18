@@ -141,7 +141,7 @@ const elements = [
   "tspan",
 ];
 
-const allowedElements = ["a", "b", "strong", "em", "u", "code", "del"];
+const allowedElements = ["a", "b", "strong", "em", "u", "code", "del", "mark"];
 
 const CustomLink = ({ children, ...props }) => (
   <a {...props} target="_blank" rel="noopener noreferrer">
@@ -149,30 +149,38 @@ const CustomLink = ({ children, ...props }) => (
   </a>
 );
 
-const MarkdownWrapper = ({ children }) => {
+const MarkdownWrapper = ({ children, searchParam }) => {
   const boldRegex = /\*(.*?)\*/g;
   const tildaRegex = /~(.*?)~/g;
 
   const pixMarker = "###PIX_MARKER###";
 
-  if (children && children.includes("***")) {
-    children = children.replace(/\*\*\*/g, pixMarker);
+  if (children && typeof children === "string") {
+    if (children.includes("***")) {
+      children = children.replace(/\*\*\*/g, pixMarker);
+    }
+
+    if (boldRegex.test(children)) {
+      children = children.replace(boldRegex, "**$1**");
+    }
+
+    if (children.includes(pixMarker)) {
+      children = children.replace(new RegExp(pixMarker, "g"), "***");
+    }
+
+    if (tildaRegex.test(children)) {
+      children = children.replace(tildaRegex, "~~$1~~");
+    }
+
+    if (searchParam) {
+      const searchRegex = new RegExp(`(${searchParam})`, 'gi');
+      children = children.replace(searchRegex, '<mark>$1</mark>');
+    }
   }
 
-  if (children && boldRegex.test(children)) {
-    children = children.replace(boldRegex, "**$1**");
-  }
-
-  if (children && children.includes(pixMarker)) {
-    children = children.replace(new RegExp(pixMarker, "g"), "***");
-  }
-
-  if (children && tildaRegex.test(children)) {
-    children = children.replace(tildaRegex, "~~$1~~");
-  }
   const options = React.useMemo(() => {
     const markdownOptions = {
-      disableParsingRawHTML: true,
+      disableParsingRawHTML: false,
       forceInline: true,
       overrides: {
         a: { component: CustomLink },

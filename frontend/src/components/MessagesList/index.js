@@ -1349,7 +1349,7 @@ const MessagesList = ({
 
                         )}
                         {!xmlRegex.test(message.body) && (
-                          <MarkdownWrapper>{(lgpdDeleteMessage && message.isDeleted) ? "🚫 _Mensagem apagada_ " :
+                          <MarkdownWrapper searchParam={searchTerm}>{(lgpdDeleteMessage && message.isDeleted) ? "🚫 _Mensagem apagada_ " :
                             message.body
                           }</MarkdownWrapper>)}
 
@@ -1360,7 +1360,7 @@ const MessagesList = ({
                   {message.quotedMsg && message.mediaType === "reactionMessage" && (
                     <>
                       <span style={{ marginLeft: "0px" }}>
-                        <MarkdownWrapper>
+                        <MarkdownWrapper searchParam={searchTerm}>
                           {"" + message?.contact?.name + " reagiu... " + message.body}
                         </MarkdownWrapper>
                       </span>
@@ -1440,7 +1440,7 @@ const MessagesList = ({
                           <div>{formatXml(message.body)}</div>
 
                         )}
-                        {!xmlRegex.test(message.body) && (<MarkdownWrapper>{message.body}</MarkdownWrapper>)}
+                        {!xmlRegex.test(message.body) && (<MarkdownWrapper searchParam={searchTerm}>{message.body}</MarkdownWrapper>)}
 
                       </>
                     )}
@@ -1448,7 +1448,7 @@ const MessagesList = ({
                   {message.quotedMsg && message.mediaType === "reactionMessage" && (
                     <>
                       <span style={{ marginLeft: "0px" }}>
-                        <MarkdownWrapper>
+                        <MarkdownWrapper searchParam={searchTerm}>
                           {"Você reagiu... " + message.body}
                         </MarkdownWrapper>
                       </span>
@@ -1534,6 +1534,7 @@ const MessagesList = ({
 };
 
 export default MessagesList;
+
 
 
 
