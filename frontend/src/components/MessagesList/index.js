@@ -567,9 +567,7 @@ const MessagesList = ({
             setLoadingMore(false);
           }
 
-          if (pageNumber === 1 && data.messages.length > 1) {
-            scrollToBottom();
-          }
+          if (pageNumber === 1 && data.messages.length > 0) { if (searchTerm) { scrollToTop(); } else { scrollToBottom(); } }
         } catch (err) {
           setLoading(false);
           toastError(err);
@@ -639,13 +637,7 @@ const MessagesList = ({
     setPageNumber((prevPageNumber) => prevPageNumber + 1);
   };
 
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      if (lastMessageRef.current) {
-        lastMessageRef.current.scrollIntoView({});
-      }
-    }, 100);
-  };
+  const scrollToBottom = () => { setTimeout(() => { if (lastMessageRef.current) { lastMessageRef.current.scrollIntoView({}); } }, 100); }; const scrollToTop = () => { const container = document.getElementById("messagesList"); if (container) { container.scrollTop = 0; } };
 
   const handleScroll = (e) => {
     if (!hasMore) return;
@@ -1534,6 +1526,7 @@ const MessagesList = ({
 };
 
 export default MessagesList;
+
 
 
 
