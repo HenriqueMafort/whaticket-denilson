@@ -6,7 +6,7 @@ import SoundRinging from './ring.mp3';
 const WavoipPhoneWidget = ({
   token,
   position = 'bottom-right',
-  name = 'MultiFlow Phone',
+  name = 'ZapGo Phone',
   country = 'BR',
   autoConnect = true,
   onCallStart,
@@ -24,7 +24,7 @@ const WavoipPhoneWidget = ({
   const [callStartTime, setCallStartTime] = useState(null);
   const [numberError, setNumberError] = useState('');
   const [callerName, setCallerName] = useState(''); // Nome de quem está ligando
-  
+
   const wavoipInstanceRef = useRef(null);
   const durationIntervalRef = useRef(null);
   const widgetRef = useRef(null);
@@ -415,7 +415,7 @@ const WavoipPhoneWidget = ({
 
       instance.socket.on('signaling', (data) => {
         console.log('Signaling event:', data);
-        
+
         if (data.tag === 'offer') {
           unlockAudio();
           playRinging()
@@ -429,7 +429,7 @@ const WavoipPhoneWidget = ({
           }
           if (onCallStart) onCallStart(data);
         }
-        
+
         if (data.tag === 'answer' || data.tag == 'accept_elsewhere' || data.tag == 'accept') {
           setIsInCall(true);
           setCallStatus('Em chamada');
@@ -439,7 +439,7 @@ const WavoipPhoneWidget = ({
           stopCalling()
           if (onCallStart) onCallStart(data);
         }
-        
+
         if (data.tag === 'bye' || data.tag == 'terminate' || data.tag == 'reject_elsewhere' || data.tag == 'reject') {
           console.log('Chamada finalizada via bye');
           setIsInCall(false);
@@ -491,7 +491,7 @@ const WavoipPhoneWidget = ({
   // Fazer chamada
   const makeCall = useCallback(() => {
     if (!wavoipInstanceRef.current || !currentNumber || numberError) return;
-    
+
     const validation = validateNumber(currentNumber);
     if (!validation.isValid) {
       setNumberError(validation.error);
@@ -517,7 +517,7 @@ const WavoipPhoneWidget = ({
   // Finalizar chamada
   const endCall = useCallback(() => {
     if (!wavoipInstanceRef.current) return;
-    
+
     try {
       wavoipInstanceRef.current.endCall();
       setIsInCall(false);
@@ -526,7 +526,7 @@ const WavoipPhoneWidget = ({
       setCurrentNumber('');
       stopDurationTimer();
       setIncomingCall(null);
-       stopCalling()
+      stopCalling()
       if (onCallEnd) onCallEnd({ action: 'ended' });
     } catch (error) {
       if (onError) onError(error);
@@ -536,7 +536,7 @@ const WavoipPhoneWidget = ({
   // Atender chamada
   const answerCall = useCallback(() => {
     if (!wavoipInstanceRef.current || !incomingCall) return;
-    
+
     try {
       wavoipInstanceRef.current.acceptCall();
       setIncomingCall(null);
@@ -544,7 +544,7 @@ const WavoipPhoneWidget = ({
       setCallStatus('Em chamada');
       setCallStartTime(Date.now());
       startDurationTimer();
-       stopCalling()
+      stopCalling()
       stopRinging()
       if (onCallStart) onCallStart(incomingCall?.data);
     } catch (error) {
@@ -555,10 +555,10 @@ const WavoipPhoneWidget = ({
   // Rejeitar chamada
   const rejectCall = useCallback(() => {
     if (!wavoipInstanceRef.current || !incomingCall) return;
-    
+
     try {
       stopCalling()
-    stopRinging()
+      stopRinging()
       wavoipInstanceRef.current.rejectCall();
       setIncomingCall(null);
       setCallerName('');
@@ -586,14 +586,14 @@ const WavoipPhoneWidget = ({
   // Pressionar tecla do teclado
   const handleKeyPress = useCallback((key) => {
     if (isInCall) return;
-    
+
     const maxLength = getMaxLength();
     const currentLength = currentNumber.replace(/\D/g, '').length;
-    
+
     if (currentLength >= maxLength) {
       return;
     }
-    
+
     if (key === '*') {
       setCurrentNumber(prev => prev + '*');
     } else if (key === '#') {
@@ -606,11 +606,11 @@ const WavoipPhoneWidget = ({
   // Input do teclado
   const handleKeyboardInput = useCallback((event) => {
     if (isMinimized || isInCall) return;
-    
+
     const key = event.key;
     const maxLength = getMaxLength();
     const currentLength = currentNumber.replace(/\D/g, '').length;
-    
+
     if (/^[0-9]$/.test(key)) {
       if (currentLength >= maxLength) {
         event.preventDefault();
@@ -700,7 +700,7 @@ const WavoipPhoneWidget = ({
         const cleared = clearInterval(durationIntervalRef.current);
         durationIntervalRef.current = null;
       }
-      
+
       // Desconectar do Wavoip
       if (wavoipInstanceRef.current) {
         const disconnected = wavoipInstanceRef.current.socket?.disconnect();
@@ -808,7 +808,7 @@ const WavoipPhoneWidget = ({
             onClick={clearNumber}
             disabled={isInCall}
           >
-              ⌫
+            ⌫
           </button>
         </div>
 
