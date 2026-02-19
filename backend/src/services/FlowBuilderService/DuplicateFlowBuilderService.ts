@@ -1,6 +1,7 @@
 import { FlowBuilderModel } from "../../models/FlowBuilder";
 import { WebhookModel } from "../../models/Webhook";
 import { randomString } from "../../utils/randomCode";
+import CreateQueueIntegrationService from "../QueueIntegrationServices/CreateQueueIntegrationService";
 
 interface Request {
   id: number;
@@ -23,9 +24,25 @@ const DuplicateFlowBuilderService = async ({
       company_id: flow.company_id
     });
 
+    // Criação automática da integração (igual ao CreateFlowBuilderService)
+    try {
+      await CreateQueueIntegrationService({
+        type: "flowbuilder",
+        name: duplicate.name,
+        companyId: duplicate.company_id,
+        projectName: duplicate.name,
+        jsonContent: "{}",
+        language: "pt",
+        urlN8N: ""
+      });
+    } catch (integrationError) {
+      console.error("Erro ao criar integração automática para o fluxo duplicado:", integrationError);
+      // Não impede a duplicação caso a integração falhe
+    }
+
     return duplicate;
   } catch (error) {
-    console.error("Erro ao inserir o usuário:", error);
+    console.error("Erro ao duplicar o fluxo:", error);
 
     return error;
   }
