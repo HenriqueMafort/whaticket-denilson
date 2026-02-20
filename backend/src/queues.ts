@@ -103,6 +103,25 @@ interface LidRetryData {
   maxRetries?: number;
 }
 
+const normalizeError = (error: unknown) => {
+  if (error instanceof Error) {
+    const errWithCause = error as Error & { cause?: unknown };
+    return {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+      cause: errWithCause.cause
+    };
+  }
+
+  return {
+    name: typeof error,
+    message: String(error),
+    stack: undefined,
+    cause: undefined
+  };
+};
+
 export const userMonitor = new BullQueue("UserMonitor", connection);
 export const scheduleMonitor = new BullQueue("ScheduleMonitor", connection);
 export const sendScheduledMessages = new BullQueue("SendSacheduledMessages", connection);
@@ -288,11 +307,16 @@ async function apiMessageQueue() {
                       fs.unlinkSync(message.path);
                     }
                   } catch (mediaError) {
-                    logger.error(`Erro ao processar mÃ­dia da mensagem ${message.id}:`, {
-                      error: mediaError,
-                      message: mediaError.message,
-                      stack: mediaError.stack
-                    });
+                    const errorData = normalizeError(mediaError);
+                    logger.error(
+                      {
+                        error: errorData,
+                        messageId: message?.id,
+                        whatsappId: whatsapp?.id,
+                        companyId
+                      },
+                      `Erro ao processar mídia da mensagem ${message.id}`
+                    );
                     throw mediaError;
                   }
                 } else {
@@ -350,36 +374,51 @@ async function apiMessageQueue() {
                 }
 
               } catch (messageError) {
-                logger.error(`Erro ao processar mensagem ${message?.id}:`, {
-                  error: messageError,
-                  message: messageError.message,
-                  stack: messageError.stack,
-                  messageData: message?.get ? message.get({ plain: true }) : message
-                });
+                const errorData = normalizeError(messageError);
+                logger.error(
+                  {
+                    error: errorData,
+                    messageId: message?.id,
+                    messageData: message?.get ? message.get({ plain: true }) : message,
+                    whatsappId: whatsapp?.id,
+                    companyId
+                  },
+                  `Erro ao processar mensagem ${message?.id}`
+                );
               }
             }
           } catch (whatsappError) {
-            logger.error(`Erro ao processar whatsapp ${whatsapp?.id}:`, {
-              error: whatsappError,
-              message: whatsappError.message,
-              stack: whatsappError.stack
-            });
+            const errorData = normalizeError(whatsappError);
+            logger.error(
+              {
+                error: errorData,
+                whatsappId: whatsapp?.id,
+                whatsappChannel: whatsapp?.channel,
+                companyId: company?.id,
+                companyName: company?.name
+              },
+              `Erro ao processar whatsapp ${whatsapp?.id}`
+            );
           }
         }));
       } catch (companyError) {
-        logger.error(`Erro ao processar empresa ${company?.id}:`, {
-          error: companyError,
-          message: companyError.message,
-          stack: companyError.stack
-        });
+        const errorData = normalizeError(companyError);
+        logger.error(
+          {
+            error: errorData,
+            companyId: company?.id,
+            companyName: company?.name
+          },
+          `Erro ao processar empresa ${company?.id}`
+        );
       }
     }));
   } catch (globalError) {
-    logger.error("Erro global no MessageAPI:", {
-      error: globalError,
-      message: globalError.message,
-      stack: globalError.stack
-    });
+    const errorData = normalizeError(globalError);
+    logger.error(
+      { error: errorData },
+      "Erro global no MessageAPI"
+    );
   }
 }
 
@@ -3172,3 +3211,4 @@ async function handleSendMessageOficial(job) {
     throw e;
   }
 }
+
