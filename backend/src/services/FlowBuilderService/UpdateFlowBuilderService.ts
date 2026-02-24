@@ -2,6 +2,7 @@ import { FlowBuilderModel } from "../../models/FlowBuilder";
 import { WebhookModel } from "../../models/Webhook";
 import { randomString } from "../../utils/randomCode";
 import QueueIntegrations from "../../models/QueueIntegrations";
+import { Op } from "sequelize";
 
 interface Request {
   companyId: number;
@@ -19,7 +20,8 @@ const UpdateFlowBuilderService = async ({
     const nameExist = await FlowBuilderModel.findOne({
       where: {
         name,
-        company_id: companyId
+        company_id: companyId,
+        id: { [Op.ne]: flowId }
       }
     })
 

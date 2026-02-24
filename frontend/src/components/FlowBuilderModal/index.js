@@ -80,6 +80,10 @@ const FlowBuilderModal = ({
     };
   }, []);
 
+  useEffect(() => {
+    setContact({ name: nameWebhook || "" });
+  }, [nameWebhook, open]);
+
   const handleClose = () => {
     onClose();
     setContact({
