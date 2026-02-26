@@ -183,7 +183,7 @@ const CampaignModal = ({
   const [campaign, setCampaign] = useState(initialState);
   const [whatsapps, setWhatsapps] = useState([]);
   const [selectedWhatsapps, setSelectedWhatsapps] = useState([]);
- const [whatsappId, setWhatsappId] = useState(null);
+  const [whatsappId, setWhatsappId] = useState(null);
   const [contactLists, setContactLists] = useState([]);
   const [tagLists, setTagLists] = useState([]);
   const [messageTab, setMessageTab] = useState(0);
@@ -246,10 +246,10 @@ const CampaignModal = ({
   const calculateMockExecutions = (values) => {
     const executions = [];
     let currentDate = moment(values.scheduledAt);
-    
+
     for (let i = 0; i < 5; i++) {
       executions.push(currentDate.format('DD/MM/YYYY HH:mm'));
-      
+
       switch (values.recurrenceType) {
         case 'minutely':
           currentDate = currentDate.clone().add(values.recurrenceInterval, 'minutes');
@@ -277,7 +277,7 @@ const CampaignModal = ({
           break;
       }
     }
-    
+
     return executions;
   };
 
@@ -343,7 +343,7 @@ const CampaignModal = ({
           setWhatsapps(mappedWhatsapps);
         });
 
-      api.get(`/tags/list`, { params: { companyId, kanban: 0 } })
+      api.get(`/tags/list`, { params: { companyId } })
         .then(({ data }) => {
           const fetchedTags = data;
           const formattedTagLists = fetchedTags
@@ -368,7 +368,7 @@ const CampaignModal = ({
         } else {
           setWhatsappId(null);
         }
-        
+
         setCampaign((prev) => {
           let prevCampaignData = Object.assign({}, prev);
 
@@ -416,66 +416,66 @@ const CampaignModal = ({
     }
   };
 
-const handleSaveCampaign = async (values) => {
-  try {
-    const dataValues = {
-      ...values,
-      whatsappId: whatsappId,
-      userId: selectedUser?.id || null,
-      queueId: selectedQueue || null,
-      // CORREÇÃO: Garantir conversão correta do array
-      recurrenceDaysOfWeek: (values.isRecurring && values.recurrenceDaysOfWeek && values.recurrenceDaysOfWeek.length > 0) 
-        ? values.recurrenceDaysOfWeek // Enviar array, o backend irá converter para JSON
-        : null, // Enviar null se não for recorrente ou array vazio
-    };
+  const handleSaveCampaign = async (values) => {
+    try {
+      const dataValues = {
+        ...values,
+        whatsappId: whatsappId,
+        userId: selectedUser?.id || null,
+        queueId: selectedQueue || null,
+        // CORREÇÃO: Garantir conversão correta do array
+        recurrenceDaysOfWeek: (values.isRecurring && values.recurrenceDaysOfWeek && values.recurrenceDaysOfWeek.length > 0)
+          ? values.recurrenceDaysOfWeek // Enviar array, o backend irá converter para JSON
+          : null, // Enviar null se não for recorrente ou array vazio
+      };
 
-    // Processar datas
-    Object.entries(values).forEach(([key, value]) => {
-      if (key === "scheduledAt" && value !== "" && value !== null) {
-        dataValues[key] = moment(value).format("YYYY-MM-DD HH:mm:ss");
-      } else if (key === "recurrenceEndDate" && value !== "" && value !== null) {
-        dataValues[key] = moment(value).format("YYYY-MM-DD HH:mm:ss");
-      } else if (key !== "recurrenceDaysOfWeek") { // Não processar recurrenceDaysOfWeek aqui
-        dataValues[key] = value === "" ? null : value;
+      // Processar datas
+      Object.entries(values).forEach(([key, value]) => {
+        if (key === "scheduledAt" && value !== "" && value !== null) {
+          dataValues[key] = moment(value).format("YYYY-MM-DD HH:mm:ss");
+        } else if (key === "recurrenceEndDate" && value !== "" && value !== null) {
+          dataValues[key] = moment(value).format("YYYY-MM-DD HH:mm:ss");
+        } else if (key !== "recurrenceDaysOfWeek") { // Não processar recurrenceDaysOfWeek aqui
+          dataValues[key] = value === "" ? null : value;
+        }
+      });
+
+      // Garantir que campos não recorrentes sejam null quando isRecurring é false
+      if (!values.isRecurring) {
+        dataValues.recurrenceType = null;
+        dataValues.recurrenceInterval = null;
+        dataValues.recurrenceDaysOfWeek = null;
+        dataValues.recurrenceDayOfMonth = null;
+        dataValues.recurrenceEndDate = null;
+        dataValues.maxExecutions = null;
       }
-    });
 
-    // Garantir que campos não recorrentes sejam null quando isRecurring é false
-    if (!values.isRecurring) {
-      dataValues.recurrenceType = null;
-      dataValues.recurrenceInterval = null;
-      dataValues.recurrenceDaysOfWeek = null;
-      dataValues.recurrenceDayOfMonth = null;
-      dataValues.recurrenceEndDate = null;
-      dataValues.maxExecutions = null;
+      if (campaignId) {
+        await api.put(`/campaigns/${campaignId}`, dataValues);
+        if (attachment != null) {
+          const formData = new FormData();
+          formData.append("file", attachment);
+          await api.post(`/campaigns/${campaignId}/media-upload`, formData);
+        }
+        handleClose();
+      } else {
+        const { data } = await api.post("/campaigns", dataValues);
+        if (attachment != null) {
+          const formData = new FormData();
+          formData.append("file", attachment);
+          await api.post(`/campaigns/${data.id}/media-upload`, formData);
+        }
+        if (onSave) {
+          onSave(data);
+        }
+        handleClose();
+      }
+      toast.success(i18n.t("campaigns.toasts.success"));
+    } catch (err) {
+      console.log(err);
+      toastError(err);
     }
-
-    if (campaignId) {
-      await api.put(`/campaigns/${campaignId}`, dataValues);
-      if (attachment != null) {
-        const formData = new FormData();
-        formData.append("file", attachment);
-        await api.post(`/campaigns/${campaignId}/media-upload`, formData);
-      }
-      handleClose();
-    } else {
-      const { data } = await api.post("/campaigns", dataValues);
-      if (attachment != null) {
-        const formData = new FormData();
-        formData.append("file", attachment);
-        await api.post(`/campaigns/${data.id}/media-upload`, formData);
-      }
-      if (onSave) {
-        onSave(data);
-      }
-      handleClose();
-    }
-    toast.success(i18n.t("campaigns.toasts.success"));
-  } catch (err) {
-    console.log(err);
-    toastError(err);
-  }
-};
+  };
 
   const deleteMedia = async () => {
     if (attachment) {
@@ -615,7 +615,7 @@ const handleSaveCampaign = async (values) => {
                       disabled={!campaignEditable}
                     />
                   </Grid>
-                  
+
                   <Grid xs={12} md={4} item>
                     <FormControl
                       variant="outlined"
@@ -767,7 +767,7 @@ const handleSaveCampaign = async (values) => {
                             Configuração de Recorrência
                           </Typography>
                         </Box>
-                        
+
                         <Grid spacing={2} container>
                           <Grid xs={12} item>
                             <FormControlLabel
@@ -839,14 +839,13 @@ const handleSaveCampaign = async (values) => {
                                   error={touched.recurrenceInterval && Boolean(errors.recurrenceInterval)}
                                   helperText={
                                     touched.recurrenceInterval && errors.recurrenceInterval ||
-                                    `A cada ${values.recurrenceInterval || 1} ${
-                                      values.recurrenceType === 'minutely' ? 'minuto(s)' :
+                                    `A cada ${values.recurrenceInterval || 1} ${values.recurrenceType === 'minutely' ? 'minuto(s)' :
                                       values.recurrenceType === 'hourly' ? 'hora(s)' :
-                                      values.recurrenceType === 'daily' ? 'dia(s)' :
-                                      values.recurrenceType === 'weekly' ? 'semana(s)' :
-                                      values.recurrenceType === 'biweekly' ? 'quinzena(s)' :
-                                      values.recurrenceType === 'monthly' ? 'mês(es)' :
-                                      values.recurrenceType === 'yearly' ? 'ano(s)' : ''
+                                        values.recurrenceType === 'daily' ? 'dia(s)' :
+                                          values.recurrenceType === 'weekly' ? 'semana(s)' :
+                                            values.recurrenceType === 'biweekly' ? 'quinzena(s)' :
+                                              values.recurrenceType === 'monthly' ? 'mês(es)' :
+                                                values.recurrenceType === 'yearly' ? 'ano(s)' : ''
                                     }`
                                   }
                                   disabled={!campaignEditable}
@@ -871,7 +870,7 @@ const handleSaveCampaign = async (values) => {
                                               if (e.target.checked) {
                                                 setFieldValue('recurrenceDaysOfWeek', [...currentDays, day.value]);
                                               } else {
-                                                setFieldValue('recurrenceDaysOfWeek', 
+                                                setFieldValue('recurrenceDaysOfWeek',
                                                   currentDays.filter(d => d !== day.value)
                                                 );
                                               }

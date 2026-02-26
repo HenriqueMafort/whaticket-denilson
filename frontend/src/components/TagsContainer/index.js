@@ -40,9 +40,7 @@ export function TagsContainer({ contact }) {
 
     const loadTags = async () => {
         try {
-            const { data } = await api.get(`/tags/list`, 
-            {params: { kanban: 0}
-        });
+            const { data } = await api.get(`/tags/list`);
             setTags(data);
         } catch (err) {
             toastError(err);
@@ -88,10 +86,10 @@ export function TagsContainer({ contact }) {
         const red = Math.floor(Math.random() * 256); // Valor entre 0 e 255
         const green = Math.floor(Math.random() * 256); // Valor entre 0 e 255
         const blue = Math.floor(Math.random() * 256); // Valor entre 0 e 255
-      
+
         // Converter os componentes de cor em uma cor hexadecimal
         const hexColor = `#${red.toString(16).padStart(2, '0')}${green.toString(16).padStart(2, '0')}${blue.toString(16).padStart(2, '0')}`;
-      
+
         return hexColor;
     }
 

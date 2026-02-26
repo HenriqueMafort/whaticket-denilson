@@ -31,7 +31,7 @@ const ListService = async ({
 }: Request): Promise<Response> => {
   const whereCondition: any = { companyId };
 
-  if (kanban !== undefined && kanban !== null) {
+  if (kanban !== undefined && kanban !== null && kanban === 1) {
     whereCondition.kanban = kanban;
   }
 

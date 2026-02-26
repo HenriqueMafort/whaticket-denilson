@@ -24,8 +24,12 @@ const ListService = async ({
     };
   }
 
+  if (kanban === 1) {
+    whereCondition = { ...whereCondition, kanban };
+  }
+
   const tags = await Tag.findAll({
-    where: { ...whereCondition, companyId, kanban },
+    where: { ...whereCondition, companyId },
     order: [["name", "ASC"]],
     include: [
       {
