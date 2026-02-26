@@ -98,6 +98,16 @@ const CreateOrUpdateContactService = async ({
       logger.info(`[RDS-LID] Número com formato incorreto corrigido: ${number} -> ${cleanNumber}`);
     }
 
+    // ⚠️ SEGURANÇA: Se o número fornecido parecer ser um LID, e não temos um LID explícito,
+    // tratamos ele como LID. Não limpamos o campo 'number' se ele vir acompanhado de @lid 
+    // ou for muito longo, para evitar erros de banco (AllowNull: false), 
+    // mas priorizamos a busca pelo LID.
+    const isNumberLikelyLid = !isGroup && cleanNumber && cleanNumber.length > 15;
+    if (isNumberLikelyLid && !lid) {
+      lid = cleanNumber;
+      logger.info(`[RDS-LID] CreateOrUpdateContactService detectou LID no lugar do número. Mapeando LID: ${lid}`);
+    }
+
     // Monta um remoteJid padrão quando não for informado
     const fallbackRemoteJid = normalizeJid(
       remoteJid || (isGroup ? `${cleanNumber}@g.us` : `${cleanNumber}@s.whatsapp.net`)
